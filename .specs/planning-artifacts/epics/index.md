@@ -22,7 +22,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 | # | Epic | Status |
 | --- | --- | --- |
 | 1 | [Local environment and project skeleton](epic-01-local-environment.md) | approved |
-| 2 | App shell and design foundations | planned |
+| 2 | [App shell and design foundations](epic-02-app-shell.md) | approved |
 | 3 | Sign-in, Family and consent | planned |
 | 4 | Child Profile and Care Team | planned |
 | 5 | Goals and Goal Periods | planned |
