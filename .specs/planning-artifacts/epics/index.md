@@ -19,31 +19,31 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 
 ## Epic List
 
-| # | Epic | Status |
-| --- | --- | --- |
-| 1 | [Local environment and project skeleton](epic-01-local-environment.md) | approved |
-| 2 | [App shell and design foundations](epic-02-app-shell.md) | approved |
-| 3 | Sign-in, Family and consent | planned |
-| 4 | Child Profile and Care Team | planned |
-| 5 | Goals and Goal Periods | planned |
-| 6 | Strategies and Restrictions | planned |
-| 7 | Activity library and Prep card | planned |
-| 8 | Weekly Plan and Today | planned |
-| 9 | Practice session and Review | planned |
-| 10 | Offline practice | planned |
-| 11 | Log a moment and Observation history | planned |
-| 12 | Progress view (basic) | planned |
-| 13 | AI foundation and AI Coach Tips | planned |
-| 14 | Period Summary and sharing | planned |
-| 15 | Appointment Feedback | planned |
-| 16 | Reminders and notifications | planned |
-| 17 | Privacy controls | planned |
-| 18 | Document import: upload and masking (P2) | planned |
-| 19 | Document import: extraction and draft review (P2) | planned |
-| 20 | AI Activity suggestions (P2) | planned |
-| 21 | Guided mode (P2) | planned |
-| 22 | Inventory and tagged notes (P2) | planned |
-| 23 | Progress trends and AI descriptions (P2) | planned |
+| # | Epic | Status | Issue |
+| --- | --- | --- | --- |
+| 1 | [Local environment and project skeleton](epic-01-local-environment.md) | approved | [#2](https://github.com/yebbah/little-steps/issues/2) |
+| 2 | [App shell and design foundations](epic-02-app-shell.md) | approved | [#3](https://github.com/yebbah/little-steps/issues/3) |
+| 3 | Sign-in, Family and consent | planned | [#4](https://github.com/yebbah/little-steps/issues/4) |
+| 4 | Child Profile and Care Team | planned | [#5](https://github.com/yebbah/little-steps/issues/5) |
+| 5 | Goals and Goal Periods | planned | [#6](https://github.com/yebbah/little-steps/issues/6) |
+| 6 | Strategies and Restrictions | planned | [#7](https://github.com/yebbah/little-steps/issues/7) |
+| 7 | Activity library and Prep card | planned | [#8](https://github.com/yebbah/little-steps/issues/8) |
+| 8 | Weekly Plan and Today | planned | [#9](https://github.com/yebbah/little-steps/issues/9) |
+| 9 | Practice session and Review | planned | [#10](https://github.com/yebbah/little-steps/issues/10) |
+| 10 | Offline practice | planned | [#11](https://github.com/yebbah/little-steps/issues/11) |
+| 11 | Log a moment and Observation history | planned | [#12](https://github.com/yebbah/little-steps/issues/12) |
+| 12 | Progress view (basic) | planned | [#13](https://github.com/yebbah/little-steps/issues/13) |
+| 13 | AI foundation and AI Coach Tips | planned | [#14](https://github.com/yebbah/little-steps/issues/14) |
+| 14 | Period Summary and sharing | planned | [#15](https://github.com/yebbah/little-steps/issues/15) |
+| 15 | Appointment Feedback | planned | [#16](https://github.com/yebbah/little-steps/issues/16) |
+| 16 | Reminders and notifications | planned | [#17](https://github.com/yebbah/little-steps/issues/17) |
+| 17 | Privacy controls | planned | [#18](https://github.com/yebbah/little-steps/issues/18) |
+| 18 | Document import: upload and masking (P2) | planned | [#19](https://github.com/yebbah/little-steps/issues/19) |
+| 19 | Document import: extraction and draft review (P2) | planned | [#20](https://github.com/yebbah/little-steps/issues/20) |
+| 20 | AI Activity suggestions (P2) | planned | [#21](https://github.com/yebbah/little-steps/issues/21) |
+| 21 | Guided mode (P2) | planned | [#22](https://github.com/yebbah/little-steps/issues/22) |
+| 22 | Inventory and tagged notes (P2) | planned | [#23](https://github.com/yebbah/little-steps/issues/23) |
+| 23 | Progress trends and AI descriptions (P2) | planned | [#24](https://github.com/yebbah/little-steps/issues/24) |
 
 ### Epic 1: Local environment and project skeleton
 A developer can start and stop the whole product on a Mac with one command each. A skeleton app builds, boots and passes CI. Every commit is security-scanned, images are hardened, and the release-note tooling exists.
