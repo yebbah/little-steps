@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: little-steps</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.9em; background: rgba(120,113,108,0.10); padding: 1px 4px; border-radius: 3px; }
+  .fix-list { margin: 4px 0 0; padding-left: 20px; }
+  .fix-list li { margin-bottom: 3px; }
+  .severity-totals { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; font-size: 13px; color: var(--muted); align-items: center; }
+  .finding-note, .finding-location { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="report-header">
+      <div class="title">
+        <h1>little-steps — UX Design Validation Report</h1>
+        <div class="subtitle">{DESIGN.md, EXPERIENCE.md}</div>
+      </div>
+    </header>
+
+    <div class="synthesis">
+      <p><em>Findings were raised against the pre-fix draft; a fix pass is being applied in parallel.</em></p>
+      <p>The pair is a solid, buildable contract for the P1 core loop (Today → Prep → Practice → Review). Every color token has a hex value and a dark twin, the contrast claims check out (lowest text pairing is 5.29:1, outline-strong is at least 3.49:1), section shape is canonical, and the flat, no-guilt posture is applied consistently. The weak spots are outside that loop. Several P1 surfaces have an IA row but no visual or behavioural spec: the progress view, the Goal entry form, Strategy and Restriction entry, the Plan editor and Appointment Feedback. FR-10's pause, adapt, skip and second-Activity controls are missing from Practice. The PRD's caregiver-membership notifications conflict with the spine's "never notify about the other Caregiver" rule. And there is no rule for a Domain outside the six tinted ones. The rubric found no critical findings: story-dev can start on the core loop now, but its five high findings should be closed before those epics are written.</p>
+      <p>The accessibility review shifts that picture for the core loop itself. It confirms the text colour system (every token text pairing passes AA in both themes) and the behavioural floor, but rates the spec <strong>not ready to build</strong>: the mandatory masking review is drag-dependent and visual-only (the one critical finding across both reviewers), nav and Plan-row "now" states rely on colour alone, flat Mark buttons have no visible edge and reuse the Selected wash, dark-mode Practice lacks token parity, text fields and steppers have sub-3:1 edges, there is no semantic contract for custom components, iOS system text sizing is not honoured, and reflow breaks in the Prep footer and Review header. Several findings reinforce rubric items independently: the Mark/Selected overload, the missing scrim and dark sheet edge, the Status line fade, the unspecified progress view, and stale mock headers.</p>
+    </div>
+
+    <div class="severity-totals"><span>All reviewers:</span> <span class="badge badge-sev-critical">1 critical</span> <span class="badge badge-sev-high">12 high</span> <span class="badge badge-sev-medium">27 medium</span> <span class="badge badge-sev-low">20 low</span> <span>(rubric 0/5/15/10 · accessibility 1/7/12/10)</span></div>
+
+    <div class="dimension-summary">
+      <div class="dim-card">
+        <div class="dim-name">Flow coverage</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Token completeness</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Component coverage</div>
+        <div class="dim-verdict" style="color: var(--verdict-thin)">thin</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">State coverage</div>
+        <div class="dim-verdict" style="color: var(--verdict-thin)">thin</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Visual reference coverage</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Bloat &amp; overspecification</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Inheritance discipline</div>
+        <div class="dim-verdict" style="color: var(--verdict-adequate)">adequate</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-name">Shape fit</div>
+        <div class="dim-verdict" style="color: var(--verdict-strong)">strong</div>
+      </div>
+    </div>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Flow coverage</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Checked all five UJs (UJ-0 to UJ-4) and FR-1 to FR-18 against Key Flows, IA and Component Patterns. Every UJ has a flow with a clear protagonist role (illustrative composites, per the memlog privacy override), numbered steps and a bolded climax. Flows 0 and 1 have failure paths. Flows 2, 3 and 4 do not.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">FR-10 Practice controls missing</h3>
+              <span class="finding-location">EXPERIENCE.md › Component Patterns › Practice screen; Key Flows › Flow 1</span>
+            </header>
+            <div class="finding-note">The PRD requires pause, adapt (switch to a variation), skip an Activity, and stop, and says a Practice Session holds one or two Activities. The Practice screen offers only Marks, the timer, the Prep card link and Done, with no way to move to a second Activity.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add Pause, "Try a variation" and "Skip / next Activity" controls to the Practice screen row (quiet, non-gesture), define how a two-Activity Practice Session sequences into one Review, and add a matching DESIGN.md Components entry.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">P1 entry surfaces have IA rows but no component pattern</h3>
+              <span class="finding-location">EXPERIENCE.md › IA rows Add or import, Goal detail; Component Patterns</span>
+            </header>
+            <div class="finding-note">Story-dev would have to invent the forms: the manual Goal form (FR-4: fields, the "describe it as an observable behaviour" prompt, original wording kept beside a Caregiver edit), manual Strategy, Restriction and prescribed-Activity entry (FR-7), editing an Observation later with edit history (FR-14), and viewing or deleting an uploaded original (FR-5).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add Component Pattern rows for a Goal form, a Strategy/Restriction form, Observation edit (with a history affordance) and Original file (view/delete, retention note), each with a matching DESIGN.md Components line.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Flow 2 has no failure or edge path</h3>
+              <span class="finding-location">EXPERIENCE.md › Key Flows › Flow 2</span>
+            </header>
+            <div class="finding-note">UJ-2 names one: an OT report with no measurable criteria becomes a Narrative Goal. An unreadable photo or unavailable AI is also uncovered.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add "Failure: OT report with broad goals → saved as Narrative Goals; unreadable photo or AI unavailable → manual-entry route stays open."</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Flows 3 and 4 have no failure paths</h3>
+              <span class="finding-location">EXPERIENCE.md › Key Flows › Flow 3, Flow 4</span>
+            </header>
+            <div class="finding-note">Neither flow covers what happens when its happy path breaks.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Flow 3: invite expired, or consent not given → the account can't be used, with plain copy. Flow 4: a Goal under 5 Observations shows "limited data", and with no share sheet the fallback is PDF download.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Flow 1 climax drifts from UJ-1; Guided mode absent</h3>
+              <span class="finding-location">EXPERIENCE.md › Key Flows › Flow 1</span>
+            </header>
+            <div class="finding-note">The Flow 1 climax ("Review saved") replaces UJ-1's in-Activity climax (the child settles and the parent had a workable next step), and Guided mode (UJ-1's Alternative) appears in no flow.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Make step 4 the climax, or note that the UJ climax maps to step 4. Add a one-line Guided-mode alternative.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Token completeness</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Checked every key under <code>colors</code>, <code>typography</code>, <code>rounded</code>, <code>spacing</code> and <code>components</code>, plus every <code>{path}</code> reference in the prose and component objects of both files. All 29 light colors have a hex value and a <code>-dark</code> twin. Recomputed contrast claims hold: ink-soft on lilac 5.29, parent-proposed on honey-soft 5.29, outline-strong on card 3.73 and on floor 3.49, dark outline-strong on dark card 3.67. <code>{colors.focus-ring}</code> and <code>{spacing.content-max}</code> in EXPERIENCE.md resolve.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No scrim token</h3>
+              <span class="finding-location">DESIGN.md › Elevation &amp; Depth; frontmatter <code>colors</code></span>
+            </header>
+            <div class="finding-note">Elevation &amp; Depth makes "a dim scrim, not a shadow" the only separation for sheets and dialogs, but no scrim token exists.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>scrim</code> and <code>scrim-dark</code> (hex plus opacity) and reference them from <code>coach-tip-sheet</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title"><code>{colors.domain-*}</code> wildcard cannot be resolved</h3>
+              <span class="finding-location">DESIGN.md frontmatter <code>components</code> (<code>hero-band.background</code>, <code>cue-tile.background</code>)</span>
+            </header>
+            <div class="finding-note">No resolver can flatten the wildcard reference.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State the binding rule explicitly (e.g. <code>background: '{colors.domain-&lt;activity.domain&gt;}'</code> plus a note) and pair it with the Domain fallback in Inheritance discipline.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Visual states named in EXPERIENCE.md have no tokens</h3>
+              <span class="finding-location">EXPERIENCE.md › State Patterns; Component Patterns › Masking review, Destructive confirm</span>
+            </header>
+            <div class="finding-note">The uncertain-field highlight ("Please check this."), the masking cover block, the danger button fill or foreground (unclear whether <code>danger</code> is text or fill), and the offline line or deletion banner have no tokens.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add <code>attention</code>/<code>attention-soft</code> (non-traffic-light) and <code>mask-cover</code> tokens with dark twins, plus <code>danger-foreground</code>, and state how <code>danger</code> is applied.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Selected wash overloaded on Mark buttons</h3>
+              <span class="finding-location">DESIGN.md › Components › Practice screen; frontmatter <code>mark-button</code></span>
+            </header>
+            <div class="finding-note"><code>mark-button.background</code> is <code>{colors.selected}</code>, the same token that means "selected" on choice chips. At rest, Mark buttons look selected, and their boundary is 1.10:1 against floor (1.42:1 dark) with no outline.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Give Mark buttons their own token (e.g. <code>mark</code> / <code>mark-dark</code>) distinct from <code>selected</code>, and record the WCAG 1.4.11 rationale: the text label identifies the control, and flat with no outline is the PO's choice.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Off-scale literal values</h3>
+              <span class="finding-location">DESIGN.md frontmatter; Layout &amp; Spacing; EXPERIENCE.md › Responsive &amp; Platform</span>
+            </header>
+            <div class="finding-note"><code>block-card.padding: 14px</code>, <code>hero-band.padding: 16px 20px 22px</code>, <code>plan-row.radius: 18px</code> (not in <code>rounded</code>), <code>cue-number.size: 44px</code>, <code>ai-label.border: 1px</code> (should be <code>{spacing.outline-width}</code>), the "24–28px" group gap and "560px" sheet width. <code>rounded.sm</code> is never used.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Snap these to scale tokens or add named tokens, and drop or assign <code>rounded.sm</code>.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details open>
+        <summary>
+          <h2>Component coverage</h2>
+          <span class="verdict-pill verdict-thin">thin</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Checked 20 DESIGN.md frontmatter components and the prose Components against 20 EXPERIENCE.md Component Pattern rows. The core-loop components (Today card, Prep card, Mark button, Coach Tip sheet, Review form, Choice chips, Stepper, Status line, Source badge, AI label) have both visual and behavioural specs. Coverage beyond the loop is thin.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Progress view (FR-16) has no spec in either spine</h3>
+              <span class="finding-location">EXPERIENCE.md › IA › Goal detail; DESIGN.md › Components</span>
+            </header>
+            <div class="finding-note">It holds the three separate measures, the Observation count, attention duration "never as a target", AI descriptions that cite Observations, and lineage back through revised Goals. It is the UJ-3 climax and feeds the Summary.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a Progress view row to both spines covering the chart or list form per Criterion type, how the three measures are separated, attribution of who logged each Observation, AI-label placement, and the visual rule against traffic lights or percentages.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">EXPERIENCE.md components with no DESIGN.md visual spec</h3>
+              <span class="finding-location">DESIGN.md › Components</span>
+            </header>
+            <div class="finding-note">The Log a moment sheet (only the button is specified), Masking review, Draft review, Confirm-to-share, Destructive confirm, Nudge and Timer.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add one visual line each (surface, radius, tokens, state appearance).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Surfaces with no component in either spine</h3>
+              <span class="finding-location">EXPERIENCE.md › IA</span>
+            </header>
+            <div class="finding-note">The Plan editor (FR-13: accept or edit, item count, days and Contexts, weekly availability, week start), the Appointment Feedback form (FR-18), the Summary preview or builder, the consent cards, Goal rows and grouping in Goals, Activity library rows (favourite and hide) and the Inventory entry (FR-15, P2).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add behavioural rows, and visual lines where the spine is the only spec.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Component names drift between files</h3>
+              <span class="finding-location">DESIGN.md › Components; EXPERIENCE.md › Component Patterns</span>
+            </header>
+            <div class="finding-note">"Plan strip" (EXPERIENCE.md) vs "Plan rows" and "This week" (DESIGN.md) vs <code>plan-row</code>; "Helpful toggle" vs "Helpful toggle chip"; "Badges and labels" / "Source badges" vs "Source badge".</div>
+            <div class="finding-fix"><strong>Fix:</strong> Pick one name per component and use it in both files and the frontmatter.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Stepper and Choice chips rows incomplete</h3>
+              <span class="finding-location">EXPERIENCE.md › Component Patterns › Stepper vs Review form; Choice chips</span>
+            </header>
+            <div class="finding-note">The Stepper row says it "shows 'X of Y' as two steppers", but attention minutes uses a single stepper. The Choice chips row omits who-modelled and the multi-select "Which cue or tip helped?" variant.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Cover both the single and paired stepper modes, and list the multi-select chip variant.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details open>
+        <summary>
+          <h2>State coverage</h2>
+          <span class="verdict-pill verdict-thin">thin</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Checked each of the 19 IA surfaces against empty, cold-load, focus, error, offline and permission-denied states. Offline, AI-slow, Restriction-blocked, limited data, narrative, retired, not attempted, deletion pending and removed Caregiver are well covered. Focus is covered globally (Accessibility Floor).</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Caregiver-membership notifications unspecified and contradicted</h3>
+              <span class="finding-location">EXPERIENCE.md › Notifications; State Patterns</span>
+            </header>
+            <div class="finding-note">FR-1 says "the remaining Caregivers are notified" when a Caregiver is removed, and PRD §5 says Family deletion "notifies the other Caregivers". The spine's Notifications section says "Never: notifications about the other Caregiver's activity" with no carve-out, and no surface shows how these notices arrive.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Carve out membership and deletion events (they are security notices, not activity), and specify the channel (in-app banner on Today, plus email via the invite mail path) and the copy.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No loading or cold-load pattern</h3>
+              <span class="finding-location">EXPERIENCE.md › State Patterns</span>
+            </header>
+            <div class="finding-note">Today on a cold open, Summary draft generation, import OCR and extraction progress, and Prep card fetch have no loading treatment.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a loading row (a skeleton or <code>meta</code> line, no spinners that read as waiting on AI for curated content).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Permission and consent states missing</h3>
+              <span class="finding-location">EXPERIENCE.md › State Patterns; Privacy &amp; Consent Surfaces</span>
+            </header>
+            <div class="finding-note">Camera permission denied for Photo import, push permission declined, consent not given (FR-1: "the account cannot be used"), and an invite link that is invalid or expired.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a row for each with copy and the route forward.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">No non-offline error state</h3>
+              <span class="finding-location">EXPERIENCE.md › State Patterns</span>
+            </header>
+            <div class="finding-note">A Save rejected by the server, an expired OIDC session mid-Review, or a failed upload has no treatment. "No error dialogs" is stated only for sync.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a generic recoverable-error row (the draft is kept, re-auth returns to the same Review) in the Voice and Tone style.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Empty states missing</h3>
+              <span class="finding-location">EXPERIENCE.md › State Patterns</span>
+            </header>
+            <div class="finding-note">Goals (none yet), Activities (no favourites, everything hidden, or every AI suggestion silently blocked by Restrictions, leaving an empty list with no message), Share (no Summaries yet), and a Summary for a Goal Period with zero Observations.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add empty-state rows. For all-blocked suggestions, show a neutral "No new ideas right now" without revealing the Restriction.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Abandoned open Practice Session has no resolution</h3>
+              <span class="finding-location">EXPERIENCE.md › Component Patterns › Practice screen; Accessibility Floor › Time limits</span>
+            </header>
+            <div class="finding-note">The Practice Session "never times out" and reopening returns to Practice, but nothing says what happens the next day. WebKit storage eviction for offline drafts (addendum §B) is not reflected.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Define when a stale open Practice Session prompts for Review or a neutral close, and note prompt sync for queued Observations.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Visual reference coverage</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Checked all six files in <code>mockups/</code> (direction-playroom, key-index, key-today, key-prep, key-practice, key-review). None is orphaned: DESIGN.md › Brand &amp; Style links all six and names each, EXPERIENCE.md › IA links the four key screens, and "spine wins on conflict" is stated, with the chip-fill conflict named as an example.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Mocks linked in one block, not inline</h3>
+              <span class="finding-location">DESIGN.md › Components › Today screen, Prep card, Practice screen, Review form</span>
+            </header>
+            <div class="finding-note">The mocks are linked from Brand &amp; Style and IA, not at the Components or Component Patterns entries they illustrate.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a one-line "→ mockups/key-*.html" under each matching component.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Mock header comments describe superseded spine content</h3>
+              <span class="finding-location">mockups/key-*.html headers</span>
+            </header>
+            <div class="finding-note">Headers claiming to list "GOVERNING SPINE SECTIONS" mention block shadows on icon tiles and Cue numbers, a "2px action outline, block shadow" on Mark buttons, and periwinkle-filled selected chips. They cite the removed <code>.working/direction-playroom.html</code> and keep <code>--block-shadow</code> / <code>--tile-shadow-*</code> variables. The Review mock's who-modelled options differ ("Caregiver" vs the spine's "You · Another caregiver"). Spine-wins covers this, so impact is low.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Refresh the mock headers, or add one sentence to the spine's reference note saying mock header comments are historical.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Bloat &amp; overspecification</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Checked pixel restatement, source restatement and section usefulness. Both files are tight. DESIGN.md prose keeps an editorial voice tied to decisions, and EXPERIENCE.md is mostly tables and rules.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Review form row is one dense paragraph</h3>
+              <span class="finding-location">EXPERIENCE.md › Component Patterns › Review form</span>
+            </header>
+            <div class="finding-note">It carries about eight fields, options, defaults and pre-fill rules in a single paragraph.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Split it into a sub-table (Field · Control · Options · Default/pre-fill source · Required).</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Inheritance discipline</h2>
+          <span class="verdict-pill verdict-adequate">adequate</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Checked that <code>sources</code> paths resolve (<code>../../prds/prd-little-steps-2026-11-05/prd.md</code> and <code>addendum.md</code>). UJ and FR IDs are cited throughout. Glossary terms (Prompt Level list, Context values, Review Status, Status Vocabulary, Mark names, "Not attempted / child not available") are verbatim. EXPERIENCE.md token references resolve to DESIGN.md.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">Fixed six-Domain tint set vs open-ended PRD Domain</h3>
+              <span class="finding-location">DESIGN.md › Colors › Domain tints; EXPERIENCE.md › Component Patterns › Domain tint</span>
+            </header>
+            <div class="finding-note">PRD §3 lists joint attention, play, imitation, understanding language and fine motor as examples, §2 names sensory, and L-3 adds oral-motor. Imports extract a free-text domain (UJ-2 step 3). Nothing says how "understanding language" or "fine motor" maps to a tint, or what an unmapped Domain gets.</div>
+            <div class="finding-fix"><strong>Fix:</strong> State whether Domain is a fixed enum (and list how PRD example Domains map to it), or define a mapping rule plus a neutral fallback tint (e.g. a <code>domain-other</code> token with a dark twin). Feed the answer back to the PRD glossary if it becomes an enum.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">FR-17 date-range option dropped</h3>
+              <span class="finding-location">EXPERIENCE.md › IA › Summary builder; Flow 4 step 1</span>
+            </header>
+            <div class="finding-note">FR-17 allows a Summary for "either a date range or a Goal Period", but the Summary builder offers only the Goal Period.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a date-range option to the builder.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">Two-tap rule contradicted by the IA</h3>
+              <span class="finding-location">EXPERIENCE.md › IA › Rules</span>
+            </header>
+            <div class="finding-note">"Every surface can be reached in two taps or fewer from Today, except Settings sub-pages", yet Appointment Feedback (Share → Summary → After the appointment) and New Goal Period (Goals → Care Team Member → New period) take three.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Widen the exception, or add shortcuts (e.g. an "After the appointment" entry on the Summaries list).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">"Goal Domain" vs glossary "Domain"; paraphrased flow titles</h3>
+              <span class="finding-location">DESIGN.md › Colors; EXPERIENCE.md › Key Flows</span>
+            </header>
+            <div class="finding-note">The files use "Goal Domain", but the glossary term is "Domain". Flow titles paraphrase the UJ names (IDs are present, so they stay traceable).</div>
+            <div class="finding-fix"><strong>Fix:</strong> Use "Domain", and optionally quote the UJ title after the ID.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">Status line animation contradicts across spines</h3>
+              <span class="finding-location">DESIGN.md › Components › Status line; EXPERIENCE.md › Component Patterns › Status line</span>
+            </header>
+            <div class="finding-note">DESIGN.md says "no toast animation"; EXPERIENCE.md says it "fades after about 4 seconds", and the fade has no Reduce Motion rule.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Either drop the fade or define it as an opacity change that Reduce Motion skips.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary>
+          <h2>Shape fit</h2>
+          <span class="verdict-pill verdict-strong">strong</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>DESIGN.md sections run in canonical order (Brand &amp; Style → Colors → Typography → Layout &amp; Spacing → Elevation &amp; Depth → Shapes → Components → Do's and Don'ts). EXPERIENCE.md has every required default. Responsive &amp; Platform is present and triggered by the multi-surface design. Inspiration &amp; Anti-patterns is present and justified by the PRD guardrails, although there are no references. The invented sections, Notifications (FR-13) and Privacy &amp; Consent Surfaces (§5, FR-1, FR-5, FR-17), earn their place.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">DESIGN.md Components organised by screen, frontmatter by component</h3>
+              <span class="finding-location">DESIGN.md › Components</span>
+            </header>
+            <div class="finding-note">The prose mixes composition with component specs, while the frontmatter is keyed by component (<code>hero-band</code>, <code>cue-tile</code>, …). Mapping prose to tokens takes inference.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Keep the screen groupings, but put the frontmatter key in each bullet (e.g. "Hero band (<code>hero-band</code>)").</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details>
+        <summary>
+          <h2>Accessibility review</h2>
+          <span class="reviewer-source">review-accessibility.md</span>
+        </summary>
+        <div class="dim-body">
+          <div class="dim-judgment">
+            <p>Reviewed DESIGN.md, EXPERIENCE.md and all six mocks against WCAG 2.1 AA (PRD §6) and practical caregiver use: phone, one hand, tired, evening (likely dark mode), any browser. Every contrast ratio was computed from the hex tokens. Where a mock differs from a spine the spine wins, but mock divergences are still flagged because builders copy mocks.</p>
+            <p><strong>Not ready to build yet. The text colour system is solid, but the component and interaction layer needs fixes.</strong> Text contrast is strong: every text/background pairing passes AA in light and dark (lowest 5.29:1). The behavioural floor is also good: no time limits, gestures never the only way to act, a visible Close on sheets, 200% text scaling, Reduce Motion, and "never colour alone" as a principle.</p>
+            <p>What blocks build: (1) the mandatory masking review relies on dragging and on vision only; (2) nav active state and Plan-row "now" state are shown by colour alone; (3) flat Mark buttons and dark-mode Practice have no visible boundary or token parity; (4) text fields and steppers have edges below 3:1 in the mocks, and the text field has no token; (5) there is no semantic contract for custom components, and the mocks model incorrect ARIA; (6) system text sizing is not honoured on iOS; (7) reflow fails in the Prep footer and the Review header.</p>
+            <p>What's already good: every token text pairing passes AA in both themes; <code>outline-strong</code> is ≥3:1 for interactive controls (the spec is right; the mocks drift); no time limits and a draft Review survives Back; gestures are never the only route except masking; touch targets ≥48px, buttons 52px, Marks 72px, primary action in the lower third; the banned list (streaks, confetti, countdowns, autoplay) removes most motion and anxiety risk; plain, warm, non-judgemental voice; Domain tints always paired with a text label. The full contrast table lives in <code>review-accessibility.md</code>.</p>
+          </div>
+        </div>
+        <div class="findings-list">
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-critical">critical</span>
+              <h3 class="finding-title">C1. The masking review is drag-dependent and visual-only</h3>
+              <span class="finding-location">EXPERIENCE.md › Component Patterns › Masking review; Privacy &amp; Consent</span>
+            </header>
+            <div class="finding-note">WCAG 2.5.1 Pointer Gestures (A), 2.1.1 Keyboard (A), 1.1.1 Non-text Content (A). Adding a cover needs a drag, and the screen is a picture of the page. A keyboard user, switch user, or a caregiver with a tremor or one free hand cannot add a cover. A screen-reader user cannot check what is covered. Because this is the gate before data goes to AI, the failure either blocks import or lets identifiers through.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Pair the image with a <strong>text list of detected lines/identifiers</strong>. Each row is a checkbox ("Covered: clinic letterhead, line 1"), reachable by Tab and toggled with Space.</li><li>Add a single-pointer <strong>"Cover more"</strong> mode: tap a line or block to cover it, or tap two corners to define a box. On keyboard, a focused box moves with arrow keys and resizes with Shift+arrows.</li><li>Keep drag as a shortcut, not the only route.</li><li>Announce the count: "3 items covered."</li><li>Make <strong>"Looks right"</strong> state what will be sent ("Send 1 page with 3 items covered").</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H1. Nav and rail active destination is shown by colour only</h3>
+              <span class="finding-location">DESIGN.md › components.bottom-nav; mocks key-today, key-review <code>.nav a.on</code></span>
+            </header>
+            <div class="finding-note">WCAG 1.4.1 Use of Color (A). Active and inactive labels differ only by colour: indigo #33457F vs ink-soft #555A66 is <strong>1.32:1</strong> in light; in dark, #A9B8EC vs #AEB3C0 is <strong>1.07:1</strong>, so the states are practically identical. Without a non-colour cue the difference would need to be at least 3:1.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Add a shape indicator: a 32×4px <code>action</code> bar under the icon (9.14:1 on card, 7.85:1 dark), or a <code>selected</code> pill behind the icon <em>plus</em> the bar.</li><li>Set the active label to weight 800 and inactive to 600.</li><li>Keep <code>aria-current="page"</code>. Apply the same treatment to the tablet/laptop left rail.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H2. Dark-mode parity breaks on Practice, the most-used evening screen</h3>
+              <span class="finding-location">key-practice.html <code>.mark</code>, <code>.tip</code> (hard-coded); DESIGN.md has no tip-surface token; no dark Practice mock</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.3 Contrast (AA), 1.4.11 Non-text Contrast (AA). In dark mode the hard-coded Mark wash would sit under <code>ink-dark</code> text at <strong>1.03:1</strong>, which makes the text invisible. The tip surface #F4F2EE has no <code>-dark</code> twin. Practice is used in the evening, on a phone that is probably in dark mode.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Mark buttons use <code>selected</code> / <code>selected-dark</code> (#2C3350; ink-dark on it is 10.86:1).</li><li>Add <code>tip-surface: '#F4F2EE'</code> (ink 13.70:1, ink-soft 6.18:1) and <code>tip-surface-dark: '#2A2D36'</code> (ink-dark 12.06:1, ink-soft-dark 6.55:1).</li><li>Add a dark Practice and Coach Tip mock. Add a lint rule: no raw hex in component CSS.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H3. Flat Mark buttons have no visible edge and reuse the "Selected" colour for an unselected action</h3>
+              <span class="finding-location">DESIGN.md › components.mark-button; Practice screen</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.11 (practical: the text label technically identifies the control), 1.4.1, 3.2.4 Consistent Identification. The Mark fill against the floor is <strong>1.10:1</strong> light and <strong>1.42:1</strong> dark; with no outline the 72px target edge cannot be seen at a glance, in dim light, or with low vision. The same <code>selected</code> wash means "chosen" on Review chips, so all four Marks look already selected. There is no visual "saved" feedback after a tap; the only feedback is the sheet opening.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Give Marks <code>1px solid outline-strong</code>: 3.49:1 on floor and 3.16:1 on the wash in light; 4.21:1 on floor in dark. Or use <code>card</code> fill + outline-strong (3.73:1), and keep <code>selected</code> for chosen states only.</li><li>Make the pressed state darken to <code>outline-strong</code> with a 2px <code>action</code> border for about 300ms (instant under Reduce Motion).</li><li>The sheet's "Mark saved: …" line stays as the textual confirmation.</li><li>Keep "flat": an outline is not a shadow.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H4. No semantic contract for custom components, and the mocks model wrong ARIA</h3>
+              <span class="finding-location">EXPERIENCE.md › Accessibility Floor; mocks (chips, Marks, stepper, Helpful toggle, disclosure, Plan rows)</span>
+            </header>
+            <div class="finding-note">WCAG 4.1.2 Name, Role, Value (A), 1.3.1 (A), 2.4.6 (AA). The Floor only says "name, role, state". In the mocks, chips are <code>&lt;span&gt;</code> inside <code>role="radiogroup"</code> with no <code>role="radio"</code>; Marks and buttons are <code>&lt;a href="#"&gt;</code>; the stepper value is a non-focusable <code>&lt;span role="spinbutton"&gt;</code> with no min/max/valuetext; the Helpful <code>role="switch"</code> spans are not focusable and all share the name "Helpful"; "If it gets hard" is an <code>&lt;a&gt;</code> with <code>aria-expanded</code>; Plan rows are not interactive elements. Builders will copy the mock markup.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Add a required-semantics table to the Accessibility Floor:</li><li><strong>Mark:</strong> native <code>&lt;button&gt;</code>; name = label; after a tap the sheet's accessible description reads "Mark saved: Losing attention".</li><li><strong>Single-select chips:</strong> native <code>&lt;input type="radio"&gt;</code> group in <code>&lt;fieldset&gt;&lt;legend&gt;</code>; arrow keys move the selection.</li><li><strong>Multi-select chips</strong> ("Which cue or tip helped?"): native checkboxes in a fieldset.</li><li><strong>Helpful toggle:</strong> <code>&lt;button aria-pressed&gt;</code> named "Helpful", with <code>aria-describedby</code> pointing to the tip text so each toggle is distinct.</li><li><strong>Stepper:</strong> native <code>&lt;input type="number" inputmode="numeric"&gt;</code> with a visible <code>&lt;label&gt;</code>, plus "−"/"+" buttons named "Fewer minutes" / "More minutes". "X of Y" is a fieldset with legend "Trials" and inputs labelled "Succeeded" / "Tried".</li><li><strong>Disclosure</strong> ("If it gets hard"): <code>&lt;button aria-expanded aria-controls&gt;</code>.</li><li><strong>Sheets and dialogs:</strong> <code>role="dialog" aria-modal="true"</code>, <code>aria-labelledby</code> = sheet heading, focus trapped, focus returned to the invoker.</li><li><strong>Status line:</strong> a persistent <code>role="status"</code> container rendered empty at page load, with text injected later.</li><li><strong>Timer:</strong> plain text, <em>not</em> <code>role="timer"</code> live, <code>aria-live="off"</code>, labelled "Time so far".</li><li><strong>Plan row:</strong> one <code>&lt;a&gt;</code> or <code>&lt;button&gt;</code> per row whose name includes day, Activity, Domain and status.</li><li><strong>Today card:</strong> <code>&lt;article&gt;</code> with a heading; Prep is the only primary button.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H5. Text field and stepper boundaries are below 3:1, and the text field has no token</h3>
+              <span class="finding-location">DESIGN.md (no <code>text-field</code> component); key-review.html <code>.note</code>, <code>.stepper</code></span>
+            </header>
+            <div class="finding-note">WCAG 1.4.11 (AA). The mocks use <code>outline</code> #D9DCE6 = <strong>1.37:1</strong> on card and <strong>1.28:1</strong> on floor (1.35/1.55 dark); the stepper's internal dividers are also <code>outline</code>. An empty note field can only be identified by its boundary. The placeholder is not a label.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Add <code>text-field: { background: card, border: '1px solid {colors.outline-strong}', radius: md, minHeight: 48px }</code> (3.73:1 light, 3.67:1 dark), focus at 2px <code>focus-ring</code>.</li><li>Steppers and their dividers use <code>outline-strong</code> as the spine already says.</li><li>Give the note field a real <code>&lt;label for&gt;</code>.</li><li>Correct the mock CSS and the mock header note that calls the neutral outline "decorative only".</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H6. System text size isn't honoured on iOS, and the mocks pin the root font size</h3>
+              <span class="finding-location">DESIGN.md › Typography; every mock <code>html{font-size:16px}</code></span>
+            </header>
+            <div class="finding-note">WCAG 1.4.4 Resize Text (AA); PRD §6 "support for system text sizing". rem follows the <em>browser's</em> default size, not iOS Dynamic Type. Safari, and every iOS browser because they all use WebKit, ignores the OS text-size setting unless the root uses <code>font: -apple-system-body</code>. A px root size also overrides users' browser font-size settings on desktop and Android.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Never set <code>html{font-size}</code> in px.</li><li>Use <code>html{font:-apple-system-body}</code> inside <code>@supports (font: -apple-system-body)</code> with a <code>100%</code> fallback, and scale the type tokens from that base.</li><li>Test with iOS Larger Text at maximum, Android font scale 200%, and Chrome or Firefox minimum/default font size.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-high">high</span>
+              <h3 class="finding-title">H7. Reflow breaks at 320 CSS px and at 200% text</h3>
+              <span class="finding-location">key-prep.html <code>.footer .btn</code>; key-review.html <code>.rtop</code>, <code>.field.inline</code>; pinned footer + bottom nav in landscape</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.10 Reflow (AA), 1.4.4 (AA). The Prep footer ("Start (optional timer)" and "Log review" side by side, <code>nowrap</code>) truncates or overflows at 320px, or at 200% from about 360px, contradicting "no control truncates". "‹ Back" and "Not attempted / child not available" share one row. At 200% text in landscape, the pinned footer, bottom nav and status bar can take more than 50% of the viewport and hide the focused field.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>The footer stacks vertically (primary on the bottom, nearest the thumb) when the container is under about 400px or text scale is above 130% (container queries). Allow labels to wrap.</li><li>Move "Not attempted…" onto its own full-width quiet row under the title.</li><li>The inline stepper field wraps to label-above.</li><li>In landscape, or when viewport height is under 500px, make the footer and nav non-sticky.</li><li>Set <code>scroll-padding-bottom</code> equal to the footer height so focused fields aren't hidden.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M1. Focus indicator geometry unspecified; the ring matches the primary button fill</h3>
+              <span class="finding-location">DESIGN.md <code>focus-ring</code> = <code>action</code>; EXPERIENCE.md Keyboard</span>
+            </header>
+            <div class="finding-note">WCAG 2.4.7 (AA), 1.4.11. On a primary button the ring against the button is 1.0:1. It only works if offset so it sits on floor or card. Measured ring contrasts otherwise pass everywhere (floor 8.55, card 9.14, Domain tints 7.00–7.45, selected 7.75; dark 9.00 / 7.85 / 6.34).</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Specify <code>outline: 2px solid focus-ring; outline-offset: 2px</code> on all controls, using <code>:focus-visible</code>.</li><li>Never use <code>outline:none</code> without a replacement. For Windows High Contrast and forced-colors mode, keep a real <code>outline</code> (not a box-shadow ring).</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M2. Focus management for sheets and route changes not specified</h3>
+              <span class="finding-location">EXPERIENCE.md › Accessibility Floor</span>
+            </header>
+            <div class="finding-note">WCAG 2.4.3 (A), 2.4.2 (A), 2.1.2 (A). The Floor only says the Coach Tip sheet moves focus to its first tip.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>When a sheet opens, focus goes to the sheet heading (<code>tabindex="-1"</code>), not to a <code>&lt;p&gt;</code> as the mock shows.</li><li>Trap focus inside the sheet. On close, return focus to the Mark that opened it.</li><li>On an SPA route change, update <code>document.title</code> ("Prep: Storybook together · LittleSteps") and move focus to the <code>&lt;h1&gt;</code>.</li><li>Restore scroll and focus position on Back. When Done goes to Review, focus "How did it go?".</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M3. Status messages can be missed or collide</h3>
+              <span class="finding-location">Status line; Mark announcement vs sheet focus; AI tips; offline line</span>
+            </header>
+            <div class="finding-note">WCAG 4.1.3 Status Messages (AA), 2.2.1 (spirit). A 4s fade is too short for magnifier users or someone glancing back after settling a child. Moving focus into the sheet interrupts the live "Mark saved" announcement. Late AI tips that insert content can shift the target under the thumb.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>The status line stays until the next user action or navigation (no time-based fade).</li><li>The "Mark saved: …" line is the sheet's <code>aria-describedby</code>, announced with the dialog name, not as a separate live region.</li><li>AI tips are added <em>below</em> the curated ones; reserve their space with a "More ideas are on the way" line and announce politely: "1 more idea added."</li><li>Offline and sync lines use <code>role="status"</code>.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M4. Dark-mode sheet edge disappears (flat, no shadow)</h3>
+              <span class="finding-location">DESIGN.md › Elevation</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.11 (practical), dark parity. <code>card-dark</code> #22252D against the scrimmed dark floor is <strong>1.15–1.29:1</strong>, so the top of the Coach Tip sheet is invisible. In light it is 3.06:1, which is fine.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a <code>1px solid outline-strong-dark</code> top and side border on sheets and dialogs in dark mode (about 4.6:1 against the scrimmed floor), or a raised <code>sheet-dark: '#2A2D36'</code> surface plus that border. Keep the grabber at <code>outline-strong-dark</code>.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M5. Flat cards and tappable rows have weak edges</h3>
+              <span class="finding-location">card / plan-row / block-card on floor; "If it gets hard"; hero band</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.11 (practical), 3.2.4. <code>outline</code> is 1.28:1 light / 1.55:1 dark on floor; card vs floor fill is 1.07 / 1.15; "If it gets hard" uses dashed <code>outline</code> at 1.37:1; hero band vs floor is 1.18. Decorative cards are fine, but <strong>Plan rows, the Today card and "If it gets hard" are interactive</strong>, and their extent is barely visible in glare or for low-vision users.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Interactive cards and rows use <code>outline-strong</code> (3.49 floor / 4.21 dark) or a new <code>outline-interactive: '#8E94A4'</code> (3.03 card / 2.84 floor; take outline-strong if ≥3 on floor is needed). Add a trailing chevron.</li><li>Purely decorative cards may stay on <code>outline</code>, or darken it to <code>#B4B9C6</code> (1.84 on floor).</li><li>"If it gets hard" uses a dashed <code>outline-strong</code>.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M6. Plan-row "now" is shown by colour only</h3>
+              <span class="finding-location">key-review / key-today <code>.plan li.now</code></span>
+            </header>
+            <div class="finding-note">WCAG 1.4.1. The current row differs only by an <code>action</code> border and an indigo day label.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a text tag "Next" or "Today" (meta, ink) and a 2px <code>action</code> border. Keep <code>aria-current="true"</code> and include "next up" in the accessible name.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M7. Selected chip: the mock drops the check glyph and uses a Domain tint</h3>
+              <span class="finding-location">mocks <code>.chip.sel</code>; spec: <code>selected</code> wash, <code>action</code> border, check glyph, bold</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.1, 1.4.11. The mock has no glyph and unselected chips use <code>outline</code> (1.37). Selected and unselected borders (action vs outline-strong) differ by only <strong>2.45:1</strong> (2.14:1 dark), and fills by 1.18, so without the glyph the state is effectively colour-only.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Make the glyph mandatory (ink on selected 12.99 / 10.86).</li><li>Selected border 2px <code>action</code>, unselected 1px <code>outline-strong</code>, with a padding adjustment so the label doesn't jump.</li><li>Fix the mocks and the "Mark: Losing attention" chip on Review.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M8. No recovery from one-tap mistakes</h3>
+              <span class="finding-location">"Not attempted" on Review; Marks; "Not this one"</span>
+            </header>
+            <div class="finding-note">WCAG 3.3.4 (spirit), cognitive. "Not attempted" is a one-tap save at the top of Review that discards the pre-filled Review; a wrong Mark has no undo.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Each status line carries an <strong>Undo</strong> button: "That's okay — logged as not today. Undo", "Mark saved: Upset. Undo".</li><li>The Undo stays until the next action, with no time limit.</li><li>The 10-second Mark dedupe tells the user what happened ("Already marked" in the sheet), not a silent ignore.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M9. Clinical jargon and form length on Review</h3>
+              <span class="finding-location">Review › Prompt Level chips; 7+ fields against a 20-second target</span>
+            </header>
+            <div class="finding-note">WCAG 3.3.2 (A), cognitive. "Full physical / Partial physical / Model / Gestural / Verbal / Independent" are therapist terms with no gloss.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Keep the therapist's terms, and add a one-line plain gloss under each option in <code>meta</code> (e.g. "Model — you showed how", "Gestural — you pointed or nodded").</li><li>Collapse the pre-filled defaults into a summary ("Reading · One-to-one · Model — Change") so a typical Review is just Save.</li><li>Announce the pre-filled state ("pre-filled from last time").</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M10. Draft review: the disabled Confirm button is unexplained</h3>
+              <span class="finding-location">EXPERIENCE.md › State Patterns › Uncertain extraction</span>
+            </header>
+            <div class="finding-note">WCAG 3.3.1 (A), 1.4.1. <code>ink-disabled</code> is 2.38:1, which is exempt, but users don't learn <em>why</em> the button is disabled.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Keep Confirm enabled. On press, move focus to the first unchecked field with "Please check this (2 left)".</li><li>The highlight uses a text tag plus an icon plus a 2px <code>parent-proposed</code> border (≥3:1), not a tint alone.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M11. Goal detail progress charts have no accessibility spec</h3>
+              <span class="finding-location">EXPERIENCE.md › IA › Goal detail</span>
+            </header>
+            <div class="finding-note">WCAG 1.1.1, 1.4.1, 1.4.11. The "three separate measures" have no non-visual or non-hue treatment.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Give each chart a text summary in the spec's honest-data voice, and offer a "Show as table" toggle.</li><li>Distinguish series by label and marker shape, not hue.</li><li>Lines and markers ≥3:1 against the card: use <code>action</code> / <code>ink-soft</code> / <code>care-team</code>, never Domain tints (about 1.2:1).</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-medium">medium</span>
+              <h3 class="finding-title">M12. Stepper validation and labelling unspecified</h3>
+              <span class="finding-location">EXPERIENCE.md › Component Patterns › Stepper</span>
+            </header>
+            <div class="finding-note">WCAG 3.3.1, 3.3.3, 1.3.1. "X of Y" with direct entry has no bounds or error copy.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <ul class="fix-list"><li>Clamp values to ≥0 and Y ≥ X with inline text ("Can't be more than 5 tried"), linked with <code>aria-describedby</code>.</li><li>Disable "−" at 0 and say so ("0, minimum").</li><li>Value changes from −/+ are reflected in the input's value, not a separate live region.</li></ul></div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L1. Restrict <code>ink-disabled</code> to disabled controls</h3>
+              <span class="finding-location">Tokens</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.3. It is 2.38 on card, 2.23 on floor, 2.97 in dark.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Restrict it by rule to disabled controls only, never placeholders, hints or "Reviewed" states.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L2. Map Reduce Motion to the web setting</h3>
+              <span class="finding-location">Accessibility Floor</span>
+            </header>
+            <div class="finding-note">WCAG 2.3.3 good practice.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Map it to <code>@media (prefers-reduced-motion: reduce)</code>. The status line and Mark pressed state change instantly, and sheets appear with no slide or fade.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L3. Don't lock orientation</h3>
+              <span class="finding-location">Practice, Prep</span>
+            </header>
+            <div class="finding-note">WCAG 1.3.4.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Practice and Prep must work in landscape, for example with the phone propped up.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L4. Coach sheet Close is out of thumb reach</h3>
+              <span class="finding-location">Coach Tip sheet</span>
+            </header>
+            <div class="finding-note">It sits top-right.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a full-width "Back to practice" quiet button at the bottom of the sheet, in the one-handed zone.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L5. Timer wording</h3>
+              <span class="finding-location">Practice › Timer</span>
+            </header>
+            <div class="finding-note">"Timer 3:42" can read as a countdown.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Use "Time so far 3:42". It is never announced live (see H4).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L6. Bypass blocks</h3>
+              <span class="finding-location">Laptop / tablet layout</span>
+            </header>
+            <div class="finding-note">WCAG 2.4.1. The mocks have <code>&lt;main&gt;</code> on the presentation board only.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Add a "Skip to content" link before the left rail, plus <code>&lt;nav&gt;</code>/<code>&lt;main&gt;</code> landmarks.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L7. Text spacing</h3>
+              <span class="finding-location">Chips, status line pill, stepper value</span>
+            </header>
+            <div class="finding-note">WCAG 1.4.12. Fixed heights (e.g. stepper value <code>line-height:48px</code>) can clip.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Use min-height and padding so text with 1.5 line-height and 0.12em letter-spacing doesn't clip (40px min-height on the status pill is fine).</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L8. Small meta text</h3>
+              <span class="finding-location"><code>meta</code> (dates, badges, AI labels)</span>
+            </header>
+            <div class="finding-note">13px/400 is legible but small for tired eyes at night.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Consider a 14px minimum for badges and the AI label.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L9. Stale mock notes</h3>
+              <span class="finding-location">mockups/ header notes and captions</span>
+            </header>
+            <div class="finding-note">They describe old states ("2px action outline, block shadow" Marks, "white block Mark with indigo outline", "outline decorative only").</div>
+            <div class="finding-fix"><strong>Fix:</strong> Update them so reviewers and builders aren't misled.</div>
+          </article>
+          <article class="finding">
+            <header>
+              <span class="badge badge-sev-low">low</span>
+              <h3 class="finding-title">L10. "Not attempted / child not available" label length</h3>
+              <span class="finding-location">Review header</span>
+            </header>
+            <div class="finding-note">It is long for a quiet button.</div>
+            <div class="finding-fix"><strong>Fix:</strong> Shorten to "Not today" with the accessible name "Not attempted today".</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li><strong>Name inconsistencies:</strong> Plan strip / Plan rows / "This week" / <code>plan-row</code>; Helpful toggle / Helpful toggle chip; Source badge / Source badges / Badges and labels; Goal Domain / Domain; Mark button / Mark buttons (harmless plural).</li>
+        <li><strong>Cross-refs:</strong> both <code>{path}</code> references in EXPERIENCE.md resolve. In DESIGN.md, <code>{colors.domain-*}</code> is unresolvable as written, and <code>ai-label.border</code> hard-codes <code>1px</code> instead of <code>{spacing.outline-width}</code>. <code>plan-row.radius: 18px</code> is off the <code>rounded</code> scale and missing from the Shapes table.</li>
+        <li><strong>Frontmatter:</strong> DESIGN.md has name, description and all five token groups, plus non-spec keys (status, created, updated, sources), which are harmless. EXPERIENCE.md has name, status, created, updated and sources. Both <code>sources</code> lists resolve.</li>
+        <li><strong>Mocks:</strong> headers reference the deleted <code>.working/</code> path and superseded shadow and outline specs. Phone-frame <code>box-shadow</code> in the mocks is presentation chrome, not a product spec.</li>
+        <li><strong>Memlog:</strong> earlier assumptions (sage primary, apricot for Marks, 14px inputs, 2px outlines, block shadows) are all superseded by later decisions, and the spines reflect the final state.</li>
+        <li><strong>Mermaid:</strong> none present.</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: review-rubric.md</span>
+        <span>Accessibility: review-accessibility.md</span>
+        <span>DESIGN.md: DESIGN.md</span>
+        <span>EXPERIENCE.md: EXPERIENCE.md</span>
+        <span>Generated: 2026-11-05T14:25:27Z</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

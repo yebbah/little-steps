@@ -3,57 +3,64 @@
 <title>Today</title>
 <style>
 /*
-  LittleSteps key screen: Today (Playroom direction)
+  LittleSteps key screen: Today (Playroom direction, flat). Light and dark columns.
+  Spines (DESIGN.md, EXPERIENCE.md, status final) win on any conflict. Flat everywhere: the only
+  box-shadow in this file is the phone device frame. Root font 100% with -apple-system-body under @supports.
   GOVERNING SPINE SECTIONS
-    DESIGN.md: Colors (Domain tints, dark mode), Typography (title greeting, heading, label, meta),
-      Components > Today screen, Plan rows, Bottom nav; Elevation (block shadow on icon tile)
-    EXPERIENCE.md: Component Patterns > Domain tint, Today card, Plan strip, Nudge;
-      Voice and Tone (reminder copy); Information Architecture (5 destinations); Foundation > Theme
-    NOTE: Plan rows add a meta Domain label under each name so the tint is never shown without its label.
-  Visual reference: .working/direction-playroom.html. Spines win on conflict with this mock.
-
-  WCAG AA CONTRAST (text >= 4.5:1), computed from DESIGN.md tokens
-    LIGHT                                   DARK (-dark tokens)
-    ink on card ............. 15.32         ink on card ............. 13.44
-    ink on floor ............ 14.33         ink on floor ............ 15.41
-    ink-soft on card ........  6.91         ink-soft on card ........  7.30
-    ink-soft on floor .......  6.46         ink-soft on floor .......  8.37
-    ink on joint tint ....... 12.14         ink on joint tint ....... 11.22
-    ink-soft on joint tint ..  5.47         ink-soft on joint tint ..  6.10
-    action on joint tint ....  7.24         action on joint tint ....  6.55
-    action on card ..........  9.14         action on card ..........  7.85
-    action on floor .........  8.55         action on floor .........  9.00
-    action-fg on action .....  9.14         action-fg on action .....  8.78
-    block-fg on block .......  7.96         block-fg on block .......  6.89
-    care-team on soft .......  5.88         care-team on soft .......  6.42
-    ink / ink-soft on comm .. 12.40 / 5.59  ink / ink-soft on comm .. 11.63 / 6.32
-    ink / ink-soft on motor . 12.49 / 5.63  ink / ink-soft on motor . 11.39 / 6.19
-    ink / ink-soft on play .. 11.91 / 5.37  ink / ink-soft on play .. 12.49 / 6.79
-    board caption #4A4E58 on #E3E0DA (presentation only) 6.32
-  NON-TEXT (1.4.11): action outline on card 9.14 (selected chip, mark button, secondary button).
-    Neutral outline on card is 1.37 light / 1.35 dark: decorative card edge only; chip/stepper
-    identity is carried by their text labels. (Flagged to parent.)
+    DESIGN.md: Colors (Domain tints + mapping, outline vs outline-strong, dark twins); Typography (title greeting,
+      heading, label, meta; text sizing); Elevation & Depth (flat); Shapes; Components > Focus indicator,
+      Today screen (Today card, hero band 56px icon tile, Log a moment secondary, Plan rows), Status line, Bottom nav
+    EXPERIENCE.md: Component Patterns > Domain tint, Today card, Plan strip, Nudge, Status line; Voice and Tone
+      (reminder copy, nickname); Information Architecture (5 destinations); Accessibility Floor > semantics table
+      (Today card <article>, Plan row one <a> with full name + aria-current, Nav aria-current=page, status container,
+      Skip to content); Foundation > Theme
+  WCAG 2.1 CONTRAST (relative luminance, computed from DESIGN.md tokens)       LIGHT    DARK
+    ink on card / floor ...................................................... 15.32/14.33  13.44/15.41
+    ink-soft on card / floor ................................................. 6.91/6.46    7.30/8.37
+    action on card / floor ................................................... 9.14/8.55    7.85/9.00
+    action-foreground on action (primary button) ............................. 9.14         8.78
+    ink / ink-soft / action on joint-attention tint .......................... 12.14/5.47/7.24  11.22/6.10/6.55
+    ink / ink-soft on communication tint ..................................... 12.40/5.59   11.63/6.32
+    ink / ink-soft on motor-imitation tint ................................... 12.49/5.63   11.39/6.19
+    ink / ink-soft on play tint .............................................. 11.91/5.37   12.49/6.79
+    nav active bar (action) on card .......................................... 9.14         7.85
+  NON-TEXT (WCAG 1.4.11)
+    outline-strong on card / floor (interactive edges) ....................... 3.73/3.49    3.67/4.21
+    outline #D9DCE6 on card 1.37: decorative card edge only, never a control edge
+    focus ring 2px + 2px offset: floor 8.55, card 9.14, selected 7.75 / dark floor 9.00, card 7.85, selected 6.34
+  Board background #E3E0DA / caption #4A4E58 = 6.32 (presentation only, not product UI).
 */
 
 :root{--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.phone{--floor:#FAF7F2;--card:#FFFFFF;--ink:#23252B;--ink2:#555A66;--outline:#D9DCE6;--action:#33457F;--action-fg:#FFFFFF;
-  --block:#3A4D8F;--block-fg:#FFFFFF;--block-shadow:#26336A;--joint:#DDE5F8;--comm:#FCE3CC;--motor:#D6EEDC;--play:#F7DCE6;
-  --care:#3D5A80;--care-soft:#E4EBF4;--icon:#33457F;--tile-shadow-joint:#B8C5EA;--tile-shadow-comm:#EFC49E;--focus:#33457F}
-.phone.dark{--floor:#17191F;--card:#22252D;--ink:#EEF0F5;--ink2:#AEB3C0;--outline:#353A47;--action:#A9B8EC;--action-fg:#141A33;
-  --block:#8FA2E3;--block-fg:#141A33;--block-shadow:#5D6DAE;--joint:#273150;--comm:#3E2C1E;--motor:#1F3628;--play:#3A2430;
-  --care:#9DB7DA;--care-soft:#243142;--icon:#A9B8EC;--tile-shadow-joint:#1A2240;--tile-shadow-comm:#2B1E14;--focus:#A9B8EC}
+.phone{--floor:#FAF7F2;--card:#FFFFFF;--ink:#23252B;--ink2:#555A66;--outline:#D9DCE6;--os:#7E8496;--selected:#E9ECF7;--pressed:#DDE1EC;
+  --tip:#F4F2EE;--scrim:#17191F80;--action:#33457F;--action-fg:#FFFFFF;--block:#3A4D8F;--block-fg:#FFFFFF;
+  --joint:#DDE5F8;--comm:#FCE3CC;--motor:#D6EEDC;--play:#F7DCE6;--care:#3D5A80;--care-soft:#E4EBF4;--icon:#33457F;--focus:#33457F;
+  --sheet-edge:none}
+.phone.dark{--floor:#17191F;--card:#22252D;--ink:#EEF0F5;--ink2:#AEB3C0;--outline:#353A47;--os:#767C8C;--selected:#2C3350;--pressed:#353B4F;
+  --tip:#2A2D36;--scrim:#00000099;--action:#A9B8EC;--action-fg:#141A33;--block:#8FA2E3;--block-fg:#141A33;
+  --joint:#273150;--comm:#3E2C1E;--motor:#1F3628;--play:#3A2430;--care:#9DB7DA;--care-soft:#243142;--icon:#A9B8EC;--focus:#A9B8EC;
+  --sheet-edge:1px solid #767C8C}
 *{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px}
+html{font-size:100%}
+@supports (font: -apple-system-body){html{font:-apple-system-body}}
 body{background:#E3E0DA;font-family:var(--sans);color:#23252B;padding:32px 16px}
 a{text-decoration:none;color:inherit}
+button,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer;text-align:inherit}
+fieldset{border:0;min-width:0}
+:focus-visible{outline:2px solid var(--focus,#33457F);outline-offset:2px}
+.demo-focus{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
 .board{display:flex;flex-wrap:wrap;gap:48px;justify-content:center;align-items:flex-start}
 .col{display:flex;flex-direction:column;gap:12px;align-items:center}
 .cap{font-size:.8125rem;line-height:1.4;color:#4A4E58;max-width:390px;text-align:center}
+/* Device frame: the ONLY shadow in the file (presentation, not product UI) */
 .phone{position:relative;width:390px;height:844px;border-radius:48px;background:var(--floor);color:var(--ink);overflow:hidden;
   box-shadow:0 0 0 10px #1A1A1A,0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column}
 .status{height:44px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:.8125rem;font-weight:600;color:var(--ink)}
 .scroll{flex:1;overflow-y:auto;overflow-x:hidden}
-/* type tokens */
+.skip{position:absolute;left:16px;top:-80px;z-index:5;background:var(--card);color:var(--action);border:1px solid var(--action);border-radius:9999px;padding:12px 16px;font-weight:700}
+.skip:focus{top:48px}
+/* type tokens (rem from the 100% / -apple-system-body root) */
 .t-display{font-size:2.25rem;font-weight:800;line-height:1.08;letter-spacing:-.02em}
 .t-title{font-size:1.5rem;font-weight:800;line-height:1.15;letter-spacing:-.01em}
 .t-heading{font-size:1.25rem;font-weight:800;line-height:1.25}
@@ -64,123 +71,65 @@ a{text-decoration:none;color:inherit}
 .t-label{font-size:.9375rem;font-weight:700;line-height:1.3}
 .t-meta{font-size:.8125rem;font-weight:400;line-height:1.4}
 .ink2{color:var(--ink2)}
-/* buttons */
-.btn{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:9999px;font:700 .9375rem/1.3 var(--sans);padding:0 20px}
+/* buttons: flat fills, 1px edges, no shadows */
+.btn{display:flex;align-items:center;justify-content:center;text-align:center;min-height:52px;border-radius:9999px;font-size:.9375rem;font-weight:700;line-height:1.3;padding:8px 20px}
 .btn-primary{background:var(--action);color:var(--action-fg)}
-.btn-secondary{background:var(--card);color:var(--action);border:2px solid var(--action)}
-.btn-quiet{color:var(--ink2);padding:0 12px;min-height:48px;background:transparent}
+.btn-secondary{background:var(--card);color:var(--action);border:1px solid var(--action)}
+.btn-quiet{color:var(--ink2);padding:8px 12px;min-height:48px;background:transparent}
+.btn-quiet:active,.btn-secondary:active{background:var(--pressed)}
+.full{width:100%}
 .badge{display:inline-flex;align-items:center;border-radius:9999px;padding:3px 10px;font-size:.8125rem;line-height:1.4;background:var(--care-soft);color:var(--care)}
-/* icon tile */
-.icon-tile{flex:none;background:var(--card);border-radius:20px;display:flex;align-items:center;justify-content:center}
-.icon-tile.joint{box-shadow:0 3px 0 var(--tile-shadow-joint)}
-.icon-tile.comm{box-shadow:0 3px 0 var(--tile-shadow-comm)}
-.ico{fill:none;stroke:var(--icon);stroke-linejoin:round;stroke-linecap:round}
-/* chips */
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border-radius:9999px;background:var(--card);color:var(--ink);
-  border:2px solid var(--outline);font:700 .9375rem/1.3 var(--sans)}
-.chip.sel{background:var(--joint);border-color:var(--action)}
-/* bottom nav */
-.nav{flex:none;display:flex;background:var(--card);border-top:2px solid var(--outline);padding:6px 4px 26px}
-.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;color:var(--ink2);font-size:.8125rem;font-weight:600;line-height:1.4}
-.nav a.on{color:var(--action)}
-.nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* icons: simple object line drawings, 2.4px stroke, no fills, no shadows */
+.icon-tile{flex:none;background:var(--card);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:none}
+.ico{fill:none;stroke:var(--icon);stroke-width:2.4;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+/* bottom nav: active = indigo + weight 800 + 32x4 bar above the icon */
+.nav{flex:none;display:flex;background:var(--card);border-top:1px solid var(--outline);padding:6px 4px 26px}
+.nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;color:var(--ink2);font-size:.8125rem;font-weight:600;line-height:1.4;padding-top:6px}
+.nav a[aria-current="page"]{color:var(--action);font-weight:800}
+.nav a[aria-current="page"]::before{content:"";position:absolute;top:0;left:50%;width:32px;height:4px;margin-left:-16px;border-radius:9999px;background:var(--action)}
+.nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
 
 .t-wrap{padding:0 16px 24px}
 .greet{padding-top:12px}
 .nudge{margin-top:6px;color:var(--ink2)}
-.statusline{display:inline-flex;align-items:center;margin-top:12px;min-height:40px;padding:0 16px;background:var(--card);border:2px solid var(--outline);border-radius:16px;color:var(--ink)}
-.tcard{margin-top:20px;background:var(--card);border:2px solid var(--outline);border-radius:28px;overflow:hidden}
+.statusline{display:flex;align-items:center;margin-top:12px;min-height:44px;padding:8px 16px;background:var(--card);border:1px solid var(--outline);border-radius:16px;color:var(--ink)}
+.statusline:empty{display:none}
+.tcard{margin-top:20px;background:var(--card);border:1px solid var(--outline);border-radius:28px;overflow:hidden}
 .tband{padding:16px 18px;display:flex;gap:14px;align-items:center}
-.tband .icon-tile{width:56px;height:56px;border-radius:16px}
+.tband .icon-tile{width:56px;height:56px}
 .tband .icon-tile svg{width:34px;height:34px}
 .tband .t-meta{color:var(--ink2)}
 .tact{padding:14px 18px 10px;display:flex;flex-direction:column;gap:4px}
 .tact .t-meta{color:var(--ink2);margin-bottom:8px}
 .tact .btn-quiet{align-self:center}
-.log{margin-top:12px}
+.log{margin-top:12px;width:100%}
 .week{margin-top:28px}
 .week-head{display:flex;justify-content:space-between;align-items:center}
 .plan{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:8px}
-.plan li{display:flex;gap:12px;align-items:center;background:var(--card);border:2px solid var(--outline);border-radius:18px;padding:8px 14px 8px 8px;min-height:56px}
-.plan li.now{border-color:var(--action)}
-.plan .sq{width:36px;height:36px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center}
-.plan .sq svg{width:22px;height:22px}
-.plan .day{width:32px;flex:none;font-size:.8125rem;font-weight:700;color:var(--ink2)}
-.plan li.now .day{color:var(--action)}
-.plan .what{flex:1;display:flex;flex-direction:column}
-.plan .what .t-meta{color:var(--ink2)}
-.plan .st{color:var(--ink2)}
+.prow{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--os);border-radius:20px;padding:8px 12px 8px 10px;min-height:56px}
+.prow:active{background:var(--pressed)}
+.prow[aria-current="true"]{border-color:var(--action)}
+.prow .day{width:32px;flex:none;font-size:.8125rem;font-weight:700;color:var(--ink2)}
+.prow .sq{width:36px;height:36px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center}
+.prow .sq svg{width:22px;height:22px}
+.prow .what{flex:1;display:flex;flex-direction:column;min-width:0}
+.prow .what .t-meta{color:var(--ink2)}
+.prow .st{color:var(--ink2)}
+.prow .next{color:var(--ink);font-weight:400}
+.prow .chev{width:18px;height:18px;flex:none;fill:none;stroke:var(--ink2);stroke-width:2.4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
 </style></head>
-<body><main class="board">
-<section class="col"><div class="phone">
-<div class="status"><span>7:12</span><span aria-hidden="true">&#9679;&#9679;&#9679; &#9644;</span></div>
-<div class="scroll"><div class="t-wrap">
-  <div class="greet"><h1 class="t-title">Good evening</h1></div>
-  <p class="nudge t-body">A few minutes of play today? Storybook together is ready.</p>
-  <article class="tcard" aria-label="Today's activity">
-    <div class="tband" style="background:var(--joint)">
-      <div class="icon-tile joint"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 12q9-4 18 0v26q-9-4-18 0z" fill="#DDE5F8" class="ico" stroke-width="2.4"/><path d="M24 12q9-4 18 0v26q-9-4-18 0z" fill="#FCE3CC" class="ico" stroke-width="2.4"/></svg></div>
-      <div><p class="t-meta">Reading with Bean</p><h2 class="t-title">Storybook together</h2></div>
-    </div>
-    <div class="tact">
-      <p class="t-meta">Joint attention goal · about 5 min</p>
-      <a class="btn btn-primary" href="#">Prep</a>
-      <a class="btn btn-quiet" href="#">Not this one</a>
-    </div>
-  </article>
-  <a class="btn btn-secondary log" href="#">Log a moment</a>
-  <section class="week" aria-label="This week">
-    <div class="week-head"><h2 class="t-heading">This week</h2><a class="btn btn-quiet" href="#" style="margin-right:-12px">See plan</a></div>
-      <ul class="plan">
-      <li><span class="sq" style="background:var(--motor)"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M5 17V9l6-4 6 4v8" class="ico" stroke-width="2"/></svg></span><span class="day">Tue</span><span class="what"><span class="t-label">Copy my moves</span><span class="t-meta">Motor and imitation</span></span><span class="st t-meta">Reviewed</span></li>
-      <li class="now" aria-current="true"><span class="sq" style="background:var(--joint)"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M2 6q4.5-2 9 0v11q-4.5-2-9 0zM11 6q4.5-2 9 0v11q-4.5-2-9 0z" class="ico" stroke-width="1.8"/></svg></span><span class="day">Thu</span><span class="what"><span class="t-label">Storybook together</span><span class="t-meta">Joint attention</span></span></li>
-      <li><span class="sq" style="background:var(--comm)"><svg viewBox="0 0 22 22" aria-hidden="true"><circle cx="8" cy="12" r="5" class="ico" stroke-width="1.8"/><circle cx="15.5" cy="7" r="3" class="ico" stroke-width="1.8"/></svg></span><span class="day">Fri</span><span class="what"><span class="t-label">Bubble play</span><span class="t-meta">Speech and communication</span></span></li>
-      <li><span class="sq" style="background:var(--play)"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M8 16V5l9-2v11" class="ico" stroke-width="1.8"/><circle cx="6" cy="16" r="2.4" class="ico" stroke-width="1.8"/><circle cx="15" cy="14" r="2.4" class="ico" stroke-width="1.8"/></svg></span><span class="day">Sun</span><span class="what"><span class="t-label">Songs with pauses</span><span class="t-meta">Play</span></span></li>
-      </ul>
-  </section>
-</div></div>
-<nav class="nav" aria-label="Main">
-  <a href="#" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>Today</a>
+<body><div class="board">
+<section class="col"><div class="phone"><a class="skip" href="#main">Skip to content</a><div class="status" aria-hidden="true"><span>7:12</span><span>&#9679;&#9679;&#9679; &#9644;</span></div><main id="main" class="scroll"><div class="t-wrap"><div class="greet"><h1 class="t-title">Good evening</h1></div><p class="nudge t-body">A few minutes of play today? Storybook together is ready.</p><p class="statusline t-label" role="status"></p><article class="tcard" aria-labelledby="tc-h"><div class="tband" style="background:var(--joint)"><div class="icon-tile"><svg viewBox="0 0 48 48" aria-hidden="true"><path class="ico" d="M6 12q9-4 18 0v26q-9-4-18 0zM24 12q9-4 18 0v26q-9-4-18 0z"/></svg></div><div><p class="t-meta">Reading with Bean</p><h2 class="t-title" id="tc-h">Storybook together</h2></div></div><div class="tact"><p class="t-meta">Joint attention goal · about 5 min</p><a class="btn btn-primary" href="#">Prep</a><button type="button" class="btn btn-quiet">Not this one</button></div></article><button type="button" class="btn btn-secondary log" aria-haspopup="dialog">Log a moment</button><section class="week" aria-labelledby="wk-h"><div class="week-head"><h2 class="t-heading" id="wk-h">This week</h2><a class="btn btn-quiet" href="#" style="margin-right:-12px">See plan</a></div><ul class="plan"><li><a href="#" class="prow" aria-label="Tuesday, Copy my moves, Motor and imitation, reviewed"><span class="day" aria-hidden="true">Tue</span><span class="sq" style="background:var(--motor)"><svg viewBox="0 0 22 22" aria-hidden="true"><path class="ico" d="M5 17V9l6-4 6 4v8"/></svg></span><span class="what"><span class="t-label">Copy my moves</span><span class="t-meta">Motor and imitation</span></span><span class="t-meta st">Reviewed</span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li><li><a href="#" class="prow" aria-current="true" aria-label="Thursday, Storybook together, Joint attention, next up"><span class="day" aria-hidden="true">Thu</span><span class="sq" style="background:var(--joint)"><svg viewBox="0 0 22 22" aria-hidden="true"><path class="ico" d="M2 6q4.5-2 9 0v11q-4.5-2-9 0zM11 6q4.5-2 9 0v11q-4.5-2-9 0z"/></svg></span><span class="what"><span class="t-label">Storybook together</span><span class="t-meta">Joint attention</span></span><span class="t-meta next">Next</span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li><li><a href="#" class="prow" aria-label="Friday, Bubble play, Speech and communication"><span class="day" aria-hidden="true">Fri</span><span class="sq" style="background:var(--comm)"><svg viewBox="0 0 22 22" aria-hidden="true"><circle class="ico" cx="8" cy="12" r="5"/><circle class="ico" cx="15.5" cy="7" r="3"/></svg></span><span class="what"><span class="t-label">Bubble play</span><span class="t-meta">Speech and communication</span></span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li><li><a href="#" class="prow" aria-label="Sunday, Songs with pauses, Play"><span class="day" aria-hidden="true">Sun</span><span class="sq" style="background:var(--play)"><svg viewBox="0 0 22 22" aria-hidden="true"><path class="ico" d="M8 16V5l9-2v11"/><circle class="ico" cx="6" cy="16" r="2.4"/><circle class="ico" cx="15" cy="14" r="2.4"/></svg></span><span class="what"><span class="t-label">Songs with pauses</span><span class="t-meta">Play</span></span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li></ul></section></div></main><nav class="nav" aria-label="Main">
+  <a href="#" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>Today</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V5M5 5h11l-2 3.5L16 12H5"/></svg>Goals</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>Activities</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>Share</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM10 20v-5h4v5"/></svg>Family</a>
-</nav>
-</div><p class="cap">Light. Today at rest: nudge, joint-attention Today card for Storybook together, Log a moment, This week rows with Domain tint + label; Tue reads Reviewed.</p></section>
-<section class="col"><div class="phone dark">
-<div class="status"><span>7:12</span><span aria-hidden="true">&#9679;&#9679;&#9679; &#9644;</span></div>
-<div class="scroll"><div class="t-wrap">
-  <div class="greet"><h1 class="t-title">Good evening</h1></div>
-  <p class="nudge t-body">A few minutes of play today? Storybook together is ready.</p>
-  <article class="tcard" aria-label="Today's activity">
-    <div class="tband" style="background:var(--joint)">
-      <div class="icon-tile joint"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 12q9-4 18 0v26q-9-4-18 0z" fill="#DDE5F8" class="ico" stroke-width="2.4"/><path d="M24 12q9-4 18 0v26q-9-4-18 0z" fill="#FCE3CC" class="ico" stroke-width="2.4"/></svg></div>
-      <div><p class="t-meta">Reading with Bean</p><h2 class="t-title">Storybook together</h2></div>
-    </div>
-    <div class="tact">
-      <p class="t-meta">Joint attention goal · about 5 min</p>
-      <a class="btn btn-primary" href="#">Prep</a>
-      <a class="btn btn-quiet" href="#">Not this one</a>
-    </div>
-  </article>
-  <a class="btn btn-secondary log" href="#">Log a moment</a>
-  <section class="week" aria-label="This week">
-    <div class="week-head"><h2 class="t-heading">This week</h2><a class="btn btn-quiet" href="#" style="margin-right:-12px">See plan</a></div>
-      <ul class="plan">
-      <li><span class="sq" style="background:var(--motor)"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M5 17V9l6-4 6 4v8" class="ico" stroke-width="2"/></svg></span><span class="day">Tue</span><span class="what"><span class="t-label">Copy my moves</span><span class="t-meta">Motor and imitation</span></span><span class="st t-meta">Reviewed</span></li>
-      <li class="now" aria-current="true"><span class="sq" style="background:var(--joint)"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M2 6q4.5-2 9 0v11q-4.5-2-9 0zM11 6q4.5-2 9 0v11q-4.5-2-9 0z" class="ico" stroke-width="1.8"/></svg></span><span class="day">Thu</span><span class="what"><span class="t-label">Storybook together</span><span class="t-meta">Joint attention</span></span></li>
-      <li><span class="sq" style="background:var(--comm)"><svg viewBox="0 0 22 22" aria-hidden="true"><circle cx="8" cy="12" r="5" class="ico" stroke-width="1.8"/><circle cx="15.5" cy="7" r="3" class="ico" stroke-width="1.8"/></svg></span><span class="day">Fri</span><span class="what"><span class="t-label">Bubble play</span><span class="t-meta">Speech and communication</span></span></li>
-      <li><span class="sq" style="background:var(--play)"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M8 16V5l9-2v11" class="ico" stroke-width="1.8"/><circle cx="6" cy="16" r="2.4" class="ico" stroke-width="1.8"/><circle cx="15" cy="14" r="2.4" class="ico" stroke-width="1.8"/></svg></span><span class="day">Sun</span><span class="what"><span class="t-label">Songs with pauses</span><span class="t-meta">Play</span></span></li>
-      </ul>
-  </section>
-</div></div>
-<nav class="nav" aria-label="Main">
-  <a href="#" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>Today</a>
+</nav></div><p class="cap">Light. Today at rest: greeting, nudge, joint-attention Today card for Storybook together (Prep is the only primary), Log a moment, This week Plan rows (1px outline-strong, Domain square + label, chevron); Thu is next (action edge + &ldquo;Next&rdquo;), Tue reads Reviewed. Empty role=status container present.</p></section><section class="col"><div class="phone dark"><a class="skip" href="#main-d">Skip to content</a><div class="status" aria-hidden="true"><span>7:12</span><span>&#9679;&#9679;&#9679; &#9644;</span></div><div id="main-d" class="scroll"><div class="t-wrap"><div class="greet"><h1 class="t-title">Good evening</h1></div><p class="nudge t-body">A few minutes of play today? Storybook together is ready.</p><p class="statusline t-label" role="status"></p><article class="tcard" aria-labelledby="tc-h-d"><div class="tband" style="background:var(--joint)"><div class="icon-tile"><svg viewBox="0 0 48 48" aria-hidden="true"><path class="ico" d="M6 12q9-4 18 0v26q-9-4-18 0zM24 12q9-4 18 0v26q-9-4-18 0z"/></svg></div><div><p class="t-meta">Reading with Bean</p><h2 class="t-title" id="tc-h-d">Storybook together</h2></div></div><div class="tact"><p class="t-meta">Joint attention goal · about 5 min</p><a class="btn btn-primary" href="#">Prep</a><button type="button" class="btn btn-quiet">Not this one</button></div></article><button type="button" class="btn btn-secondary log" aria-haspopup="dialog">Log a moment</button><section class="week" aria-labelledby="wk-h-d"><div class="week-head"><h2 class="t-heading" id="wk-h-d">This week</h2><a class="btn btn-quiet" href="#" style="margin-right:-12px">See plan</a></div><ul class="plan"><li><a href="#" class="prow" aria-label="Tuesday, Copy my moves, Motor and imitation, reviewed"><span class="day" aria-hidden="true">Tue</span><span class="sq" style="background:var(--motor)"><svg viewBox="0 0 22 22" aria-hidden="true"><path class="ico" d="M5 17V9l6-4 6 4v8"/></svg></span><span class="what"><span class="t-label">Copy my moves</span><span class="t-meta">Motor and imitation</span></span><span class="t-meta st">Reviewed</span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li><li><a href="#" class="prow" aria-current="true" aria-label="Thursday, Storybook together, Joint attention, next up"><span class="day" aria-hidden="true">Thu</span><span class="sq" style="background:var(--joint)"><svg viewBox="0 0 22 22" aria-hidden="true"><path class="ico" d="M2 6q4.5-2 9 0v11q-4.5-2-9 0zM11 6q4.5-2 9 0v11q-4.5-2-9 0z"/></svg></span><span class="what"><span class="t-label">Storybook together</span><span class="t-meta">Joint attention</span></span><span class="t-meta next">Next</span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li><li><a href="#" class="prow" aria-label="Friday, Bubble play, Speech and communication"><span class="day" aria-hidden="true">Fri</span><span class="sq" style="background:var(--comm)"><svg viewBox="0 0 22 22" aria-hidden="true"><circle class="ico" cx="8" cy="12" r="5"/><circle class="ico" cx="15.5" cy="7" r="3"/></svg></span><span class="what"><span class="t-label">Bubble play</span><span class="t-meta">Speech and communication</span></span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li><li><a href="#" class="prow" aria-label="Sunday, Songs with pauses, Play"><span class="day" aria-hidden="true">Sun</span><span class="sq" style="background:var(--play)"><svg viewBox="0 0 22 22" aria-hidden="true"><path class="ico" d="M8 16V5l9-2v11"/><circle class="ico" cx="6" cy="16" r="2.4"/><circle class="ico" cx="15" cy="14" r="2.4"/></svg></span><span class="what"><span class="t-label">Songs with pauses</span><span class="t-meta">Play</span></span><svg class="chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5"/></svg></a></li></ul></section></div></div><nav class="nav" aria-label="Main">
+  <a href="#" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>Today</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V5M5 5h11l-2 3.5L16 12H5"/></svg>Goals</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>Activities</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>Share</a>
   <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM10 20v-5h4v5"/></svg>Family</a>
-</nav>
-</div><p class="cap">Dark (follows device setting). Same screen with -dark tokens: deep floor, light indigo action, deepened Domain tints.</p></section>
-</main></body></html>
+</nav></div><p class="cap">Dark (follows device setting). Same screen with -dark tokens: deep floor, light indigo action, deepened Domain tints.</p></section>
+</div></body></html>
