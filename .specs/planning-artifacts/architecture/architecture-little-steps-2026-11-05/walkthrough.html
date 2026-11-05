@@ -1,0 +1,398 @@
+<title>LittleSteps Architecture Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one reading column with a sticky section bar; flat "Playroom" blocks from DESIGN.md, 1px outlines, no shadows */
+:root {
+  --floor: #FAF7F2; --card: #FFFFFF; --ink: #23252B; --ink-soft: #555A66;
+  --outline: #D9DCE6; --outline-strong: #7E8496; --selected: #E9ECF7;
+  --action: #33457F; --action-fg: #FFFFFF; --tip: #F4F2EE;
+  --t-family: #DDE5F8; --t-goals: #FCE3CC; --t-practice: #D6EEDC; --t-plan: #F7DCE6;
+  --t-platform: #E8DDF5; --t-shared: #ECE8E1; --t-ai: #D3ECEC;
+  --care: #3D5A80; --attention: #8A5A00; --attention-soft: #FBF0DC;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --floor: #17191F; --card: #22252D; --ink: #EEF0F5; --ink-soft: #AEB3C0;
+  --outline: #353A47; --outline-strong: #767C8C; --selected: #2C3350;
+  --action: #A9B8EC; --action-fg: #141A33; --tip: #2A2D36;
+  --t-family: #273150; --t-goals: #3E2C1E; --t-practice: #1F3628; --t-plan: #3A2430;
+  --t-platform: #30284A; --t-shared: #2E2C29; --t-ai: #1D3638;
+  --care: #9DB7DA; --attention: #E7B865; --attention-soft: #3B301A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --floor: #17191F; --card: #22252D; --ink: #EEF0F5; --ink-soft: #AEB3C0;
+  --outline: #353A47; --outline-strong: #767C8C; --selected: #2C3350;
+  --action: #A9B8EC; --action-fg: #141A33; --tip: #2A2D36;
+  --t-family: #273150; --t-goals: #3E2C1E; --t-practice: #1F3628; --t-plan: #3A2430;
+  --t-platform: #30284A; --t-shared: #2E2C29; --t-ai: #1D3638;
+  --care: #9DB7DA; --attention: #E7B865; --attention-soft: #3B301A; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--floor); color: var(--ink); font: 400 1.0625rem/1.55 var(--font); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--floor); }
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 64px; }
+h1, h2, h3 { font-weight: 800; text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.75rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.15rem; }
+p { margin: 0; max-width: 65ch; }
+.soft { color: var(--ink-soft); }
+code { font-family: var(--mono); font-size: 0.88em; background: var(--tip); padding: 0.05em 0.35em; border-radius: 6px; }
+.eyebrow { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+
+nav.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--floor); border-bottom: 1px solid var(--outline); }
+nav.bar .wrap { display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; scrollbar-width: none; }
+nav.bar a { flex: none; text-decoration: none; color: var(--ink); font-weight: 700; font-size: 0.875rem; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--outline); background: var(--card); }
+nav.bar a:hover, nav.bar a:focus-visible { border-color: var(--outline-strong); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--action); outline-offset: 2px; }
+
+header.hero { display: grid; gap: 14px; padding-block: 40px 28px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.fact { border: 1px solid var(--outline); background: var(--card); border-radius: 999px; padding: 4px 12px; font-size: 0.875rem; font-weight: 600; }
+section { display: grid; gap: 16px; padding-block: 36px 8px; scroll-margin-top: 64px; }
+.panel { background: var(--card); border: 1px solid var(--outline); border-radius: var(--r); padding: 18px; min-width: 0; }
+.diagram { overflow-x: auto; }
+.diagram pre.mermaid { margin: 0; background: transparent; }
+
+/* module map */
+.layers { display: grid; gap: 12px; }
+.layer { display: grid; gap: 8px; }
+.layer .label { font-size: 0.8125rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 0.04em; text-transform: uppercase; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 700 0.95rem var(--font); color: var(--ink); border: 1px solid transparent; border-radius: 12px; padding: 10px 14px; cursor: pointer; min-height: 44px; }
+.chip[aria-pressed="true"] { border-color: var(--ink); outline: 2px solid var(--ink); outline-offset: 0; }
+.chip.dim { opacity: 0.38; }
+.chip.up { border-color: var(--action); border-style: dashed; }
+.detail { display: grid; gap: 10px; }
+.detail dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; }
+.detail dt { font-weight: 700; color: var(--ink-soft); font-size: 0.9rem; }
+.detail dd { margin: 0; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.875rem; color: var(--ink-soft); }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; border: 2px solid var(--ink); }
+.legend .l-up::before { border: 1px dashed var(--action); }
+.legend .l-dim::before { border: 1px solid var(--outline); opacity: 0.5; }
+
+/* steps */
+.steps { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; }
+.steplist { display: grid; gap: 6px; align-content: start; list-style: none; margin: 0; padding: 0; counter-reset: s; }
+.steplist button { width: 100%; text-align: left; font: 700 0.95rem var(--font); color: var(--ink); background: var(--card); border: 1px solid var(--outline); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; gap: 10px; align-items: center; min-height: 44px; }
+.steplist button .n { font-variant-numeric: tabular-nums; width: 1.6em; height: 1.6em; border-radius: 999px; display: inline-grid; place-items: center; background: var(--selected); font-size: 0.8rem; flex: none; }
+.steplist button[aria-selected="true"] { background: var(--action); color: var(--action-fg); border-color: var(--action); }
+.steplist button[aria-selected="true"] .n { background: var(--action-fg); color: var(--action); }
+.stepbody { display: grid; gap: 12px; align-content: start; }
+.where { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 0.8rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--selected); }
+.tag.ad { background: var(--tip); border: 1px solid var(--outline); font-family: var(--mono); font-weight: 600; }
+.stepbody ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.stepbody li { max-width: 65ch; }
+
+/* pipeline */
+.pipe { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.stage { background: var(--t-ai); border-radius: 12px; padding: 12px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.stage b { font-size: 0.95rem; }
+.stage small { color: var(--ink-soft); font-size: 0.85rem; line-height: 1.4; }
+.stage.stop { background: var(--attention-soft); }
+
+/* decisions */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filters input { font: 400 1rem var(--font); color: var(--ink); background: var(--card); border: 1px solid var(--outline-strong); border-radius: 10px; padding: 10px 12px; min-height: 44px; flex: 1 1 220px; min-width: 0; }
+.fbtn { font: 700 0.875rem var(--font); color: var(--ink); background: var(--card); border: 1px solid var(--outline); border-radius: 999px; padding: 8px 12px; cursor: pointer; min-height: 40px; }
+.fbtn[aria-pressed="true"] { background: var(--ink); color: var(--floor); border-color: var(--ink); }
+.adlist { display: grid; gap: 8px; }
+details.ad { background: var(--card); border: 1px solid var(--outline); border-radius: 12px; }
+details.ad summary { cursor: pointer; padding: 12px 14px; display: flex; gap: 12px; align-items: baseline; list-style: none; }
+details.ad summary::-webkit-details-marker { display: none; }
+details.ad summary .id { font-family: var(--mono); font-weight: 700; font-size: 0.85rem; color: var(--ink-soft); flex: none; width: 3.4em; font-variant-numeric: tabular-nums; }
+details.ad summary .t { font-weight: 700; }
+details.ad[open] summary { border-bottom: 1px solid var(--outline); }
+details.ad .b { padding: 12px 14px 14px calc(14px + 3.4em + 12px); display: grid; gap: 8px; }
+details.ad .b p { font-size: 0.97rem; }
+.count { font-size: 0.875rem; color: var(--ink-soft); }
+
+/* questions */
+.qgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.q { background: var(--card); border: 1px solid var(--outline); border-radius: 12px; padding: 14px; display: grid; gap: 6px; align-content: start; }
+.q.assume { background: var(--attention-soft); border-color: transparent; }
+.q .k { font-family: var(--mono); font-size: 0.8rem; font-weight: 700; color: var(--attention); }
+.q.open .k { color: var(--care); }
+
+@media (max-width: 720px) {
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .steplist { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pipe { grid-template-columns: minmax(0, 1fr); }
+  .qgrid { grid-template-columns: minmax(0, 1fr); }
+  details.ad .b { padding-left: 14px; }
+  .detail dl { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+
+<nav class="bar" aria-label="Sections">
+  <div class="wrap">
+    <a href="#shape">The shape</a>
+    <a href="#modules">Modules</a>
+    <a href="#loop">Core loop</a>
+    <a href="#ai">AI safety</a>
+    <a href="#privacy">Privacy</a>
+    <a href="#decisions">All decisions</a>
+    <a href="#confirm">To confirm</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Architecture walkthrough · v1 pilot · final</span>
+    <h1>How LittleSteps is put together</h1>
+    <p class="soft">A guided tour of the architecture spine for the first release. It covers how the parts fit, which rules keep separately built pieces consistent, and what is still open. The spine itself, <code>ARCHITECTURE-SPINE.md</code>, is the binding source; this page explains it.</p>
+    <div class="facts">
+      <span class="fact">One Spring Boot app, 15 modules</span>
+      <span class="fact">React PWA, offline-first</span>
+      <span class="fact">24 decisions (AD-1 to AD-24)</span>
+      <span class="fact">Runs fully on a Mac</span>
+      <span class="fact">≤ US$5 per family per month</span>
+    </div>
+  </header>
+
+  <section id="shape" aria-labelledby="h-shape">
+    <span class="eyebrow">1 · The shape</span>
+    <h2 id="h-shape">One app, a few containers, a model on the side</h2>
+    <p>A Caregiver's phone, tablet or laptop runs the PWA. It talks to a single Spring Boot application, which serves both the app and its API. PostgreSQL, Keycloak and file storage sit beside it. The AI model runs natively on the Mac during development and is swapped for a hosted model at launch by configuration alone. The same compose file runs locally and on a small server.</p>
+    <div class="panel diagram">
+<pre class="mermaid">
+graph LR
+  subgraph device["Caregiver device"]
+    pwa["PWA + offline outbox"]
+  end
+  subgraph host["Mac (local) / small VM (shipping)"]
+    app["Spring Boot app"]
+    kc["Keycloak sign-in"]
+    pg[("PostgreSQL")]
+    files[("Encrypted file storage")]
+    mail["Email"]
+  end
+  llm["AI model: Ollama locally, hosted at launch"]
+  pwa -- HTTPS --> app
+  pwa -- "OIDC sign-in" --> kc
+  app --> pg
+  app --> files
+  app --> mail
+  app --> llm
+</pre>
+    </div>
+  </section>
+
+  <section id="modules" aria-labelledby="h-modules">
+    <span class="eyebrow">2 · Modules</span>
+    <h2 id="h-modules">A modular monolith with closed borders</h2>
+    <p>Inside the app, code is split into modules that each own their own tables. A module can call only the modules it is allowed to depend on (AD-1), and a CI test fails when that rule is broken. Pick a module to see what it owns and what it may call.</p>
+    <div class="panel layers" id="map">
+      <div class="layer"><span class="label">Family and people</span><div class="chips" data-group="family"></div></div>
+      <div class="layer"><span class="label">Goals and content</span><div class="chips" data-group="goals"></div></div>
+      <div class="layer"><span class="label">Practice and planning</span><div class="chips" data-group="practice"></div></div>
+      <div class="layer"><span class="label">Insight and sharing</span><div class="chips" data-group="plan"></div></div>
+      <div class="layer"><span class="label">Platform (depend on shared only)</span><div class="chips" data-group="platform"></div></div>
+      <div class="legend" aria-hidden="true"><span>selected</span><span class="l-up">may call</span><span class="l-dim">not reachable</span></div>
+    </div>
+    <div class="panel detail" id="moddetail" aria-live="polite"></div>
+  </section>
+
+  <section id="loop" aria-labelledby="h-loop">
+    <span class="eyebrow">3 · Core loop</span>
+    <h2 id="h-loop">Follow one evening Practice Session through the system</h2>
+    <p>The core loop must work with a poor connection, attribute every entry to the right Caregiver, and never lose a Review. Step through it to see which module acts and which rules apply.</p>
+    <div class="steps">
+      <ol class="steplist" role="tablist" aria-label="Core loop steps" id="steplist"></ol>
+      <div class="panel stepbody" role="tabpanel" id="stepbody" tabindex="0"></div>
+    </div>
+  </section>
+
+  <section id="ai" aria-labelledby="h-ai">
+    <span class="eyebrow">4 · AI safety</span>
+    <h2 id="h-ai">Every AI answer passes the same five gates</h2>
+    <p>No feature module talks to a model directly. Each use is a named AI task in the <code>ai</code> module, and its output is checked before anything reaches a Caregiver (AD-10 to AD-14). If a check can't run, the item is dropped. The exception is a therapist's prescribed Activity: it is shown with a warning, never hidden.</p>
+    <div class="pipe" role="list">
+      <div class="stage" role="listitem"><b>1. Allow-listed input</b><small>Only the nickname or "the child", plus Goal, Strategy and Observation content. No field for identifiers exists.</small></div>
+      <div class="stage" role="listitem"><b>2. Masked documents</b><small>Imports reach AI only after the Caregiver confirms the masking. Originals never enter <code>ai</code>.</small></div>
+      <div class="stage" role="listitem"><b>3. Schema check</b><small>Output must be structured and valid. No schema has a Goal-status field.</small></div>
+      <div class="stage stop" role="listitem"><b>4. Restriction + scope check</b><small>A deterministic match against every Restriction and "avoid" sensitivity, then a scope label: "check with your therapist".</small></div>
+      <div class="stage" role="listitem"><b>5. Citations</b><small>Each progress or Summary sentence must cite Observations in scope, or it is dropped.</small></div>
+    </div>
+    <p class="soft">Budget and speed: Coach Tips wait at most 1.5 seconds for AI before showing curated tips only. A per-family monthly counter switches AI off above a soft cap, so cost stays under the US$5 ceiling.</p>
+  </section>
+
+  <section id="privacy" aria-labelledby="h-privacy">
+    <span class="eyebrow">5 · Privacy</span>
+    <h2 id="h-privacy">Family data is fenced in, logged without content, and fully deletable</h2>
+    <div class="qgrid">
+      <div class="q"><h3>Tenant fence</h3><p>Every family-owned row carries <code>family_id</code>, filtered automatically by Hibernate. The family comes from the signed-in Caregiver, never from the request (AD-2).</p></div>
+      <div class="q"><h3>No content in logs</h3><p>Caregiver and AI text live in value types that print as <code>[redacted]</code>. Logs carry IDs, enums and counts only (AD-19).</p></div>
+      <div class="q"><h3>History, not overwrites</h3><p>Edits add revisions. Two Caregivers editing at once both keep their version, shown in History (AD-6).</p></div>
+      <div class="q"><h3>Deletion reaches every copy</h3><p>Seven days to undo, then purge: database rows, stored files, Keycloak accounts, and backups that age out within 14 days (AD-16).</p></div>
+    </div>
+  </section>
+
+  <section id="decisions" aria-labelledby="h-dec">
+    <span class="eyebrow">6 · All decisions</span>
+    <h2 id="h-dec">The 24 architecture decisions</h2>
+    <div class="filters">
+      <label for="q" class="soft" style="position:absolute;left:-9999px">Search decisions</label>
+      <input id="q" type="search" placeholder="Search, e.g. offline, Restriction, Summary">
+      <div class="chips" id="fbtns"></div>
+    </div>
+    <p class="count" id="count" aria-live="polite"></p>
+    <div class="adlist" id="adlist"></div>
+  </section>
+
+  <section id="confirm" aria-labelledby="h-confirm">
+    <span class="eyebrow">7 · To confirm</span>
+    <h2 id="h-confirm">Confirmed defaults and open questions</h2>
+    <p>The five defaults from the fast-path draft were confirmed on 2026-11-05. Three questions remain open, each with the point at which it gets decided.</p>
+    <div class="qgrid" id="qgrid"></div>
+  </section>
+</div>
+
+<script>
+const MODULES = {
+  family:   {g:"family", c:"--t-family", owns:"Families, memberships, invites, consent, Family deletion and purge", deps:[], ads:["AD-2","AD-3","AD-16"]},
+  child:    {g:"family", c:"--t-family", owns:"Child Profile: nickname, interests, materials, sensitivities", deps:["family"], ads:["AD-6","AD-11"]},
+  careteam: {g:"family", c:"--t-family", owns:"Care Team Members, Status Vocabularies, Prompt Level list and mappings", deps:["family"], ads:["AD-9"]},
+  goals:    {g:"goals", c:"--t-goals", owns:"Goals, Goal Periods and lineage, Strategies, Restrictions; implements the Restriction lookup", deps:["careteam","child"], ads:["AD-9","AD-10","AD-11"]},
+  library:  {g:"goals", c:"--t-goals", owns:"Every Activity (curated, prescribed, AI), Coach Tips, favourites and hidden, engagement ranking", deps:["goals","child","ai"], ads:["AD-9","AD-11","AD-18"]},
+  "import": {g:"goals", c:"--t-goals", owns:"Document import state machine, masking review, encrypted originals and their retention", deps:["goals","library","ai"], ads:["AD-14","AD-21"]},
+  practice: {g:"practice", c:"--t-practice", owns:"Practice Sessions, Marks, Observations and revisions, Inventory", deps:["goals","library","careteam"], ads:["AD-4","AD-6","AD-7","AD-8"]},
+  planning: {g:"practice", c:"--t-practice", owns:"Weekly Plan, reminder preferences, the reminder job", deps:["goals","library","practice"], ads:["AD-8","AD-17"]},
+  progress: {g:"plan", c:"--t-plan", owns:"Per-Goal measures (the only place they are computed), progress descriptions", deps:["practice","goals","ai"], ads:["AD-13"]},
+  summary:  {g:"plan", c:"--t-plan", owns:"Summaries, share snapshots and PDF, Appointment Feedback", deps:["progress","goals","careteam","ai"], ads:["AD-13"]},
+  ai:       {g:"platform", c:"--t-ai", owns:"Named AI tasks, guardrail pipeline, usage budget; defines the Restriction lookup port", deps:[], ads:["AD-11","AD-12"]},
+  notifications:{g:"platform", c:"--t-platform", owns:"Email, push subscriptions, templates, security notices", deps:[], ads:["AD-17"]},
+  audit:    {g:"platform", c:"--t-platform", owns:"Append-only audit log (IDs only), readable by the Family", deps:[], ads:["AD-6"]},
+  privacy:  {g:"platform", c:"--t-platform", owns:"Data export archive; every module contributes to it", deps:[], ads:["AD-16"]},
+  metrics:  {g:"platform", c:"--t-platform", owns:"Counts-only pilot and AI-evaluation metrics", deps:[], ads:["AD-19"]}
+};
+const map = document.getElementById("map"), det = document.getElementById("moddetail");
+let sel = "practice";
+function renderMap(){
+  map.querySelectorAll(".chips").forEach(c=>c.innerHTML="");
+  const reach = new Set(MODULES[sel].deps);
+  for (const [k,m] of Object.entries(MODULES)) {
+    const b = document.createElement("button");
+    b.type="button"; b.className="chip"; b.textContent=k; b.style.background=`var(${m.c})`;
+    b.setAttribute("aria-pressed", k===sel);
+    if (k!==sel) b.classList.add(reach.has(k) ? "up" : "dim");
+    b.onclick=()=>{sel=k; renderMap();};
+    map.querySelector(`[data-group="${m.g}"]`).appendChild(b);
+  }
+  const m = MODULES[sel];
+  const callers = Object.entries(MODULES).filter(([,x])=>x.deps.includes(sel)).map(([k])=>k);
+  det.innerHTML = `<h3><code>${sel}</code></h3><dl>
+    <dt>Owns</dt><dd>${m.owns}</dd>
+    <dt>May call</dt><dd>${m.deps.length? m.deps.map(d=>`<code>${d}</code>`).join(", ") : "<code>shared</code> only"}</dd>
+    <dt>Called by</dt><dd>${callers.length? callers.map(d=>`<code>${d}</code>`).join(", ") : "none directly (events only)"}</dd>
+    <dt>Key rules</dt><dd>${m.ads.join(", ")}</dd></dl>`;
+}
+renderMap();
+
+const STEPS = [
+  {t:"Open Today", where:["planning","library"], ads:["AD-8","AD-11","AD-15"], pts:[
+    "The PWA loads the offline snapshot: this week's Plan, its Prep cards, and curated Coach Tips already checked against Restrictions.",
+    "The week is computed on the server in the Family's own timezone, and each week starts fresh. Nothing carries over.",
+    "If a new Restriction was added, the snapshot's version changes and the whole offline copy is replaced."]},
+  {t:"Prep and practise", where:["frontend","practice"], ads:["AD-7","AD-15"], pts:[
+    "The session lives only on the device until the Review. Marks, the timer and the tips shown are written to the local database.",
+    "Curated tips appear instantly from the snapshot. AI tips are a read-only extra with a 1.5-second limit.",
+    "The phone can sleep or lose signal; nothing is lost."]},
+  {t:"Save the Review", where:["frontend outbox"], ads:["AD-4","AD-5","AD-8"], pts:[
+    "The Review is queued in the outbox with a device-made ID and the time it actually happened.",
+    "The queued command remembers which Caregiver made it, so a shared tablet can't credit the wrong person.",
+    "The Caregiver sees \"Saved on this device — will sync.\""]},
+  {t:"Sync", where:["practice"], ads:["AD-4","AD-5","AD-7"], pts:[
+    "When online, the outbox sends one CompletePracticeSession command. Replaying it is harmless because the ID already exists.",
+    "If sign-in expired, replay pauses, the Caregiver signs in again in place, and the draft is still there.",
+    "practice then tells library about engagement and helpful tips, which update the ranking for next time."]},
+  {t:"See progress", where:["progress"], ads:["AD-8","AD-13"], pts:[
+    "The progress view asks one query for the Goal's measures: consistency, performance and generalisation.",
+    "Below 5 Observations it shows the points without a trend.",
+    "Any AI description cites the Observations it describes."]},
+  {t:"Share a Summary", where:["summary","audit"], ads:["AD-13","AD-6"], pts:[
+    "The Summary reuses the same measures query, so its numbers always match the progress view.",
+    "AI sentences are stored apart from the Caregiver's own edits, and only AI sentences need citations.",
+    "Confirming the share freezes a snapshot, records an audit event, and fetches the PDF before the share sheet opens."]}
+];
+const sl = document.getElementById("steplist"), sb = document.getElementById("stepbody");
+let cur = 0;
+function renderSteps(){
+  sl.innerHTML = "";
+  STEPS.forEach((s,i)=>{
+    const li=document.createElement("li"), b=document.createElement("button");
+    b.type="button"; b.setAttribute("role","tab"); b.id="st"+i; b.setAttribute("aria-selected", i===cur);
+    b.setAttribute("aria-controls","stepbody"); b.tabIndex = i===cur?0:-1;
+    b.innerHTML=`<span class="n">${i+1}</span>${s.t}`;
+    b.onclick=()=>{cur=i; renderSteps();};
+    b.onkeydown=e=>{ if(e.key==="ArrowDown"||e.key==="ArrowRight"){cur=(cur+1)%STEPS.length;renderSteps();sl.querySelector("#st"+cur).focus();e.preventDefault();}
+                     if(e.key==="ArrowUp"||e.key==="ArrowLeft"){cur=(cur+STEPS.length-1)%STEPS.length;renderSteps();sl.querySelector("#st"+cur).focus();e.preventDefault();} };
+    li.appendChild(b); sl.appendChild(li);
+  });
+  const s=STEPS[cur];
+  sb.setAttribute("aria-labelledby","st"+cur);
+  sb.innerHTML=`<h3>${cur+1}. ${s.t}</h3>
+    <div class="where">${s.where.map(w=>`<span class="tag">${w}</span>`).join("")}${s.ads.map(a=>`<span class="tag ad">${a}</span>`).join("")}</div>
+    <ul>${s.pts.map(p=>`<li>${p}</li>`).join("")}</ul>`;
+}
+renderSteps();
+
+const ADS = [
+ ["AD-1","Module boundaries and the dependency graph are closed","structure","Modules own their tables and call each other only through their api package or events. The graph is verified in CI; platform modules define the events they consume."],
+ ["AD-2","Every Family-owned row is tenant-scoped","privacy","family_id on every Family table with Hibernate @TenantId, resolved from the signed-in Caregiver. Only jobs use the root tenant; native SQL filters explicitly."],
+ ["AD-3","Keycloak owns credentials; the app owns Family and consent","privacy","Invite-only sign-up, consent gate on every Family endpoint, memberships ended rather than deleted."],
+ ["AD-4","UUIDv7 IDs, UUIDv5 for curated content, idempotent creates","offline","The device makes IDs for anything created offline; replaying a create is a no-op. Curated content IDs come from their slug."],
+ ["AD-5","One command outbox, owned by one Caregiver","offline","All writes queue in IndexedDB first, replay under the Caregiver who made them, and survive re-sign-in. Local data is wiped on sign-out."],
+ ["AD-6","Content records are revisioned; concurrent edits are both kept","data","Edits append revisions; two simultaneous edits both appear in History. Undo appends a voided revision. The audit log is insert-only."],
+ ["AD-7","The device owns a Practice Session until the Review","offline","Marks, timer and tips stay on the device and reach the server as one CompletePracticeSession command."],
+ ["AD-8","Time: device occurrence, server attribution, Family calendar","data","occurred_at from the device (clamped), recorded_at and Caregiver from the server; weeks computed in the Family's timezone."],
+ ["AD-9","Ownership of shared domain concepts","structure","A single table of who owns Prompt Levels, Goal Periods, Activities, rankings, Inventory, Plan, Summaries and push subscriptions."],
+ ["AD-10","Typed Source and origin; Care Team wording is immutable","safety","Every Goal, Strategy, Restriction, Activity and tip carries source and origin; original therapist text is write-once."],
+ ["AD-11","One Restriction lookup, versioned checks, fail-closed","safety","Restrictions plus 'avoid' sensitivities, read live, with a version. Failing items are dropped; prescribed Activities are flagged instead."],
+ ["AD-12","Named, allow-listed, budgeted AI tasks","safety","Only the ai module uses Spring AI. Inputs are allow-listed, outputs schema-checked, tips time out at 1.5 s, and a monthly budget caps cost."],
+ ["AD-13","Cited AI text; only Feedback sets Goal status","safety","One measures query for progress and Summaries; AI sentences cite Observations; sharing freezes an audited snapshot."],
+ ["AD-14","Import is gated; nothing unmasked reaches AI","privacy","uploaded → text_read → masking_confirmed → extracted → reviewed. Only a MaskedDocument can be sent for extraction."],
+ ["AD-15","The offline set is one checked snapshot","offline","One endpoint returns this week's Plan, Prep cards and checked tips; replaced when the Restriction version changes."],
+ ["AD-16","Deletion, retention and export reach every copy","privacy","7-day undo then purge of rows, files and Keycloak accounts; backups kept at most 14 days; export as an encrypted, expiring archive."],
+ ["AD-17","Background jobs are idempotent and due-state driven","operations","Jobs claim due rows so a rerun is harmless; at most one reminder a Plan day, none overdue by an hour; security notices never suppressed."],
+ ["AD-18","UI wording in the client; curated content in reviewed files","structure","Server returns codes; copy lives in message catalogs. Curated Activities and tips are reviewed YAML loaded at startup."],
+ ["AD-19","Child content is never logged","privacy","Redacting value types, IDs-only logs, no prompts in logs, counts-only metrics."],
+ ["AD-20","One API contract and one migration layout","structure","RFC 9457 errors, TypeScript types generated from OpenAPI, one Flyway history with per-module folders."],
+ ["AD-21","Encryption and transport","privacy","Storage adapters receive only ciphertext with a key ID; encrypted disks; TLS everywhere, including Tailscale for local devices."],
+ ["AD-22","One deployable, configured only by environment","operations","One app image serving the PWA and API; one compose file for local and shipping; adapters chosen by profile."],
+ ["AD-23","The client data layer has one shape","offline","TanStack Query for server reads, one Dexie database for offline data and the outbox, Radix primitives with DESIGN.md tokens."],
+ ["AD-24","Real-infrastructure tests; guardrails gate releases","operations","Testcontainers PostgreSQL, no H2; the 30+ case guardrail set must pass for the configured model before a pilot release."]
+];
+const CATS = {all:"All", offline:"Offline", safety:"AI safety", privacy:"Privacy", data:"Data", structure:"Structure", operations:"Operations"};
+let cat="all";
+const fb=document.getElementById("fbtns"), list=document.getElementById("adlist"), qi=document.getElementById("q"), cnt=document.getElementById("count");
+for (const [k,v] of Object.entries(CATS)) {
+  const b=document.createElement("button"); b.type="button"; b.className="fbtn"; b.textContent=v; b.dataset.k=k;
+  b.onclick=()=>{cat=k; renderAds();}; fb.appendChild(b);
+}
+function renderAds(){
+  fb.querySelectorAll(".fbtn").forEach(b=>b.setAttribute("aria-pressed", b.dataset.k===cat));
+  const q=qi.value.trim().toLowerCase();
+  const rows=ADS.filter(a=>(cat==="all"||a[2]===cat)&&(!q||(a[0]+" "+a[1]+" "+a[3]).toLowerCase().includes(q)));
+  list.innerHTML=rows.map(a=>`<details class="ad"><summary><span class="id">${a[0]}</span><span class="t">${a[1]}</span></summary><div class="b"><p>${a[3]}</p><span class="tag">${CATS[a[2]]}</span></div></details>`).join("");
+  cnt.textContent = rows.length===ADS.length ? `${rows.length} decisions` : `${rows.length} of ${ADS.length} decisions`;
+}
+qi.addEventListener("input", renderAds); renderAds();
+
+const QS = [
+ ["open","CONFIRMED","One Family per Caregiver","A Caregiver belongs to at most one Family in v1. Changing this later touches the tenant resolver (AD-3)."],
+ ["open","CONFIRMED","Backups kept 14 days","Deleted data can survive in backups for at most 14 days (AD-16)."],
+ ["open","CONFIRMED","A Care Team Member exists before any Goal","Parent-proposed Goals name the member they are proposed to. Onboarding adds one first (AD-9)."],
+ ["open","CONFIRMED","One app instance","Jobs are already safe to rerun; scaling out would add job locks (AD-17)."],
+ ["open","CONFIRMED","Maven, npm, plain CSS modules","Build and styling defaults (AD-23)."],
+ ["open","OQ-1","Support access","How a Caregiver grants time-limited support access. Decide before the pilot launches."],
+ ["open","OQ-2","Which AI models","Chosen by the guardrail evaluation and the cost ceiling, at the start of P2."],
+ ["open","OQ-3","OCR engine for import","A Tesseract container or a vision model, at the start of the import epic."]
+];
+document.getElementById("qgrid").innerHTML = QS.map(q=>`<div class="q ${q[0]}"><span class="k">${q[1]}</span><h3>${q[2]}</h3><p>${q[3]}</p></div>`).join("");
+</script>
