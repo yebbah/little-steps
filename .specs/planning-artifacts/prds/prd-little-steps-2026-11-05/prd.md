@@ -77,7 +77,7 @@ Personas are illustrative composites.
   - **Path:** signs in on a tablet → sees the same plan and goals → runs a movement-based activity prescribed by the child's early-intervention teacher → logs the observation.
   - **Climax:** the first caregiver sees the log in the progress view, attributed to the co-caregiver, without having to ask about it.
 
-- **UJ-4. A caregiver prepares for a therapy review.**
+- **UJ-4. A caregiver prepares for a therapy appointment.**
   - **Path:**
     1. The caregiver opens Summary and picks the SLP and the current goal period.
     2. The draft shows, per goal: how often it was practised at home, X/Y trials, minutes, prompt levels, contexts, new words and gestures, and the caregiver's questions.
@@ -213,6 +213,9 @@ During an activity, a Caregiver who hits a challenge can tap one situation Mark:
 - A Caregiver can mark a tip as helpful, during the activity or in the Review. Helpful tips are shown first next time.
 - Marks pre-fill the Review.
 
+### 4.4 Light Planning
+**Description:** a gentle suggestion of what to practise each week, not a schedule to keep up with.
+
 #### FR-13: Weekly Plan
 A Caregiver can accept or edit a suggested weekly Plan: a few Activities spread across active Goals. They can optionally place each item in a routine or on a day.
 
@@ -255,11 +258,12 @@ They can also add tagged notes for topics such as feeding or sensory needs.
 #### FR-16: Progress view per Goal
 A Caregiver can open a Goal and see its progress across the Goal Period, split into three separate measures:
 - **practice consistency**: sessions per week
-- **performance**: trials, minutes, or counts, plus the Prompt Level trend
+- **performance**: trials, minutes, or counts, plus the Prompt Level trend and, where recorded, attention duration across Practice Sessions
 - **generalisation**: the settings or routines in which the skill was seen
 
 **Consequences (testable):**
 - The view states plainly how much data there is (e.g. "only 3 observations — too few to show a trend").
+- Attention duration appears only when the optional timer or the Review recorded it, and is never framed as a target.
 - AI-written descriptions describe what was recorded and draw no clinical conclusions.
 
 ### 4.6 Summaries for the Care Team
@@ -347,7 +351,7 @@ v1 is released as a small, invite-only pilot. `[ASSUMPTION]`
 **Primary**
 - **SM-1:** Pilot Families use LittleSteps for home practice on ≥3 days a week for 8 consecutive weeks. Validates FR-10, FR-13.
 - **SM-2:** In Families with more than one Caregiver, at least two Caregivers log Observations independently within the first month. Validates FR-1, FR-14.
-- **SM-3:** Caregivers share Summaries at therapy reviews, and the therapists rate them as useful. Validates FR-17.
+- **SM-3:** Caregivers share Summaries at therapy appointments, and the therapists rate them as useful. Validates FR-17.
 
 **Secondary**
 - **SM-4:** A typical Observation is logged in ≤30 seconds. Validates FR-14.
