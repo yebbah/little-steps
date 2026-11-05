@@ -364,7 +364,7 @@ const ADS = [
  ["AD-19","Child content is never logged","privacy","Redacting value types, IDs-only logs, no prompts in logs, counts-only metrics."],
  ["AD-20","One API contract and one migration layout","structure","RFC 9457 errors, TypeScript types generated from OpenAPI, one Flyway history with per-module folders."],
  ["AD-21","Encryption and transport","privacy","Storage adapters receive only ciphertext with a key ID; encrypted disks; TLS everywhere, including Tailscale for local devices."],
- ["AD-22","One deployable, configured only by environment","operations","One app image serving the PWA and API; one compose file for local and shipping; adapters chosen by profile."],
+ ["AD-22","One deployable, configured only by environment","operations","One app image serving the PWA and API; one compose file for local and shipping; dev-up.sh and dev-down.sh start and stop the local stack (CAP-19); adapters chosen by profile."],
  ["AD-23","The client data layer has one shape","offline","TanStack Query for server reads, one Dexie database for offline data and the outbox, Radix primitives with DESIGN.md tokens."],
  ["AD-24","Real-infrastructure tests; guardrails gate releases","operations","Testcontainers PostgreSQL, no H2; the 30+ case guardrail set must pass for the configured model before a pilot release."]
 ];

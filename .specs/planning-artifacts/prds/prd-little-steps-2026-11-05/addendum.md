@@ -67,9 +67,15 @@ Notes for architecture:
 - It builds to static files, which Spring Boot can serve. Next.js's main advantage is server-side rendering, and the Spring Boot backend already does the server-side work, so Next.js adds complexity without benefit here.
 
 ### A.7 Local packaging
-- `docker compose up` starts PostgreSQL, Keycloak, and Mailpit (plus Presidio, if it is adopted; see A.8).
-- Spring Boot and the Vite dev server run outside Docker, for debugging and hot reload. The AI model runtime runs natively on the Mac.
-- The README covers the one-time setup: Keycloak realm import, the Ollama model pull, and Tailscale for testing on a device.
+Setting up the local environment is in v1 scope (spec CAP-19, architecture AD-22), and it is built first.
+- `deploy/dev-up.sh` starts PostgreSQL, Keycloak with its realm imported, and Mailpit (plus Presidio, once it is adopted; see A.8), then waits until they are healthy.
+  - It first checks the prerequisites (Docker, Java, Node, Ollama and the configured model) and says how to fix anything missing.
+  - It is safe to run twice.
+  - `--full` also builds and runs the app container image.
+- `deploy/dev-down.sh` stops everything and keeps the data. `--wipe` resets the volumes and local files.
+- One `deploy/Dockerfile` builds the app image (the PWA plus Spring Boot). The same image is used when shipping.
+- For day-to-day work, Spring Boot and the Vite dev server run outside Docker, for debugging and hot reload. The AI model runtime runs natively on the Mac.
+- The README covers the one-time setup with these commands, plus Tailscale for testing on a device.
 
 ### A.8 Identifier masking library (option)
 - **Microsoft Presidio** is open source (Python) and is one of the strongest tools for detecting and masking PII such as names, dates of birth, addresses, and ID numbers.
