@@ -23,7 +23,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 | --- | --- | --- | --- |
 | 1 | [Local environment and project skeleton](epic-01-local-environment.md) | approved | [#2](https://github.com/yebbah/little-steps/issues/2) |
 | 2 | [App shell and design foundations](epic-02-app-shell.md) | approved | [#3](https://github.com/yebbah/little-steps/issues/3) |
-| 3 | Sign-in, Family and consent | planned | [#4](https://github.com/yebbah/little-steps/issues/4) |
+| 3 | [Sign-in, Family and consent](epic-03-sign-in-family-consent.md) | approved | [#4](https://github.com/yebbah/little-steps/issues/4) |
 | 4 | Child Profile and Care Team | planned | [#5](https://github.com/yebbah/little-steps/issues/5) |
 | 5 | Goals and Goal Periods | planned | [#6](https://github.com/yebbah/little-steps/issues/6) |
 | 6 | Strategies and Restrictions | planned | [#7](https://github.com/yebbah/little-steps/issues/7) |
@@ -56,8 +56,8 @@ The app has its visual identity, navigation shell, status region and shared comp
 **Done when:** a component gallery renders in light and dark, at phone and laptop widths, and passes the contrast and accessibility checks.
 
 ### Epic 3: Sign-in, Family and consent
-A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family.
-**FRs covered:** FR-1
+A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family. Also adds Family tenancy, the device outbox, the audit table, and a maintainer console for pilot invites.
+**FRs covered:** FR-1; NFR-4, NFR-5 (recording)
 **Done when:** invite → sign-up → consent → Family → co-caregiver joins, leaves or is removed, and the others are notified.
 
 ### Epic 4: Child Profile and Care Team
