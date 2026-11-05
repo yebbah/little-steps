@@ -22,7 +22,7 @@ Young children in developmental therapy often work with several professionals at
 
 Therapy sessions are often expensive and infrequent, so most of the repetition happens at home. Home is also where caregivers feel least equipped. They don't know what to do today or how to do it well in the moment, and they lose track of what they saw.
 
-LittleSteps brings the care team's guidance into one place. It turns goals into short, playful activities that fit family routines. It also **coaches caregivers during the activity itself**. For example: "Hold the book yourself and control the pace. Get down to the child's eye level. Bring in a familiar song."
+LittleSteps brings the care team's guidance into one place. It turns goals into short, playful activities that fit family routines. It also **prepares caregivers before the activity** and gives lightweight help if it gets hard. Coaching happens mostly in a short prep, not on screen while the caregiver is with the child. The aim is a natural interaction for the child and the caregiver, not a clinical one. For example: "Hold the book yourself and control the pace. Get down to the child's eye level. Bring in a familiar song."
 
 Caregivers log what happened in seconds, using the therapists' own units and terms: trials, prompt levels, minutes. At the end of a goal period, they have a shareable summary that shows the therapist what happened at home, in a structure the therapist recognises.
 
@@ -36,7 +36,7 @@ LittleSteps supports professional care and never replaces it. It does not diagno
 
 ### 2.1 Jobs To Be Done
 - **Functional:** "Show me what to practise today, for which goal, and how, in under a minute."
-- **In the moment:** "When my child loses attention, give me a quick tip I can use right now."
+- **Before and in the moment:** "Give me a few cues to take into the activity, and if it gets hard, let me mark it and get a quick tip without breaking the flow."
 - **Memory:** "Help me record what my child did, so I'm not reconstructing it from memory before the next session."
 - **Continuity:** "Keep goals from every professional in one place, including how they change from one goal period to the next."
 - **Partnership:** "Let another caregiver pick up practice and log it without needing a briefing."
@@ -50,16 +50,17 @@ LittleSteps supports professional care and never replaces it. It does not diagno
 
 Personas are illustrative composites.
 
-- **UJ-1. A caregiver rescues a shared-reading session that's falling apart.**
-  - **Persona + context:** a working parent doing evening practice with a toddler. The activity is shared storybook reading, linked to a joint-attention goal.
-  - **Entry state:** signed in on a phone, with today's plan open.
+- **UJ-1. A caregiver preps a short shared-reading session, plays it naturally, and reviews it afterwards.**
+  - **Persona + context:** a working parent doing evening practice with a toddler. The activity is shared storybook reading, linked to a joint-attention goal. A session is one or two short activities, so the phone can stay in a pocket.
+  - **Entry state:** signed in on a phone, with today's plan open. The child is not yet involved.
   - **Path:**
-    1. The parent taps today's "Storybook together" activity and sees the objective, the materials, and 3 short steps, then starts.
-    2. The child keeps grabbing the book and flipping pages.
-    3. The parent taps **"Losing attention"** and gets 2–3 short coach tips: *hold the book yourself and control the pace; sit face to face at eye level; sing a familiar song about the picture; let the child turn the page only after a shared look.*
+    1. **Prep (caregiver alone).** The parent opens today's "Storybook together" activity and reads a short prep card: the objective, the materials, and 2–3 cues: *hold the book yourself and control the pace; sit face to face at eye level; have a familiar song ready.* They also see, ahead of time, what to try if attention drops. They put the phone away.
+    2. **Activity (phone out of the way).** The parent reads with the child using the cues from memory. The child keeps grabbing the book and flipping pages. The parent uses a cue from the prep card. Optionally, a timer was started to note how long the child stayed engaged.
+    3. **Optional mid-activity mark.** If the parent hits a challenge, they tap one button, **"Losing attention"**, without leaving the moment. The app records the mark and shows at most 2–3 short tips (e.g. *sing a familiar song about the picture; let the child turn the page only after a shared look*). Tips are optional and glanceable.
   - **Climax:** the child settles for a few pages and points at a picture. The parent had a workable next step instead of giving up.
-  - **Resolution:** the parent taps Stop and logs the session in about 20 seconds: roughly 4 minutes of shared attention, "model shown" as the prompt level, engagement "OK", and which tip helped. Over time, the activity learns which tips work for this child.
+  - **Resolution (after the activity):** the parent reviews and logs the session in about 20 seconds. The app pre-fills the elapsed time and any marks from the session. The parent adds roughly how long the child attended (e.g. about 4 minutes), "model shown" as the prompt level, engagement "OK", and which tip or cue helped. Over time, the activity learns which tips work for this child, and attention span across sessions shows gentle progression.
   - **Edge case:** the child is tired. The parent stops after 1 minute and logs "not attempted / child not available." Nothing is marked as failed and nothing carries over to tomorrow.
+  - **Alternative mode:** a caregiver who wants live step-by-step guidance can use **Guided mode**, which keeps the steps and tips on screen during the activity. It is a choice, not the default.
 
 - **UJ-2. A caregiver enters a new period's therapy goals.**
   - **Persona + context:** at the start of a new goal period, a new goal sheet arrives from the SLP, often together with the previous period's progress summary.
@@ -97,9 +98,12 @@ Personas are illustrative composites.
 - **Status Vocabulary**: the progress terms a Care Team Member uses, e.g. Achieved / Achieved in context / Partially achieved / Not yet presented. Configurable per Care Team Member.
 - **Strategy**: a technique recommended by a Care Team Member, e.g. "adapt a repeated script by changing 1–2 words to fit the situation." Attached to Goals.
 - **Activity**: a short practice idea linked to one or more Goals. Has a purpose, materials, steps, variations, Coach Tips, and what to observe. Either *prescribed* (from a Care Team Member) or *suggested* (AI-generated).
-- **Coach Tip**: a short engagement tip shown in the moment during a Practice Session.
+- **Coach Tip**: a short engagement tip shown in the prep card, or on request in the moment when the Caregiver marks a challenge.
+- **Prep**: the Caregiver-only step before an Activity: objective, materials, and a few cues to carry into the activity.
+- **Mark**: a one-tap note a Caregiver makes mid-activity about a challenge (e.g. Losing attention). Marks are stored with the session and pre-fill the review.
 - **Plan**: the lightweight set of Activities suggested for the current week.
-- **Practice Session**: one run of an Activity by a Caregiver. Can be paused, skipped, or stopped at any time.
+- **Practice Session**: one to two Activities done together in one sitting, after a Prep and followed by a Review. Can be paused, skipped, or stopped at any time.
+- **Review**: the quick Observation a Caregiver logs after the activity, not during it.
 - **Observation**: what a Caregiver records about a Practice Session, or about a spontaneous moment.
 - **Summary**: a shareable, editable digest of Observations for one Care Team Member and Goal Period.
 
@@ -164,7 +168,7 @@ A Caregiver can record Strategies and prescribed Activities and attach them to G
 - AI never rewrites a prescribed Activity.
 
 ### 4.3 Activities & Coaching
-**Description:** LittleSteps suggests short, playful Activities for active Goals. During practice, it guides the Caregiver with glanceable steps and Coach Tips. The core problem it solves is the moment practice falls apart. Realizes UJ-1, UJ-3.
+**Description:** LittleSteps suggests short, playful Activities for active Goals. It follows a **prep, activity, review** flow: the Caregiver preps with cues, does the activity naturally with the phone out of the way, and reviews afterwards. During the activity, the app stays in the background and offers only optional marks and tips. The core problem it solves is the moment practice falls apart. Realizes UJ-1, UJ-3.
 
 #### FR-8: Activity library
 A Caregiver can browse Activities by Goal, save favourites, and hide Activities that don't work.
@@ -181,28 +185,33 @@ A Caregiver can request new Activity ideas for a Goal. They can optionally filte
 - Suggestions are labelled *AI-suggested*.
 - Any suggestion that would change a therapeutic technique is flagged "check with your therapist".
 
-#### FR-10: Guided Practice Session
-A Caregiver can start an Activity and follow it step by step on a phone or tablet. They can pause, skip a step, or stop at any time.
+#### FR-10: Prep, activity, review flow
+A Caregiver can prep an Activity, do it without the app in the foreground, and review it afterwards. A Practice Session consists of one or two Activities. Optional **Guided mode** shows step-by-step guidance on a phone or tablet for Caregivers who want it.
 
 **Consequences (testable):**
-- The session is readable at arm's length and usable with one hand. `[ASSUMPTION]`
-- Stopping early always leads to the quick log (FR-13).
-- Stopping early is never presented as a failure.
+- The default flow needs no screen interaction between Prep and Review.
+- The Caregiver can pause, skip, or stop at any time.
+- Stopping early always leads to the quick log (FR-14) and is never presented as a failure.
+- An optional timer can be started with one tap. It is not required, is never shown as a target, and its result only pre-fills attention duration for the Review. Attention span across sessions can be viewed as a gentle trend.
+- Guided mode and marks are readable at arm's length and usable with one hand. `[ASSUMPTION]`
 
-#### FR-11: Before-you-start prep
-Before a session, a Caregiver sees 1–3 setup tips specific to the Activity, e.g. *you hold the book and control the pace; sit face to face at eye level; have a familiar song ready.*
-
-#### FR-12: In-the-moment Coach Tips
-During a Practice Session, a Caregiver can tap a situation button: **Losing attention**, **Upset**, **Too easy**, or **Too hard**. The app then shows 2–3 short, actionable Coach Tips. Realizes UJ-1.
+#### FR-11: Prep
+Before an Activity, a Caregiver sees a short Prep card with the objective, materials, 1–3 cues specific to the Activity, and what to try if attention drops, e.g. *you hold the book and control the pace; sit face to face at eye level; have a familiar song ready.*
 
 **Consequences (testable):**
+- The Prep card is readable in under a minute and works without starting a session.
+- Cues can be saved or reviewed again, so the Caregiver can carry them into the activity from memory.
+
+#### FR-12: Marks and Coach Tips
+During an activity, a Caregiver who hits a challenge can tap one situation Mark: **Losing attention**, **Upset**, **Too easy**, or **Too hard**. The Mark is saved with the session. The app can then show 2–3 short, actionable Coach Tips. Realizes UJ-1.
+
+**Consequences (testable):**
+- Marking takes one tap, and tips are optional and dismissible.
 - Tips appear in under 2 seconds.
 - A curated starter set of tips comes first, so the first tips never wait on AI. `[ASSUMPTION]`
 - Tips draw on the child's interests (e.g. familiar songs) and on the Care Team's Strategies.
-- A Caregiver can mark a tip as helpful. Helpful tips are shown first next time.
-
-### 4.4 Light Planning
-**Description:** a gentle suggestion of what to practise each week, not a schedule to keep up with.
+- A Caregiver can mark a tip as helpful, during the activity or in the Review. Helpful tips are shown first next time.
+- Marks pre-fill the Review.
 
 #### FR-13: Weekly Plan
 A Caregiver can accept or edit a suggested weekly Plan: a few Activities spread across active Goals. They can optionally place each item in a routine or on a day.
@@ -316,7 +325,7 @@ FR-1 to FR-17:
 - document import with review
 - Strategies and prescribed Activities
 - Activity library with AI suggestions
-- guided Practice Sessions with prep and in-the-moment Coach Tips
+- a prep, activity, review flow (with optional Guided mode and timer), plus one-tap Marks and Coach Tips
 - a weekly Plan with no backlog
 - quick Observations
 - skill inventories
