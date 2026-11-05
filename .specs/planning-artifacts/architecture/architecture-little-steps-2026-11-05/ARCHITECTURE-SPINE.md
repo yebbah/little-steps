@@ -340,6 +340,57 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
   - The guardrail evaluation set (at least 30 cases) lives in `eval/guardrails/*.yaml` and runs as the JUnit tag `guardrail-eval` against the model configured for an environment.
   - A pilot release needs a passing report for that environment's model.
 
+### AD-25 — Every commit and every image passes a vulnerability gate
+
+- **Binds:** all code, dependencies, container images and CI; NFR-20
+- **Prevents:** a known-exploited or high-severity vulnerability reaching a commit or a release, and each developer or agent scanning differently, or not at all.
+- **Rule:**
+  - `deploy/security-scan.sh` is the one scan entry point. It is run by a git pre-commit hook (`.githooks/`, enabled through `core.hooksPath` by `dev-up.sh`) and again in CI. Commits are never made with `--no-verify`, and CI repeats the scan, so a skipped hook still fails.
+  - It checks:
+    - secrets in staged changes (gitleaks)
+    - backend and frontend dependencies, through CycloneDX SBOMs (Maven plugin, npm lockfile) scanned by Grype
+    - the images listed in `deploy/images.yaml`
+  - **Blocking rule:** any finding whose CVE is in the CISA KEV catalog, or whose CVSS is High or Critical (7.0 or above), blocks the commit or build until it is fixed by upgrading, replacing or removing the component.
+  - The KEV feed is cached daily. With no cache, the scan blocks.
+  - The only way past a blocking finding without a fix is when no fixed version exists. That needs an entry in `security/exceptions.yaml` with the CVE, the reason, the mitigation and an expiry of at most 30 days. An expired entry blocks again. Every active exception appears in the release note (AD-27).
+  - Scan reports (`build/security/`) feed the release note.
+  - GitHub Actions are pinned to full commit SHAs. Scanner versions are pinned, and their checksums are verified by the script.
+
+### AD-26 — Container images come from Docker Hardened Images where available, pinned by digest
+
+- **Binds:** `deploy/Dockerfile`, `deploy/compose.yaml`; NFR-21
+- **Prevents:** unvetted base images, and image drift between machines.
+- **Rule:**
+  - `deploy/images.yaml` is the manifest of every image used. For each one it records the name, the source (`dhi` or `other`), the tag, the digest, and for `other`, why no DHI image is used.
+  - Images are pulled from `dhi.io` when the catalog has one: PostgreSQL, and the Node build and Java/Temurin JRE runtime stages of the app image.
+  - Images with no DHI equivalent are pulled from their official publisher: Keycloak (`quay.io/keycloak`), Mailpit (local only) and Presidio (P2).
+  - Every image in `compose.yaml` and the `Dockerfile` is referenced by digest, matching the manifest. A CI check fails on any mismatch.
+  - Each `other` image appears as a warning in every release note.
+  - `dev-up.sh` checks that the developer is logged in to `dhi.io`.
+
+### AD-27 — Every completed epic ships a release note
+
+- **Binds:** every epic; NFR-22
+- **Prevents:** epics closed without a record of what changed, how to integrate it, its security posture and its test evidence.
+- **Rule:**
+  - An epic is closed only when `docs/release-notes/epic-NN-<slug>.md` exists, built from `docs/release-notes/TEMPLATE.md`.
+  - `deploy/release-notes.sh <epic>` gathers the facts:
+    - the commits and stories in the epic
+    - migrations and new configuration
+    - security reports, active exceptions and `other` images
+    - quality reports
+    - test results
+  - The narrative sections are written by the developer or agent closing the epic.
+  - Required sections:
+    - Summary
+    - New features (by story)
+    - Changes
+    - Integration notes: migrations, new environment variables, services, ports, API changes and breaking changes
+    - Security: scan totals, KEV and High/Critical counts (must be 0), exceptions, non-DHI image warnings and SBOM location
+    - Code quality: lint, typecheck, coverage, modularity verification
+    - Test results: new tests for this epic (positive and negative cases), plus the full non-regression suite with counts and duration
+    - Known issues
+
 ## Consistency Conventions
 
 | Concern | Convention |
@@ -380,6 +431,8 @@ Versions checked on the web on 2026-11-05. Pin the exact patch versions at scaff
 | zerodep-web-push-java | 2.1.5 |
 | Presidio (P2, `ghcr.io/data-privacy-stack/presidio-*`) | 2.2.366 |
 | Mailpit, Ollama | latest (local only) |
+| Grype (vulnerability scan), Syft/CycloneDX (SBOM), gitleaks (secrets) | pinned at scaffold, checksum-verified |
+| Docker Hardened Images (`dhi.io`) | digest-pinned per `deploy/images.yaml` |
 
 **Release line:** if scaffolding happens after Spring Boot 4.2 GA, move Boot 4.2.x, Spring Modulith 2.2.x and Spring AI 2.1.x together, never mixed with the 4.1 set.
 
@@ -483,7 +536,10 @@ little-steps/
   frontend/                # React + Vite PWA
   content/                 # curated Activities, Cues, Coach Tips (YAML, professionally reviewed)
   eval/guardrails/         # >=30 Restriction and scope cases (AD-24)
-  deploy/                  # Dockerfile, compose.yaml, *.env.example, keycloak/ realm export, dev-up.sh, dev-down.sh
+  deploy/                  # Dockerfile, compose.yaml, images.yaml, *.env.example, keycloak/, dev-up.sh, dev-down.sh, security-scan.sh, release-notes.sh
+  .githooks/               # pre-commit runs deploy/security-scan.sh (AD-25)
+  security/                # exceptions.yaml (AD-25)
+  docs/release-notes/      # TEMPLATE.md + one note per completed epic (AD-27)
 ```
 
 ## Capability → Architecture Map
@@ -511,6 +567,7 @@ little-steps/
 | §5 Export, deletion, retention, audit log, pilot end | `family`, `privacy`, `import`, `audit` | AD-6, AD-16, AD-17 |
 | §6 Observability, cost; §9 metrics | `metrics`, `ai` | AD-12, AD-19 |
 | CAP-19 Local development environment | `deploy/` | AD-22, AD-24 |
+| Supply-chain security, release notes | `deploy/`, `.githooks/`, `security/`, `docs/release-notes/` | AD-25, AD-26, AD-27 |
 
 ## Open Questions
 
