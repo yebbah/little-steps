@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Practice</title>
+<style>
+/*
+  LittleSteps key screen: Practice (Playroom direction)
+  GOVERNING SPINE SECTIONS
+    DESIGN.md: Components > Practice screen (floor, quiet ink-soft timer, 2x2 mark-button: card bg, ink
+      heading text, 2px action outline, block shadow, lg radius, >=72px), Done = button-primary [ASSUMPTION],
+      Coach Tip sheet (xl top corners, grabber, "A few ideas to try", body tips, Helpful choice-chip);
+      Elevation (only sheets float, soft shadow over scrim)
+    EXPERIENCE.md: Component Patterns > Practice screen, Mark button, Coach Tip sheet, Timer (no target/countdown);
+      Accessibility Floor (Mark announces "Mark saved: Losing attention"; focus moves to first tip, shown by focus ring);
+      Interaction Primitives (Close as non-gesture dismiss); Key Flows > Flow 1 step 4
+  Visual reference: .working/direction-playroom.html. Spines win on conflict with this mock.
+
+  WCAG AA CONTRAST (text >= 4.5:1), computed from DESIGN.md tokens
+    LIGHT                                   DARK (-dark tokens)
+    ink on card ............. 15.32         ink on card ............. 13.44
+    ink on floor ............ 14.33         ink on floor ............ 15.41
+    ink-soft on card ........  6.91         ink-soft on card ........  7.30
+    ink-soft on floor .......  6.46         ink-soft on floor .......  8.37
+    ink on joint tint ....... 12.14         ink on joint tint ....... 11.22
+    ink-soft on joint tint ..  5.47         ink-soft on joint tint ..  6.10
+    action on joint tint ....  7.24         action on joint tint ....  6.55
+    action on card ..........  9.14         action on card ..........  7.85
+    action on floor .........  8.55         action on floor .........  9.00
+    action-fg on action .....  9.14         action-fg on action .....  8.78
+    block-fg on block .......  7.96         block-fg on block .......  6.89
+    care-team on soft .......  5.88         care-team on soft .......  6.42
+    ink / ink-soft on comm .. 12.40 / 5.59  ink / ink-soft on comm .. 11.63 / 6.32
+    ink / ink-soft on motor . 12.49 / 5.63  ink / ink-soft on motor . 11.39 / 6.19
+    ink / ink-soft on play .. 11.91 / 5.37  ink / ink-soft on play .. 12.49 / 6.79
+    board caption #4A4E58 on #E3E0DA (presentation only) 6.32
+  NON-TEXT (1.4.11): action outline on card 9.14 (selected chip, mark button, secondary button).
+    Neutral outline on card is 1.37 light / 1.35 dark: decorative card edge only; chip/stepper
+    identity is carried by their text labels. (Flagged to parent.)
+*/
+
+:root{--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.phone{--floor:#FAF7F2;--card:#FFFFFF;--ink:#23252B;--ink2:#555A66;--outline:#D9DCE6;--action:#33457F;--action-fg:#FFFFFF;
+  --block:#3A4D8F;--block-fg:#FFFFFF;--block-shadow:#26336A;--joint:#DDE5F8;--comm:#FCE3CC;--motor:#D6EEDC;--play:#F7DCE6;
+  --care:#3D5A80;--care-soft:#E4EBF4;--icon:#33457F;--tile-shadow-joint:#B8C5EA;--tile-shadow-comm:#EFC49E;--focus:#33457F}
+.phone.dark{--floor:#17191F;--card:#22252D;--ink:#EEF0F5;--ink2:#AEB3C0;--outline:#353A47;--action:#A9B8EC;--action-fg:#141A33;
+  --block:#8FA2E3;--block-fg:#141A33;--block-shadow:#5D6DAE;--joint:#273150;--comm:#3E2C1E;--motor:#1F3628;--play:#3A2430;
+  --care:#9DB7DA;--care-soft:#243142;--icon:#A9B8EC;--tile-shadow-joint:#1A2240;--tile-shadow-comm:#2B1E14;--focus:#A9B8EC}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:#E3E0DA;font-family:var(--sans);color:#23252B;padding:32px 16px}
+a{text-decoration:none;color:inherit}
+.board{display:flex;flex-wrap:wrap;gap:48px;justify-content:center;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:12px;align-items:center}
+.cap{font-size:.8125rem;line-height:1.4;color:#4A4E58;max-width:390px;text-align:center}
+.phone{position:relative;width:390px;height:844px;border-radius:48px;background:var(--floor);color:var(--ink);overflow:hidden;
+  box-shadow:0 0 0 10px #1A1A1A,0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.status{height:44px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:.8125rem;font-weight:600;color:var(--ink)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+/* type tokens */
+.t-display{font-size:2.25rem;font-weight:800;line-height:1.08;letter-spacing:-.02em}
+.t-title{font-size:1.5rem;font-weight:800;line-height:1.15;letter-spacing:-.01em}
+.t-heading{font-size:1.25rem;font-weight:800;line-height:1.25}
+.t-section{font-size:.8125rem;font-weight:700;line-height:1.3;letter-spacing:.04em;color:var(--ink2)}
+.t-body{font-size:1.0625rem;font-weight:400;line-height:1.55}
+.t-body-sm{font-size:.875rem;font-weight:400;line-height:1.55;color:var(--ink2)}
+.t-cue{font-size:1.1875rem;font-weight:600;line-height:1.35}
+.t-label{font-size:.9375rem;font-weight:700;line-height:1.3}
+.t-meta{font-size:.8125rem;font-weight:400;line-height:1.4}
+.ink2{color:var(--ink2)}
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:9999px;font:700 .9375rem/1.3 var(--sans);padding:0 20px}
+.btn-primary{background:var(--action);color:var(--action-fg)}
+.btn-secondary{background:var(--card);color:var(--action);border:2px solid var(--action)}
+.btn-quiet{color:var(--ink2);padding:0 12px;min-height:48px;background:transparent}
+.badge{display:inline-flex;align-items:center;border-radius:9999px;padding:3px 10px;font-size:.8125rem;line-height:1.4;background:var(--care-soft);color:var(--care)}
+/* icon tile */
+.icon-tile{flex:none;background:var(--card);border-radius:20px;display:flex;align-items:center;justify-content:center}
+.icon-tile.joint{box-shadow:0 3px 0 var(--tile-shadow-joint)}
+.icon-tile.comm{box-shadow:0 3px 0 var(--tile-shadow-comm)}
+.ico{fill:none;stroke:var(--icon);stroke-linejoin:round;stroke-linecap:round}
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border-radius:9999px;background:var(--card);color:var(--ink);
+  border:2px solid var(--outline);font:700 .9375rem/1.3 var(--sans)}
+.chip.sel{background:var(--joint);border-color:var(--action)}
+/* bottom nav */
+.nav{flex:none;display:flex;background:var(--card);border-top:2px solid var(--outline);padding:6px 4px 26px}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;color:var(--ink2);font-size:.8125rem;font-weight:600;line-height:1.4}
+.nav a.on{color:var(--action)}
+.nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.screen{flex:1;display:flex;flex-direction:column;padding:0 16px 30px;position:relative}
+.ptop{display:flex;justify-content:space-between;align-items:center;min-height:48px}
+.ptop .timer{color:var(--ink2);padding-left:4px}
+.spacer{flex:1}
+.marks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mark{display:flex;align-items:center;justify-content:center;text-align:center;min-height:128px;padding:12px;background:var(--card);color:var(--ink);
+  border:2px solid var(--action);border-radius:20px;box-shadow:0 3px 0 var(--block-shadow);font-size:1.25rem;font-weight:800;line-height:1.25}
+.done{margin-top:20px}
+.scrim{position:absolute;inset:0;background:rgba(23,25,31,.45)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:28px 28px 0 0;padding:12px 24px 34px;
+  box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+.grab{width:44px;height:5px;border-radius:9999px;background:var(--outline);margin:0 auto 16px}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.sheet-head .t-meta{color:var(--ink2)}
+.tips{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:12px}
+.tip{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border:2px solid var(--outline);border-radius:20px}
+.tip .chip{align-self:flex-start}
+.tip:first-child p{outline:2px solid var(--focus);outline-offset:4px;border-radius:6px}
+</style></head>
+<body><main class="board">
+<section class="col"><div class="phone">
+<div class="status"><span>7:12</span><span aria-hidden="true">&#9679;&#9679;&#9679; &#9644;</span></div>
+<div class="screen">
+  <div class="ptop"><span class="t-meta timer">Timer 3:42</span><a class="btn btn-quiet" href="#" style="margin-right:-12px">Prep card</a></div>
+  <div class="spacer"></div>
+  <div class="marks" role="group" aria-label="Marks">
+    <a class="mark" href="#">Losing attention</a><a class="mark" href="#">Upset</a>
+    <a class="mark" href="#">Too easy</a><a class="mark" href="#">Too hard</a>
+  </div>
+  <a class="btn btn-primary done" href="#">Done</a>
+</div>
+</div><p class="cap">Practice at rest: nearly empty floor, quiet timer, four white block Mark buttons with indigo outline in the lower half, Done.</p></section>
+<section class="col"><div class="phone">
+<div class="status"><span>7:12</span><span aria-hidden="true">&#9679;&#9679;&#9679; &#9644;</span></div>
+<div class="screen">
+  <div class="ptop"><span class="t-meta timer">Timer 3:42</span><a class="btn btn-quiet" href="#" style="margin-right:-12px">Prep card</a></div>
+  <div class="spacer"></div>
+  <div class="marks" role="group" aria-label="Marks">
+    <a class="mark" href="#">Losing attention</a><a class="mark" href="#">Upset</a>
+    <a class="mark" href="#">Too easy</a><a class="mark" href="#">Too hard</a>
+  </div>
+  <a class="btn btn-primary done" href="#">Done</a>
+</div>
+<div class="scrim" aria-hidden="true"></div>
+<section class="sheet" role="dialog" aria-label="Coach tips: Losing attention">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sheet-head"><div><p class="t-meta">Mark saved: Losing attention</p><h2 class="t-heading">A few ideas to try</h2></div>
+    <a class="btn btn-quiet" href="#" style="margin-right:-12px">Close</a></div>
+  <ul class="tips">
+    <li class="tip"><p class="t-body">Sing a familiar song about the picture</p><span class="chip sel" role="switch" aria-checked="true">Helpful</span></li>
+    <li class="tip"><p class="t-body">Let the page turn only after a shared look</p><span class="chip" role="switch" aria-checked="false">Helpful</span></li>
+    <li class="tip"><p class="t-body">Try just two more pages</p><span class="chip" role="switch" aria-checked="false">Helpful</span></li>
+  </ul>
+</section>
+</div><p class="cap">After tapping Losing attention: Coach Tip sheet over a scrim, three curated tips, first marked Helpful; focus ring on the first tip.</p></section>
+</main></body></html>

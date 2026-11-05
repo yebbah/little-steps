@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prep card</title>
+<style>
+/*
+  LittleSteps key screen: Prep card (Playroom direction)
+  GOVERNING SPINE SECTIONS
+    DESIGN.md: Components > Prep card (hero band, icon-tile 76px, domain-chip, display name, body-sm,
+      materials block-card grid, Care Team Strategy block-card + source-badge-care-team, cue-tile, cue-number,
+      dashed "If it gets hard", pinned footer); Typography (display -> body-sm jump); Colors (joint-attention
+      periwinkle, dark mode); Elevation (block shadow on icon tile + cue numbers only); Shapes
+    EXPERIENCE.md: Component Patterns > Domain tint, Prep card (2-3 Cues, collapsed If it gets hard), Source badge;
+      Key Flows > Flow 1 step 1; Voice and Tone (nickname Bean)
+  Visual reference: .working/direction-playroom.html. Spines win on conflict with this mock.
+
+  WCAG AA CONTRAST (text >= 4.5:1), computed from DESIGN.md tokens
+    LIGHT                                   DARK (-dark tokens)
+    ink on card ............. 15.32         ink on card ............. 13.44
+    ink on floor ............ 14.33         ink on floor ............ 15.41
+    ink-soft on card ........  6.91         ink-soft on card ........  7.30
+    ink-soft on floor .......  6.46         ink-soft on floor .......  8.37
+    ink on joint tint ....... 12.14         ink on joint tint ....... 11.22
+    ink-soft on joint tint ..  5.47         ink-soft on joint tint ..  6.10
+    action on joint tint ....  7.24         action on joint tint ....  6.55
+    action on card ..........  9.14         action on card ..........  7.85
+    action on floor .........  8.55         action on floor .........  9.00
+    action-fg on action .....  9.14         action-fg on action .....  8.78
+    block-fg on block .......  7.96         block-fg on block .......  6.89
+    care-team on soft .......  5.88         care-team on soft .......  6.42
+    ink / ink-soft on comm .. 12.40 / 5.59  ink / ink-soft on comm .. 11.63 / 6.32
+    ink / ink-soft on motor . 12.49 / 5.63  ink / ink-soft on motor . 11.39 / 6.19
+    ink / ink-soft on play .. 11.91 / 5.37  ink / ink-soft on play .. 12.49 / 6.79
+    board caption #4A4E58 on #E3E0DA (presentation only) 6.32
+  NON-TEXT (1.4.11): action outline on card 9.14 (selected chip, mark button, secondary button).
+    Neutral outline on card is 1.37 light / 1.35 dark: decorative card edge only; chip/stepper
+    identity is carried by their text labels. (Flagged to parent.)
+*/
+
+:root{--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.phone{--floor:#FAF7F2;--card:#FFFFFF;--ink:#23252B;--ink2:#555A66;--outline:#D9DCE6;--action:#33457F;--action-fg:#FFFFFF;
+  --block:#3A4D8F;--block-fg:#FFFFFF;--block-shadow:#26336A;--joint:#DDE5F8;--comm:#FCE3CC;--motor:#D6EEDC;--play:#F7DCE6;
+  --care:#3D5A80;--care-soft:#E4EBF4;--icon:#33457F;--tile-shadow-joint:#B8C5EA;--tile-shadow-comm:#EFC49E;--focus:#33457F}
+.phone.dark{--floor:#17191F;--card:#22252D;--ink:#EEF0F5;--ink2:#AEB3C0;--outline:#353A47;--action:#A9B8EC;--action-fg:#141A33;
+  --block:#8FA2E3;--block-fg:#141A33;--block-shadow:#5D6DAE;--joint:#273150;--comm:#3E2C1E;--motor:#1F3628;--play:#3A2430;
+  --care:#9DB7DA;--care-soft:#243142;--icon:#A9B8EC;--tile-shadow-joint:#1A2240;--tile-shadow-comm:#2B1E14;--focus:#A9B8EC}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:#E3E0DA;font-family:var(--sans);color:#23252B;padding:32px 16px}
+a{text-decoration:none;color:inherit}
+.board{display:flex;flex-wrap:wrap;gap:48px;justify-content:center;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:12px;align-items:center}
+.cap{font-size:.8125rem;line-height:1.4;color:#4A4E58;max-width:390px;text-align:center}
+.phone{position:relative;width:390px;height:844px;border-radius:48px;background:var(--floor);color:var(--ink);overflow:hidden;
+  box-shadow:0 0 0 10px #1A1A1A,0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.status{height:44px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:.8125rem;font-weight:600;color:var(--ink)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+/* type tokens */
+.t-display{font-size:2.25rem;font-weight:800;line-height:1.08;letter-spacing:-.02em}
+.t-title{font-size:1.5rem;font-weight:800;line-height:1.15;letter-spacing:-.01em}
+.t-heading{font-size:1.25rem;font-weight:800;line-height:1.25}
+.t-section{font-size:.8125rem;font-weight:700;line-height:1.3;letter-spacing:.04em;color:var(--ink2)}
+.t-body{font-size:1.0625rem;font-weight:400;line-height:1.55}
+.t-body-sm{font-size:.875rem;font-weight:400;line-height:1.55;color:var(--ink2)}
+.t-cue{font-size:1.1875rem;font-weight:600;line-height:1.35}
+.t-label{font-size:.9375rem;font-weight:700;line-height:1.3}
+.t-meta{font-size:.8125rem;font-weight:400;line-height:1.4}
+.ink2{color:var(--ink2)}
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:9999px;font:700 .9375rem/1.3 var(--sans);padding:0 20px}
+.btn-primary{background:var(--action);color:var(--action-fg)}
+.btn-secondary{background:var(--card);color:var(--action);border:2px solid var(--action)}
+.btn-quiet{color:var(--ink2);padding:0 12px;min-height:48px;background:transparent}
+.badge{display:inline-flex;align-items:center;border-radius:9999px;padding:3px 10px;font-size:.8125rem;line-height:1.4;background:var(--care-soft);color:var(--care)}
+/* icon tile */
+.icon-tile{flex:none;background:var(--card);border-radius:20px;display:flex;align-items:center;justify-content:center}
+.icon-tile.joint{box-shadow:0 3px 0 var(--tile-shadow-joint)}
+.icon-tile.comm{box-shadow:0 3px 0 var(--tile-shadow-comm)}
+.ico{fill:none;stroke:var(--icon);stroke-linejoin:round;stroke-linecap:round}
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;min-height:48px;padding:0 16px;border-radius:9999px;background:var(--card);color:var(--ink);
+  border:2px solid var(--outline);font:700 .9375rem/1.3 var(--sans)}
+.chip.sel{background:var(--joint);border-color:var(--action)}
+/* bottom nav */
+.nav{flex:none;display:flex;background:var(--card);border-top:2px solid var(--outline);padding:6px 4px 26px}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;color:var(--ink2);font-size:.8125rem;font-weight:600;line-height:1.4}
+.nav a.on{color:var(--action)}
+.nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.hero{background:var(--joint);margin:0 12px;border-radius:28px;padding:16px 20px 22px}
+.hero .back{display:inline-flex;margin-left:-12px;color:var(--action)}
+.hero-row{display:flex;gap:16px;align-items:center;margin-top:6px}
+.hero .icon-tile{width:76px;height:76px}
+.hero .icon-tile svg{width:48px;height:48px}
+.domain{display:inline-flex;align-items:center;font-size:.8125rem;font-weight:700;line-height:1.3;letter-spacing:.04em;color:var(--action);background:var(--card);border-radius:9999px;padding:4px 12px}
+.hero .t-meta{color:var(--ink2);margin-top:6px}
+.hero .t-display{margin-top:14px}
+.hero .t-body-sm{margin-top:8px}
+.body{padding:20px 16px;display:flex;flex-direction:column;gap:18px}
+.blocks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.blk{background:var(--card);border:2px solid var(--outline);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.blk svg{width:28px;height:28px}
+.strat{background:var(--card);border:2px solid var(--outline);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.strat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.cues{list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.cue{display:flex;gap:14px;align-items:center;background:var(--joint);border-radius:20px;padding:12px 16px 12px 12px;color:var(--ink)}
+.cue .n{width:44px;height:44px;flex:none;border-radius:16px;background:var(--block);color:var(--block-fg);font-size:1.25rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--block-shadow)}
+.hard{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;border:2px dashed var(--outline);border-radius:20px;color:var(--ink2)}
+.hard svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.footer{flex:none;display:flex;gap:8px;padding:12px 16px 30px;background:var(--floor);border-top:2px solid var(--outline)}
+.footer .btn{flex:1;padding:0 8px;white-space:nowrap}
+.footer .btn-secondary{flex:1.25}
+</style></head>
+<body><main class="board">
+<section class="col"><div class="phone">
+<div class="status"><span>7:12</span><span aria-hidden="true">&#9679;&#9679;&#9679; &#9644;</span></div>
+<div class="scroll">
+  <header class="hero" aria-label="Prep card">
+    <a class="btn btn-quiet back" href="#">&#8249; Today</a>
+    <div class="hero-row">
+      <div class="icon-tile joint"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 12q9-4 18 0v26q-9-4-18 0z" fill="#DDE5F8" class="ico" stroke-width="2.4"/><path d="M24 12q9-4 18 0v26q-9-4-18 0z" fill="#FCE3CC" class="ico" stroke-width="2.4"/></svg></div>
+      <div><span class="domain">Joint attention</span><p class="t-meta">Reading with Bean · about 5 min</p></div>
+    </div>
+    <h1 class="t-display">Storybook together</h1>
+    <p class="t-body-sm">Look at the same picture together, page by page, with Bean.</p>
+  </header>
+  <div class="body">
+    <section>
+      <h2 class="t-section">You'll need</h2>
+      <div class="blocks">
+        <div class="blk"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M3 7q5.5-2.5 11 0v15q-5.5-2.5-11 0zM14 7q5.5-2.5 11 0v15q-5.5-2.5-11 0z" fill="#FCE3CC" class="ico" stroke-width="1.8"/></svg><p class="t-body-sm">A favourite picture book</p></div>
+        <div class="blk"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="11" width="22" height="11" rx="5.5" fill="#D6EEDC" class="ico" stroke-width="1.8"/><path d="M8 11.5q6 4 12 0" class="ico" stroke-width="1.5"/></svg><p class="t-body-sm">A cosy spot to sit together</p></div>
+      </div>
+    </section>
+    <section class="strat">
+      <div class="strat-head"><h2 class="t-section">Care Team Strategy</h2><span class="badge">Care Team · SLP</span></div>
+      <p class="t-body-sm">Follow Bean's lead. Pause and wait for a look before you turn the page.</p>
+    </section>
+    <section>
+      <h2 class="t-section">Take these with you</h2>
+      <ol class="cues">
+        <li class="cue"><span class="n" aria-hidden="true">1</span><p class="t-cue">You hold the book and set the pace</p></li>
+        <li class="cue"><span class="n" aria-hidden="true">2</span><p class="t-cue">Sit face to face, at eye level</p></li>
+        <li class="cue"><span class="n" aria-hidden="true">3</span><p class="t-cue">Have a familiar song ready</p></li>
+      </ol>
+    </section>
+    <a class="hard" href="#" aria-expanded="false"><span class="t-label">If it gets hard</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+  </div>
+</div>
+<div class="footer"><a class="btn btn-secondary" href="#">Start (optional timer)</a><a class="btn btn-primary" href="#">Log review</a></div>
+</div><p class="cap">Light. Prep card for Storybook together: periwinkle hero with Joint attention chip, 36px/800 name over 14px description, materials blocks, Care Team Strategy, three numbered Cue tiles, collapsed If it gets hard, pinned footer.</p></section>
+<section class="col"><div class="phone dark">
+<div class="status"><span>7:12</span><span aria-hidden="true">&#9679;&#9679;&#9679; &#9644;</span></div>
+<div class="scroll">
+  <header class="hero" aria-label="Prep card">
+    <a class="btn btn-quiet back" href="#">&#8249; Today</a>
+    <div class="hero-row">
+      <div class="icon-tile joint"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 12q9-4 18 0v26q-9-4-18 0z" fill="#DDE5F8" class="ico" stroke-width="2.4"/><path d="M24 12q9-4 18 0v26q-9-4-18 0z" fill="#FCE3CC" class="ico" stroke-width="2.4"/></svg></div>
+      <div><span class="domain">Joint attention</span><p class="t-meta">Reading with Bean · about 5 min</p></div>
+    </div>
+    <h1 class="t-display">Storybook together</h1>
+    <p class="t-body-sm">Look at the same picture together, page by page, with Bean.</p>
+  </header>
+  <div class="body">
+    <section>
+      <h2 class="t-section">You'll need</h2>
+      <div class="blocks">
+        <div class="blk"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M3 7q5.5-2.5 11 0v15q-5.5-2.5-11 0zM14 7q5.5-2.5 11 0v15q-5.5-2.5-11 0z" fill="#FCE3CC" class="ico" stroke-width="1.8"/></svg><p class="t-body-sm">A favourite picture book</p></div>
+        <div class="blk"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="11" width="22" height="11" rx="5.5" fill="#D6EEDC" class="ico" stroke-width="1.8"/><path d="M8 11.5q6 4 12 0" class="ico" stroke-width="1.5"/></svg><p class="t-body-sm">A cosy spot to sit together</p></div>
+      </div>
+    </section>
+    <section class="strat">
+      <div class="strat-head"><h2 class="t-section">Care Team Strategy</h2><span class="badge">Care Team · SLP</span></div>
+      <p class="t-body-sm">Follow Bean's lead. Pause and wait for a look before you turn the page.</p>
+    </section>
+    <section>
+      <h2 class="t-section">Take these with you</h2>
+      <ol class="cues">
+        <li class="cue"><span class="n" aria-hidden="true">1</span><p class="t-cue">You hold the book and set the pace</p></li>
+        <li class="cue"><span class="n" aria-hidden="true">2</span><p class="t-cue">Sit face to face, at eye level</p></li>
+        <li class="cue"><span class="n" aria-hidden="true">3</span><p class="t-cue">Have a familiar song ready</p></li>
+      </ol>
+    </section>
+    <a class="hard" href="#" aria-expanded="false"><span class="t-label">If it gets hard</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+  </div>
+</div>
+<div class="footer"><a class="btn btn-secondary" href="#">Start (optional timer)</a><a class="btn btn-primary" href="#">Log review</a></div>
+</div><p class="cap">Dark. Same Prep card with -dark tokens; deepened periwinkle hero and Cue tiles, light indigo Cue blocks and actions.</p></section>
+</main></body></html>

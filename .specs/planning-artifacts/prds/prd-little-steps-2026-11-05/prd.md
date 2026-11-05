@@ -458,12 +458,38 @@ v1 is released as a small, invite-only pilot.
 - Public self-serve sign-up and monetisation. Planned for after the pilot.
 - Calendar integration. Later.
 - Native mobile apps. Later, if the PWA proves limiting.
-- Structured feeding-programme tracking and structured sensory profiles. Later.
+- Structured feeding-programme tracking and structured sensory profiles. Later (see §8.3 L-4).
 - Longitudinal developmental insights across several Goal Periods, beyond Goal lineage. Later.
 - Interactive child-facing activities. To be evaluated after the pilot.
 - Audio- or video-assisted Observations. Later, and only with careful validation.
 - Tracking of therapy sessions and packages. Later.
 - Multiple children per Family. Later.
+
+### 8.3 Later Versions (post-MVP)
+These capabilities are planned for releases after the pilot. They come from a common situation: a Care Team Member, for example an early-intervention educator, notices a new behaviour such as oral seeking. The educator asks the Caregivers whether they see it at home, asks them to check with the other therapists, and asks what those therapists are working on.
+
+**How v1 already covers this situation:**
+- The behaviour can be captured with Log a moment and tagged notes (FR-14, FR-15).
+- Caregivers can bring it to the SLP and OT through "the Caregiver's questions" in a Summary (FR-17).
+- The answers can be recorded as Appointment Feedback (FR-18).
+- If a therapist sets a Goal, its Activities follow the normal flow (FR-4, FR-7, FR-8).
+
+**What v1 cannot yet do,** and these later versions add:
+
+- **L-1. Care Team Requests.** A Caregiver can log a request or question that arrives from a Care Team Member, by message, paper, or verbally, using the import from FR-5. The app tracks it until it is answered:
+  - which Care Team Members it should be raised with
+  - the answers gathered through Appointment Feedback
+  - a short reply Summary back to the requester
+
+  This closes the loop *across* Care Team Members, not only with one of them.
+- **L-2. Watch items (concerns before goals).** A Caregiver or a Care Team Member can name a behaviour to observe, for example oral seeking, before it becomes a Goal. Log a moment offers active watch items, so Observations record when, where, and how often the behaviour appears, across Caregivers and Contexts. A watch item can later be turned into a Goal, keeping its Observations, or closed.
+- **L-3. Sensory and oral-motor Activities.** Goals in sensory and oral-motor Domains, such as addressing oral sensitivities, reuse the existing Goal → Activity → Prep → Review flow. Many of these Activities are therapeutic techniques, for example oral massage or using chew tools. So:
+  - They come only from a Care Team Member, as prescribed Activities and Strategies (FR-7), or from a professionally reviewed library.
+  - AI suggestions (FR-9) and Coach Tips (FR-12) stay limited to general engagement, such as making the routine playful or pairing it with a song. Any technique suggestion is labelled "check with your therapist" or blocked.
+  - Restrictions, such as textures to avoid, apply as they do in v1.
+- **L-4. Structured sensory profile.** This extends the tagged sensory notes already listed in §8.2. A light, Caregiver-friendly profile of sensory seeking and avoiding patterns, which can feed Activity fit and Summaries.
+
+Guardrails unchanged: none of these lets AI assess, diagnose, or decide whether a behaviour is a concern. They only record, organise, and relay what Caregivers and the Care Team observe and recommend (§5).
 
 ## 9. Success Metrics
 
