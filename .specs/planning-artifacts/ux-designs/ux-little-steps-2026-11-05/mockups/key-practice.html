@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Practice</title>
+<style>
+/*
+  LittleSteps key screen: Practice and Coach Tip sheet (Playroom direction, flat). Light and dark columns.
+  Spines (DESIGN.md, EXPERIENCE.md, status final) win on any conflict. Flat everywhere: the only
+  box-shadow in this file is the phone device frame. Root font 100% with -apple-system-body under @supports.
+  GOVERNING SPINE SECTIONS
+    DESIGN.md: Components > Practice screen (floor, quiet "Time so far" meta + "Prep card", 2x2 mark-button: card fill,
+      1px outline-strong, heading label, pressed fill, no shadow; quiet "Pause or change"; primary "Done"),
+      Coach Tip sheet (coach-tip-sheet over scrim, grabber, "Mark saved: Losing attention · Undo" in meta, tip-block on
+      tip-surface with no outline, helpful-toggle, Close + "Back to practice"; dark sheet adds 1px outline-strong-dark
+      top and sides), Focus indicator; Colors (pressed, tip-surface, scrim); Elevation & Depth (scrim, not shadow)
+    EXPERIENCE.md: Component Patterns > Practice screen, Practice options sheet (opened by "Pause or change"),
+      Mark button, Coach Tip sheet, Timer, Helpful toggle; Accessibility Floor > semantics table (Mark native <button>;
+      dialog role + aria-modal + aria-labelledby; aria-describedby = "Mark saved" line; Helpful <button aria-pressed
+      aria-describedby=tip>; Timer plain text aria-live=off, not role=timer); Focus management (sheet focuses its
+      heading, shown with the 2px ring); Reduce Motion; Key Flows > Flow 1 step 4
+    The page behind an open sheet is `inert` (focus trapped in the dialog).
+  WCAG 2.1 CONTRAST (relative luminance, computed from DESIGN.md tokens)       LIGHT    DARK
+    ink on card / floor ...................................................... 15.32/14.33  13.44/15.41
+    ink-soft on card / floor ................................................. 6.91/6.46    7.30/8.37
+    action on card / floor ................................................... 9.14/8.55    7.85/9.00
+    action-foreground on action (primary button) ............................. 9.14         8.78
+    ink on Mark (card) / on pressed fill ..................................... 15.32/11.71  13.44/9.75
+    ink / ink-soft on tip-surface ............................................ 13.70/6.18   12.06/6.55
+    ink on selected (pressed Helpful toggle) ................................. 12.99        10.86
+  NON-TEXT (WCAG 1.4.11)
+    outline-strong on card / floor (interactive edges) ....................... 3.73/3.49    3.67/4.21
+    outline #D9DCE6 on card 1.37: decorative card edge only, never a control edge
+    focus ring 2px + 2px offset: floor 8.55, card 9.14, selected 7.75 / dark floor 9.00, card 7.85, selected 6.34
+    Mark edge outline-strong on floor ........................................ 3.49         4.21
+    Light sheet (card) on scrimmed floor 3.06; dark card on scrimmed floor 1.29, so the dark sheet edge
+    outline-strong-dark is 4.75 on the scrimmed floor / 4.59 on the scrimmed card.
+  Board background #E3E0DA / caption #4A4E58 = 6.32 (presentation only, not product UI).
+*/
+
+:root{--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.phone{--floor:#FAF7F2;--card:#FFFFFF;--ink:#23252B;--ink2:#555A66;--outline:#D9DCE6;--os:#7E8496;--selected:#E9ECF7;--pressed:#DDE1EC;
+  --tip:#F4F2EE;--scrim:#17191F80;--action:#33457F;--action-fg:#FFFFFF;--block:#3A4D8F;--block-fg:#FFFFFF;
+  --joint:#DDE5F8;--comm:#FCE3CC;--motor:#D6EEDC;--play:#F7DCE6;--care:#3D5A80;--care-soft:#E4EBF4;--icon:#33457F;--focus:#33457F;
+  --sheet-edge:none}
+.phone.dark{--floor:#17191F;--card:#22252D;--ink:#EEF0F5;--ink2:#AEB3C0;--outline:#353A47;--os:#767C8C;--selected:#2C3350;--pressed:#353B4F;
+  --tip:#2A2D36;--scrim:#00000099;--action:#A9B8EC;--action-fg:#141A33;--block:#8FA2E3;--block-fg:#141A33;
+  --joint:#273150;--comm:#3E2C1E;--motor:#1F3628;--play:#3A2430;--care:#9DB7DA;--care-soft:#243142;--icon:#A9B8EC;--focus:#A9B8EC;
+  --sheet-edge:1px solid #767C8C}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:100%}
+@supports (font: -apple-system-body){html{font:-apple-system-body}}
+body{background:#E3E0DA;font-family:var(--sans);color:#23252B;padding:32px 16px}
+a{text-decoration:none;color:inherit}
+button,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer;text-align:inherit}
+fieldset{border:0;min-width:0}
+:focus-visible{outline:2px solid var(--focus,#33457F);outline-offset:2px}
+.demo-focus{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+.board{display:flex;flex-wrap:wrap;gap:48px;justify-content:center;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:12px;align-items:center}
+.cap{font-size:.8125rem;line-height:1.4;color:#4A4E58;max-width:390px;text-align:center}
+/* Device frame: the ONLY shadow in the file (presentation, not product UI) */
+.phone{position:relative;width:390px;height:844px;border-radius:48px;background:var(--floor);color:var(--ink);overflow:hidden;
+  box-shadow:0 0 0 10px #1A1A1A,0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.status{height:44px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:.8125rem;font-weight:600;color:var(--ink)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.skip{position:absolute;left:16px;top:-80px;z-index:5;background:var(--card);color:var(--action);border:1px solid var(--action);border-radius:9999px;padding:12px 16px;font-weight:700}
+.skip:focus{top:48px}
+/* type tokens (rem from the 100% / -apple-system-body root) */
+.t-display{font-size:2.25rem;font-weight:800;line-height:1.08;letter-spacing:-.02em}
+.t-title{font-size:1.5rem;font-weight:800;line-height:1.15;letter-spacing:-.01em}
+.t-heading{font-size:1.25rem;font-weight:800;line-height:1.25}
+.t-section{font-size:.8125rem;font-weight:700;line-height:1.3;letter-spacing:.04em;color:var(--ink2)}
+.t-body{font-size:1.0625rem;font-weight:400;line-height:1.55}
+.t-body-sm{font-size:.875rem;font-weight:400;line-height:1.55;color:var(--ink2)}
+.t-cue{font-size:1.1875rem;font-weight:600;line-height:1.35}
+.t-label{font-size:.9375rem;font-weight:700;line-height:1.3}
+.t-meta{font-size:.8125rem;font-weight:400;line-height:1.4}
+.ink2{color:var(--ink2)}
+/* buttons: flat fills, 1px edges, no shadows */
+.btn{display:flex;align-items:center;justify-content:center;text-align:center;min-height:52px;border-radius:9999px;font-size:.9375rem;font-weight:700;line-height:1.3;padding:8px 20px}
+.btn-primary{background:var(--action);color:var(--action-fg)}
+.btn-secondary{background:var(--card);color:var(--action);border:1px solid var(--action)}
+.btn-quiet{color:var(--ink2);padding:8px 12px;min-height:48px;background:transparent}
+.btn-quiet:active,.btn-secondary:active{background:var(--pressed)}
+.full{width:100%}
+.badge{display:inline-flex;align-items:center;border-radius:9999px;padding:3px 10px;font-size:.8125rem;line-height:1.4;background:var(--care-soft);color:var(--care)}
+/* icons: simple object line drawings, 2.4px stroke, no fills, no shadows */
+.icon-tile{flex:none;background:var(--card);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:none}
+.ico{fill:none;stroke:var(--icon);stroke-width:2.4;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+/* bottom nav: active = indigo + weight 800 + 32x4 bar above the icon */
+.nav{flex:none;display:flex;background:var(--card);border-top:1px solid var(--outline);padding:6px 4px 26px}
+.nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;justify-content:center;color:var(--ink2);font-size:.8125rem;font-weight:600;line-height:1.4;padding-top:6px}
+.nav a[aria-current="page"]{color:var(--action);font-weight:800}
+.nav a[aria-current="page"]::before{content:"";position:absolute;top:0;left:50%;width:32px;height:4px;margin-left:-16px;border-radius:9999px;background:var(--action)}
+.nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+
+/* choice chips: native radio/checkbox under a chip face. Rest = card + 1px outline-strong, label 600.
+   Chosen = selected wash + 1px action border + mandatory check glyph + bold (800) label. */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex}
+.chip input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.face{display:inline-flex;flex-direction:column;justify-content:center;min-height:48px;padding:10px 16px;border-radius:9999px;
+  background:var(--card);color:var(--ink);border:1px solid var(--os);font-size:.9375rem;font-weight:600;line-height:1.3}
+.face .gloss{font-size:.8125rem;font-weight:400;line-height:1.4;color:var(--ink2)}
+.chip input:checked + .face,.toggle[aria-pressed="true"]{background:var(--selected);border-color:var(--action);font-weight:800}
+.chip input:checked + .face .lbl::before,.toggle[aria-pressed="true"]::before{content:"\2713\00A0";font-weight:800}
+.chip input:focus-visible + .face{outline:2px solid var(--focus);outline-offset:2px}
+.chip input:active + .face{background:var(--pressed)}
+.toggle{display:inline-flex;align-items:center;min-height:48px;padding:10px 16px;border-radius:9999px;background:var(--card);color:var(--ink);
+  border:1px solid var(--os);font-size:.9375rem;font-weight:600;line-height:1.3}
+
+.screen{flex:1;display:flex;flex-direction:column;padding:0 16px 30px;position:relative}
+.ptop{display:flex;justify-content:space-between;align-items:center;min-height:48px}
+.ptop .timer{color:var(--ink2);padding-left:4px}
+.spacer{flex:1}
+.marks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mark{display:flex;align-items:center;justify-content:center;text-align:center;min-height:128px;padding:12px;background:var(--card);color:var(--ink);
+  border:1px solid var(--os);border-radius:20px;box-shadow:none;font-size:1.25rem;font-weight:800;line-height:1.25}
+.mark:active{background:var(--pressed)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+.opts{margin-top:12px;align-self:center}
+.done{margin-top:20px}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:28px 28px 0 0;padding:12px 24px 34px;box-shadow:none;
+  border-top:var(--sheet-edge);border-left:var(--sheet-edge);border-right:var(--sheet-edge)}
+.grab{width:44px;height:5px;border-radius:9999px;background:var(--os);margin:0 auto 12px}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.saved{display:flex;align-items:center;flex-wrap:wrap;color:var(--ink2)}
+.saved .btn-quiet{min-height:48px;padding:8px 10px;font-size:.8125rem;text-decoration:underline}
+.tips{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:12px}
+.tip{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:14px 16px;border:none;background:var(--tip);border-radius:20px;color:var(--ink)}
+.back{margin-top:12px}
+</style></head>
+<body><div class="board">
+<section class="col"><div class="phone"><div class="status" aria-hidden="true"><span>7:12</span><span>&#9679;&#9679;&#9679; &#9644;</span></div><main id="main" class="scroll" style="display:flex;flex-direction:column"><div class="screen"><div class="ptop"><span class="t-meta timer" aria-live="off">Time so far 3:42</span><a class="btn btn-quiet" href="#" style="margin-right:-12px">Prep card</a></div><div class="spacer"></div><h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Practice: Storybook together</h1><div class="marks" role="group" aria-label="Marks"><button type="button" class="mark">Losing attention</button><button type="button" class="mark">Upset</button><button type="button" class="mark">Too easy</button><button type="button" class="mark">Too hard</button></div><button type="button" class="btn btn-quiet opts" aria-haspopup="dialog">Pause or change</button><button type="button" class="btn btn-primary done">Done</button></div></main></div><p class="cap">Light. Practice at rest: nearly empty floor, quiet &ldquo;Time so far 3:42&rdquo; (never a target) and Prep card link, four flat Mark buttons (card fill, 1px outline-strong) in the lower half, quiet &ldquo;Pause or change&rdquo;, primary Done.</p></section><section class="col"><div class="phone"><div class="status" aria-hidden="true"><span>7:12</span><span>&#9679;&#9679;&#9679; &#9644;</span></div><div id="main-s" class="scroll" style="display:flex;flex-direction:column"><div class="screen" inert><div class="ptop"><span class="t-meta timer" aria-live="off">Time so far 3:42</span><a class="btn btn-quiet" href="#" style="margin-right:-12px">Prep card</a></div><div class="spacer"></div><h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Practice: Storybook together</h1><div class="marks" role="group" aria-label="Marks"><button type="button" class="mark">Losing attention</button><button type="button" class="mark">Upset</button><button type="button" class="mark">Too easy</button><button type="button" class="mark">Too hard</button></div><button type="button" class="btn btn-quiet opts" aria-haspopup="dialog">Pause or change</button><button type="button" class="btn btn-primary done">Done</button></div></div><div class="scrim" aria-hidden="true"></div><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="tips-h-s" aria-describedby="saved-s"><div class="grab" aria-hidden="true"></div><div class="sheet-head"><div><p class="t-meta saved"><span id="saved-s">Mark saved: Losing attention</span>&nbsp;&middot;<button type="button" class="btn btn-quiet">Undo</button></p><h2 class="t-heading demo-focus" id="tips-h-s" tabindex="-1">A few ideas to try</h2></div><button type="button" class="btn btn-quiet" style="margin-right:-12px">Close</button></div><ul class="tips"><li class="tip"><p class="t-body" id="tip1-s">Sing a familiar song about the picture</p><button type="button" class="toggle" aria-pressed="true" aria-describedby="tip1-s">Helpful</button></li><li class="tip"><p class="t-body" id="tip2-s">Let the page turn only after a shared look</p><button type="button" class="toggle" aria-pressed="false" aria-describedby="tip2-s">Helpful</button></li><li class="tip"><p class="t-body" id="tip3-s">Try just two more pages</p><button type="button" class="toggle" aria-pressed="false" aria-describedby="tip3-s">Helpful</button></li></ul><button type="button" class="btn btn-quiet full back">Back to practice</button></section></div><p class="cap">Light. After tapping Losing attention: Coach Tip sheet over the scrim, &ldquo;Mark saved: Losing attention &middot; Undo&rdquo;, three tips on the tip surface, first one Helpful (Selected wash + indigo edge + check + bold); focus ring (2px, 2px offset) on the sheet heading.</p></section><section class="col"><div class="phone dark"><div class="status" aria-hidden="true"><span>7:12</span><span>&#9679;&#9679;&#9679; &#9644;</span></div><div id="main-d" class="scroll" style="display:flex;flex-direction:column"><div class="screen"><div class="ptop"><span class="t-meta timer" aria-live="off">Time so far 3:42</span><a class="btn btn-quiet" href="#" style="margin-right:-12px">Prep card</a></div><div class="spacer"></div><h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Practice: Storybook together</h1><div class="marks" role="group" aria-label="Marks"><button type="button" class="mark">Losing attention</button><button type="button" class="mark">Upset</button><button type="button" class="mark">Too easy</button><button type="button" class="mark">Too hard</button></div><button type="button" class="btn btn-quiet opts" aria-haspopup="dialog">Pause or change</button><button type="button" class="btn btn-primary done">Done</button></div></div></div><p class="cap">Dark. Practice at rest with -dark tokens: Mark edges outline-strong-dark (4.21:1 on floor), light indigo Done.</p></section><section class="col"><div class="phone dark"><div class="status" aria-hidden="true"><span>7:12</span><span>&#9679;&#9679;&#9679; &#9644;</span></div><div id="main-ds" class="scroll" style="display:flex;flex-direction:column"><div class="screen" inert><div class="ptop"><span class="t-meta timer" aria-live="off">Time so far 3:42</span><a class="btn btn-quiet" href="#" style="margin-right:-12px">Prep card</a></div><div class="spacer"></div><h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Practice: Storybook together</h1><div class="marks" role="group" aria-label="Marks"><button type="button" class="mark">Losing attention</button><button type="button" class="mark">Upset</button><button type="button" class="mark">Too easy</button><button type="button" class="mark">Too hard</button></div><button type="button" class="btn btn-quiet opts" aria-haspopup="dialog">Pause or change</button><button type="button" class="btn btn-primary done">Done</button></div></div><div class="scrim" aria-hidden="true"></div><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="tips-h-ds" aria-describedby="saved-ds"><div class="grab" aria-hidden="true"></div><div class="sheet-head"><div><p class="t-meta saved"><span id="saved-ds">Mark saved: Losing attention</span>&nbsp;&middot;<button type="button" class="btn btn-quiet">Undo</button></p><h2 class="t-heading" id="tips-h-ds" tabindex="-1">A few ideas to try</h2></div><button type="button" class="btn btn-quiet" style="margin-right:-12px">Close</button></div><ul class="tips"><li class="tip"><p class="t-body" id="tip1-ds">Sing a familiar song about the picture</p><button type="button" class="toggle" aria-pressed="true" aria-describedby="tip1-ds">Helpful</button></li><li class="tip"><p class="t-body" id="tip2-ds">Let the page turn only after a shared look</p><button type="button" class="toggle" aria-pressed="false" aria-describedby="tip2-ds">Helpful</button></li><li class="tip"><p class="t-body" id="tip3-ds">Try just two more pages</p><button type="button" class="toggle" aria-pressed="false" aria-describedby="tip3-ds">Helpful</button></li></ul><button type="button" class="btn btn-quiet full back">Back to practice</button></section></div><p class="cap">Dark. Coach Tip sheet over the darker scrim, with the 1px outline-strong-dark top and side edge that separates it from the dimmed screen.</p></section>
+</div></body></html>
