@@ -13,7 +13,7 @@ sources: []
 
 # LittleSteps v1 (invite-only pilot)
 
-Terms are the PRD glossary (§3), used verbatim. Each CAP-N is the PRD's FR-N, and its testable consequences in the PRD are acceptance criteria. Architecture decisions (AD-n) in the architecture spine bind every implementation.
+Terms are the PRD glossary (§3), used verbatim. CAP-1 to CAP-18 are the PRD's FR-1 to FR-18, and their testable consequences in the PRD are acceptance criteria. CAP-19 has no PRD FR and is defined here. Architecture decisions (AD-n) in the architecture spine bind every implementation.
 
 ## Why
 
@@ -77,6 +77,14 @@ P1 is the first pilot slice. It must work end to end before P2 work starts.
 - **CAP-18 [P1] Appointment Feedback**
   - **intent:** After an appointment, Caregivers record the therapist's goal status, new Strategies and Restrictions, and the Review Status of parent-proposed Goals.
   - **success:** The status uses that therapist's Status Vocabulary. New Strategies and Restrictions take effect in the next Plan and in later suggestions.
+- **CAP-19 [P1, built first] Local development environment**
+  - **intent:** A developer can bring the whole product up on a Mac with one command and tear it down with another, using container images for everything except the AI runtime.
+  - **success:**
+    - On a Mac with the prerequisites installed, one start command brings up PostgreSQL, Keycloak with the realm imported, and Mailpit, all reporting healthy.
+    - The start command names any missing prerequisite (Docker, Java, Node, Ollama, the configured model) with the step to fix it, and running it twice is harmless.
+    - A full mode also builds and runs the app image, and a phone reaches the app over Tailscale HTTPS.
+    - The stop command stops everything and keeps the data. A wipe option resets the volumes and local files.
+    - The README covers first-time setup in these commands.
 
 ## Constraints
 

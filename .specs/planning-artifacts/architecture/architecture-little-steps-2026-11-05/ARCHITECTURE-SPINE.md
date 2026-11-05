@@ -310,11 +310,14 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
 
 ### AD-22 — One deployable, configured only by environment [ADOPTED direction]
 
-- **Binds:** §6 Deployment, Cost; addendum §A.1, §A.7
-- **Prevents:** code paths that differ between local and shipping, and configuration scattered across code.
+- **Binds:** §6 Deployment, Cost; addendum §A.1, §A.7; CAP-19
+- **Prevents:** code paths that differ between local and shipping, configuration scattered across code, and each developer starting the stack a different way.
 - **Rule:**
-  - Production runs one app image, in which Spring Boot serves the built PWA at the same origin as `/api`. In local development, the Vite dev server proxies `/api`.
-  - Keycloak, PostgreSQL, Mailpit (local only) and Presidio (P2) run from one `deploy/compose.yaml`, with an env-file per environment. Ollama runs natively on the host.
+  - One multi-stage `deploy/Dockerfile` builds the app image: the PWA build and the Spring Boot jar, with Spring Boot serving the PWA at the same origin as `/api`. Production runs this image. In local development the app usually runs from the IDE, and the Vite dev server proxies `/api`.
+  - Keycloak (realm imported from `deploy/keycloak/`), PostgreSQL, Mailpit (local only) and Presidio (P2) run from one `deploy/compose.yaml`, with an env-file per environment. Ollama runs natively on the host.
+  - `deploy/dev-up.sh` and `deploy/dev-down.sh` are the only supported way to start and stop the local stack. They are idempotent bash scripts.
+    - `dev-up.sh` checks prerequisites (Docker, Java, Node, Ollama and the configured model), creates `local.env` from the example if it is missing, starts the compose services, and waits for their health checks. `--full` also builds and runs the app image.
+    - `dev-down.sh` stops everything and keeps data. `--wipe` also removes the volumes and the local storage folder.
   - Adapters are selected by Spring profile (`local`, `test`, `prod`) plus environment variables. There are no environment checks in code. Secrets come only from the environment.
 
 ### AD-23 — The client data layer has one shape
@@ -480,7 +483,7 @@ little-steps/
   frontend/                # React + Vite PWA
   content/                 # curated Activities, Cues, Coach Tips (YAML, professionally reviewed)
   eval/guardrails/         # >=30 Restriction and scope cases (AD-24)
-  deploy/                  # compose.yaml, *.env.example, Keycloak realm export
+  deploy/                  # Dockerfile, compose.yaml, *.env.example, keycloak/ realm export, dev-up.sh, dev-down.sh
 ```
 
 ## Capability → Architecture Map
@@ -507,6 +510,7 @@ little-steps/
 | FR-18 Appointment Feedback | `summary` → `goals.api` | AD-9, AD-13 |
 | §5 Export, deletion, retention, audit log, pilot end | `family`, `privacy`, `import`, `audit` | AD-6, AD-16, AD-17 |
 | §6 Observability, cost; §9 metrics | `metrics`, `ai` | AD-12, AD-19 |
+| CAP-19 Local development environment | `deploy/` | AD-22, AD-24 |
 
 ## Open Questions
 
