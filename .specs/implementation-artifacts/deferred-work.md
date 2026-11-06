@@ -28,6 +28,5 @@
 - #88  2027-01-05  Make the Story 1.6 and 1.7 checks mandatory in CI  (origin #33, Story 1.8)
 - #89  2027-02-04  Coverage thresholds for JaCoCo and Vitest  (origin #33, Story 1.8)
 - #90  2027-02-04  CI policy for fork and Dependabot PRs, and PR-scoped secret scan  (origin #33, Story 1.8)
-- #85  2026-12-04  Finish and close the Epic 1 release note (blocked on Stories 1.6 to 1.8)  (origin #34, Story 1.9)
 - #86  2027-01-05  release-notes.sh: hardening and test gaps from the Story 1.9 review  (origin #34, Story 1.9)
 - #87  2027-02-04  Count new positive and negative tests automatically in release notes  (origin #34, Story 1.9)

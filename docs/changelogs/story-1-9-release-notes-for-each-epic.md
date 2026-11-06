@@ -60,6 +60,6 @@ Nothing to do. To close an epic, follow [Finishing an epic](../CONTRIBUTING.md#f
 
 ## Deferred and known issues
 
-- [#85](https://github.com/yebbah/little-steps/issues/85): finish and close the Epic 1 release note once Stories 1.6 to 1.8 land. The note is a draft today.
+- [#85](https://github.com/yebbah/little-steps/issues/85): resolved in this story. Stories 1.6 to 1.8 merged, the Epic 1 note is finished (`Status: done`) and passes `check --strict`. Close the issue when this merges.
 - [#86](https://github.com/yebbah/little-steps/issues/86): release-notes.sh hardening and test gaps.
 - [#87](https://github.com/yebbah/little-steps/issues/87): count new positive and negative tests automatically.

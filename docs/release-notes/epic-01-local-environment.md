@@ -13,14 +13,14 @@ The repository is public: no personal data, no absolute local paths, no secret v
 |---|---|
 | Epic | 01, Local environment and project skeleton |
 | Generated | 2026-11-06 |
-| Commit | 8b663a1 |
+| Commit | cc62640 |
 | Compared with | the start of the repository (first epic) |
 
-Status: draft
+Status: done
 
 ## Summary
 
-TODO(author): two or three sentences on what this epic delivers and why it matters.
+Epic 1 delivers the local environment and engineering foundation for LittleSteps. A developer can start PostgreSQL, Keycloak and Mailpit with one script from hardened images pinned by digest, run the app as it ships, and rely on a security scan before every commit and in CI. The backend now has its module skeleton with enforced boundaries, real-database tests, one error format, a generated API contract and logs that cannot leak caregiver text, so every later feature lands in the right place and fails the build if it crosses a boundary.
 
 ## New features
 
@@ -40,6 +40,7 @@ One entry per story, with its changelog and security report.
 
 Commits since the start of the repository (first epic):
 
+- `cc62640` feat: release notes for each epic (#34)
 - `8b663a1` feat: CI with security and quality gates (#33) (#96)
 - `d30615f` feat: API contract, errors and safe logging (#32) (#94)
 - `4acffc6` feat: backend module skeleton and persistence baseline (#31) (#93)
@@ -56,7 +57,7 @@ Commits since the start of the repository (first epic):
 - `f6ffc3e` Merge pull request #25 from yebbah/docs/bmad-specs
 - `0adbb7f` Initial commit
 
-TODO(author): describe behaviour that changed for existing users or developers, or write "None".
+Nothing changes for end users: the product has no released version before this epic. For developers: the backend needs a Spring profile (`local`, `test` or `prod`) and a PostgreSQL database, so IDE runs need `SPRING_PROFILES_ACTIVE=local` and the `deploy/local.env` variables exported after `deploy/dev-up.sh`; backend tests need Docker (Testcontainers); logs are JSON on stdout; the `import` module's package is `importer`; every commit runs `deploy/security-scan.sh` through the pre-commit hook.
 
 ## Integration notes
 
@@ -100,11 +101,19 @@ Ports (from `deploy/local.env.example`):
 
 ### API changes, breaking changes and upgrade steps
 
-TODO(author): API changes, breaking changes, and the ordered upgrade steps, or write "None".
+API changes: the first endpoint, `GET /api/v1/ping`. Every failed request returns RFC 9457 `application/problem+json` with a `type` from `ProblemTypes` (`urn:littlesteps:problem:<slug>`), no `detail`, and a `requestId` that is also sent as the `X-Request-Id` header. `backend/openapi.json` is the committed contract and the build fails when it drifts. There are no breaking changes (new project).
+
+Upgrade steps, in order:
+
+1. `docker login dhi.io` (Docker Hardened Images account).
+2. `deploy/dev-up.sh` (add `--full` to also build and run the app image).
+3. For IDE runs, export the `deploy/local.env` variables and set `SPRING_PROFILES_ACTIVE=local`.
+4. `(cd frontend && npm ci)`, then `npm run api:types` after any endpoint change.
+5. Add the repository secrets `DHI_USERNAME` and `DHI_TOKEN` so CI can pull the PostgreSQL image for the backend tests.
 
 ## Security
 
-- Scan date: 2026-11-06T08:34:31Z. Tool versions: grype 0.121.2, syft 1.57.0, gitleaks 8.30.1.
+- Scan date: 2026-11-06T08:51:11Z. Tool versions: grype 0.121.2, syft 1.57.0, gitleaks 8.30.1.
 - Scan result: PASS.
 - Blocking rule: CISA KEV, or CVSS 7.0 or above, unless a valid entry in `security/exceptions.yaml` covers a finding with no fix.
 
@@ -165,8 +174,8 @@ Story security reports:
 
 | Check | Result |
 |---|---|
-| Lint (backend and frontend) | TODO(author): record the lint result |
-| Typecheck | TODO(author): record the typecheck result |
+| Lint (backend and frontend) | Frontend: oxlint passes with 0 errors, including `react/jsx-no-literals`, and `lint:test` passes. Backend: no linter configured yet (see Known issues) |
+| Typecheck | Frontend: `tsc -b` passes. Backend: compiles with Java 25 in `./mvnw verify` |
 | Backend coverage (JaCoCo) | 95.5% lines (106 of 111) |
 | Frontend coverage (Vitest) | 40% lines |
 | Modularity verification (ModularityTests) | PASS (4 tests) |
@@ -194,13 +203,14 @@ New test files in this epic (added since the start of the repository (first epic
 - `deploy/tests/ci-workflow.test.sh`
 - `deploy/tests/dev-scripts.test.sh`
 - `deploy/tests/realm.test.sh`
+- `deploy/tests/release-notes.test.sh`
 - `deploy/tests/security-scan.test.sh`
 - `frontend/src/App.test.tsx`
 
 | Kind | Count |
 |---|---|
-| New positive tests | TODO(author): count of new happy-path tests |
-| New negative tests | TODO(author): count of new failure and rejection tests |
+| New positive tests | 174 (approximate: classified by test name; #87 automates the count) |
+| New negative tests | 206 (approximate: classified by test name; #87 automates the count) |
 
 Full non-regression suite (all tests, this commit):
 
@@ -252,8 +262,12 @@ Open items from `.specs/implementation-artifacts/deferred-work.md` (the GitHub i
 - #88  2027-01-05  Make the Story 1.6 and 1.7 checks mandatory in CI  (origin #33, Story 1.8)
 - #89  2027-02-04  Coverage thresholds for JaCoCo and Vitest  (origin #33, Story 1.8)
 - #90  2027-02-04  CI policy for fork and Dependabot PRs, and PR-scoped secret scan  (origin #33, Story 1.8)
-- #85  2026-12-04  Finish and close the Epic 1 release note (blocked on Stories 1.6 to 1.8)  (origin #34, Story 1.9)
 - #86  2027-01-05  release-notes.sh: hardening and test gaps from the Story 1.9 review  (origin #34, Story 1.9)
 - #87  2027-02-04  Count new positive and negative tests automatically in release notes  (origin #34, Story 1.9)
 
-TODO(author): add known limitations that are not tracked as issues, or write "None".
+Not tracked as issues:
+
+- The backend has no linter or formatter check yet; only the frontend is linted.
+- Frontend coverage is 40% lines: the app is a shell with one smoke test.
+- The next manual image scan fails on `zlib1g` CVE-2026-76844 (CVSS 8.3, no upstream fix) in the Keycloak and JDK images until an exception is added or the images are updated; image scans are not in CI (#95).
+- The positive and negative test counts above are classified by test name, so they are approximate.

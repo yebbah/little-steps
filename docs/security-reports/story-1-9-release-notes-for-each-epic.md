@@ -63,7 +63,7 @@ Three reviewers ran. Relevant: arithmetic and awk code fed from a report file (f
 |---|---|---|
 | Markdown cells not escaped | A CVE reason containing a pipe breaks a table | #86 |
 | `tag` not tied to `main` | Tag on the wrong commit if run from a branch | #86 |
-| Epic 1 note still a draft | Epic closes without a finished note | #85 |
+| Epic 1 note finished (`Status: done`), passes `check --strict`; tag `epic-01` after merge | none | resolved, #85 |
 
 ## 10. Sign-off
 
