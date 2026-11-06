@@ -6,6 +6,20 @@ Project policies for everyone working in this repo, human or AI. They apply what
 
 Prefer linking to an existing document over repeating its content. Each rule or fact lives in one place; every other document links to it. Before writing a rule or fact, search the docs for where it already lives, and add it there. This file is the source for project policies.
 
+## Spec first
+
+The specs are the contract: the PRD, the SPEC, the architecture spine, the UX documents and the epics and stories (all under `.specs/`). A change is never made in code, or fixed in a bug issue, when it would make the code differ from a spec.
+
+1. **Check for drift before you start.** Compare the change with the specs it touches (requirement, AD, UX rule, story acceptance criteria). If the specs already describe the intended behaviour, the code is the bug: fix the code.
+2. **If the change would cause drift, update the specs first.** Run the spec update (`bmad-spec` for the SPEC, the PRD, architecture or UX skill for those documents, `bmad-correct-course` for a change that spans several) and get the human to confirm it. Update every affected document in the same pass: requirements, AD, SPEC, UX, `epics/requirements.md`, the epic files and `epics/index.md`.
+3. **Then raise the issue** (feature request, change or bug) and link the spec update in it. An issue that needs a spec change is not created, assigned or started before step 2 is done.
+4. **Then implement.** The PR links the spec change, and the story spec records it under its deviations.
+5. **Never fix first and document later.** A found deviation (code that already differs from a spec) is not silently kept: either fix the code to match, or update the spec by the steps above before the story closes. "Spec drift" is never a deferred item.
+
+The architecture spine's rule applies to agents too: a contradiction between specs, or between a spec and the code, is surfaced to the human, never resolved locally.
+
+The decision trees behind these policies are drawn in [workflow.md](workflow.md). Update it in any change to a policy or to the CI workflow.
+
 ## Issues
 
 - Epic N is GitHub issue #N+1, labelled `epic` plus `P1` or `P2`.
@@ -37,6 +51,13 @@ Example: `feature/epic-01-issue-28-hardened-local-infrastructure`.
 - PRs are squash-merged. Never force-push a shared branch.
 - Commit messages are conventional (`feat:`, `fix:`, `docs:`, `chore:`) and reference the story issue.
 - The repository is public: no personal data, secret values or absolute local paths in any file.
+
+## Continuous integration
+
+- CI ([ci.yml](../.github/workflows/ci.yml)) runs on every push and pull request. The jobs, secrets, artifacts and caches are in the [README](../README.md#continuous-integration); the flow is in [workflow.md](workflow.md#5-continuous-integration).
+- A PR is merged only when all CI jobs are green. Never merge on red, never skip or disable a job to get green, and never rerun a failing job until it passes without finding out why (a flaky test becomes a `deferred` issue).
+- A change to the CI workflow follows the same rules as code: spec first when it changes what a spec requires (for example which scans run in CI), and every action is pinned to a full commit SHA.
+- Checks that CI does not run (image scans, app image build) are run by hand before a release and recorded in the epic's release note.
 
 ## Security gate
 

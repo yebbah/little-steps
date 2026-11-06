@@ -9,7 +9,8 @@ LittleSteps is a modular-monolith web app: a Spring Boot backend and a React PWA
 | What | Where | Written |
 |---|---|---|
 | Continuous integration | [Continuous integration](#continuous-integration) below | jobs, secrets, artifacts, local equivalents |
-| Contributing policies | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | branching, security gate, finishing a story or epic |
+| Contributing policies | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | spec first, branching, security gate, finishing a story or epic |
+| Workflow decision trees | [docs/workflow.md](docs/workflow.md) | spec first, story lifecycle, triage, security finding, CI, deferred items, epic finish |
 | Architecture diagrams | [docs/architecture.md](docs/architecture.md) | infrastructure (local and cloud) and components |
 | Deferred items process | [docs/deferred-items.md](docs/deferred-items.md) | issues, target dates, exceptions |
 | Changelog | [docs/changelogs/](docs/changelogs/) | one per story, when the story is implemented |
