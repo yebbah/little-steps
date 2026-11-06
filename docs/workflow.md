@@ -134,6 +134,23 @@ flowchart TD
   F --> G["Retrospective reviews open deferred issues"]
 ```
 
+## 8. Epic and story issues
+
+Rule: [Issues](CONTRIBUTING.md#issues).
+
+```mermaid
+flowchart TD
+  E["Epic approved"] --> EI["Epic issue #N+1<br/>labels: epic, P1 or P2"]
+  E --> SI["One sub-issue per story<br/>labels: story, P1 or P2, full story text"]
+  SI --> LINK["gh issue edit --parent: epic issue<br/>carries 'Tracked as sub-issues #X to #Y'"]
+  SI --> ST["Story branch, PR 'Closes #story' (section 2)"]
+  ST --> SC["Story issue closed with a short comment"]
+  SC --> LAST{"Last story of the epic?"}
+  LAST -- "no" --> SI
+  LAST -- "yes" --> REL["Epic finish (section 7), then close the epic issue"]
+  CR["Change request or bug"] --> SPEC["Spec first (section 1) before the issue is created"]
+```
+
 ## Keeping this current
 
 Update this page in any change to a policy or to the CI workflow, in the same PR.

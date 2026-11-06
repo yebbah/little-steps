@@ -9,6 +9,8 @@ How work that is parked instead of fixed is tracked. The rule (one `deferred` is
 - A warning (below CVSS 7.0, not in KEV) that needs a follow-up, or a fix that exists but is not adopted yet.
 - A security exception in `security/exceptions.yaml`.
 
+Not deferrable: anything whose completion would change a spec, or that leaves the code differing from a spec. That follows [Spec first](CONTRIBUTING.md#spec-first): update the spec, or fix the code, before the story closes.
+
 ## Where things live
 
 | Place | Role | Who reads it |

@@ -10,7 +10,7 @@ LittleSteps is a modular-monolith web app: a Spring Boot backend and a React PWA
 |---|---|---|
 | Continuous integration | [Continuous integration](#continuous-integration) below | jobs, secrets, artifacts, local equivalents |
 | Contributing policies | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | spec first, branching, security gate, finishing a story or epic |
-| Workflow decision trees | [docs/workflow.md](docs/workflow.md) | spec first, story lifecycle, triage, security finding, CI, deferred items, epic finish |
+| Workflow decision trees | [docs/workflow.md](docs/workflow.md) | spec first, story lifecycle, triage, security finding, CI, deferred items, epic finish, issue hierarchy |
 | Architecture diagrams | [docs/architecture.md](docs/architecture.md) | infrastructure (local and cloud) and components |
 | Deferred items process | [docs/deferred-items.md](docs/deferred-items.md) | issues, target dates, exceptions |
 | Changelog | [docs/changelogs/](docs/changelogs/) | one per story, when the story is implemented |
@@ -142,7 +142,7 @@ Reports are written to `build/security/`. The first run downloads the vulnerabil
 - **Caches**: Maven and npm (by the setup actions) and the Grype vulnerability database. The pinned scan tools and the KEV feed are fetched and verified every run, never cached.
 - **Adding or updating an action**: pin it to the full commit SHA of the release (`gh api repos/<owner>/<repo>/commits/<tag> -q .sha`) and put the version in a comment after it. `deploy/check-actions.sh` fails on a tag or branch.
 - **Run the same checks locally**: the commands under "Development" above; the Security job is `deploy/security-scan.sh secrets`, `scan backend` and `scan frontend`; add `deploy/security-scan.sh scan images` and `scan app-image` for the image scans CI does not run.
-- **Branch protection** (require the four CI jobs before merge) is a repository setting, not code: set it under Settings, Branches.
+- **Branch protection** is a repository setting, not code. `main` requires a pull request and the four CI jobs (Backend, Frontend, Scripts, Security) before merge; the repository owner can still bypass it in an emergency. Change it under Settings, Branches.
 
 ## Release
 

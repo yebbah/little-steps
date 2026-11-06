@@ -13,7 +13,7 @@ The specs are the contract: the PRD, the SPEC, the architecture spine, the UX do
 1. **Check for drift before you start.** Compare the change with the specs it touches (requirement, AD, UX rule, story acceptance criteria). If the specs already describe the intended behaviour, the code is the bug: fix the code.
 2. **If the change would cause drift, update the specs first.** Run the spec update (`bmad-spec` for the SPEC, the PRD, architecture or UX skill for those documents, `bmad-correct-course` for a change that spans several) and get the human to confirm it. Update every affected document in the same pass: requirements, AD, SPEC, UX, `epics/requirements.md`, the epic files and `epics/index.md`.
 3. **Then raise the issue** (feature request, change or bug) and link the spec update in it. An issue that needs a spec change is not created, assigned or started before step 2 is done.
-4. **Then implement.** The PR links the spec change, and the story spec records it under its deviations.
+4. **Then implement.** The PR links the spec change, and the story's changelog records it under "Changed".
 5. **Never fix first and document later.** A found deviation (code that already differs from a spec) is not silently kept: either fix the code to match, or update the spec by the steps above before the story closes. "Spec drift" is never a deferred item.
 
 The architecture spine's rule applies to agents too: a contradiction between specs, or between a spec and the code, is surfaced to the human, never resolved locally.
