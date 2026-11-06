@@ -5,7 +5,7 @@
 | Story | 1.3, issue #28 |
 | Epic | 1, Local environment and project skeleton |
 | Branch | feature/epic-01-issue-28-hardened-local-infrastructure |
-| Commits | not yet committed |
+| Commits | ff357ea |
 | Date | 2026-11-06 |
 | Security report | [story-1-3-hardened-local-infrastructure.md](../security-reports/story-1-3-hardened-local-infrastructure.md) |
 

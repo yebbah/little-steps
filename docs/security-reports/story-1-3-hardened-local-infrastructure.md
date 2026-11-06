@@ -4,7 +4,7 @@
 |---|---|
 | Story | 1.3, issue #28 |
 | Branch | feature/epic-01-issue-28-hardened-local-infrastructure |
-| Commit scanned | dbd3cead2df2d654b8950ad613d44065be2e4f42 plus the uncommitted working tree of this story (the scan reads the working copy; the final commit hash is added at sign-off) |
+| Commit scanned | ff357ead44110cfe1fe11b10bcaf416726127dbe (the pre-commit hook scanned the staged tree of this commit) |
 | Date | 2026-11-06 |
 | Verdict | PASS WITH WARNINGS (16 time-limited exceptions for Keycloak; Presidio deferred) |
 
@@ -123,4 +123,4 @@ Three independent reviewers (blind, edge cases, verification gaps) ran on the fu
 
 ## 10. Sign-off
 
-Decision on the Keycloak findings: option A (time-limited exceptions) chosen by the human on 2026-11-06. Pending: reviewer name and date, and the final commit hash. The deferred items are issues #56 to #61, linked from #28.
+Decision on the Keycloak findings: option A (time-limited exceptions) chosen by the maintainer on 2026-11-06. Reviewer name and date: to be added at PR review. The deferred items are issues #56 to #61, linked from #28.
