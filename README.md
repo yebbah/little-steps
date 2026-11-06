@@ -59,43 +59,25 @@ deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh   # tests for th
 
 If a command fails with a Java error, `JAVA_HOME` is not a JDK 25. The build stops with "Java 25 is required".
 
-**Security scan.** Every commit is scanned for leaked secrets and for vulnerable backend, frontend and image components. A finding in the CISA KEV catalog, or with a CVSS of 7.0 or more, blocks the commit.
+**Security scan.** Every commit is scanned for leaked secrets and for vulnerable backend, frontend and image components. The blocking rule and exceptions are in [security/README.md](security/README.md).
 
 ```bash
 deploy/security-scan.sh                   # run the scan by hand
 ```
 
-**Never commit with `--no-verify`.** CI repeats the scan (Story 1.8), so a skipped hook still fails. Reports are written to `build/security/`; exceptions are described in `security/README.md`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day).
+Reports are written to `build/security/`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day). CI repeats the scan (Story 1.8).
 
-**Branches and commits**
-
-- Work on a branch from an up-to-date `main`, one per level: `feature/epic-<NN>-<slug>`, `feature/epic-<NN>-issue-<N>-<slug>` or `feature/epic-<NN>-issue-<N>-sub-<M>-<slug>`. Each is merged back to `main` by PR.
-- Commit messages are conventional (`feat:`, `fix:`, `docs:`, `chore:`) and reference the story issue.
-- Pull requests are squash-merged. Never force-push a shared branch.
-- Do not put personal data, secret values or absolute local paths in any file: the repository is public.
-
-**Finishing a story.** Before a story's last commit:
-
-1. Run the independent three-reviewer pass (blind, edge cases, verification gaps) and triage the findings.
-2. Write its changelog in `docs/changelogs/` from the template, and add it to the index there.
-3. Write its security report in `docs/security-reports/` from the template.
-4. Review this README and update every section the story made stale (Prerequisites, Setup, Development, Release, Deployment, Layout, Versions), even if that is none; say so in the changelog.
-5. Log every deferred item as a `deferred` GitHub issue (see `docs/deferred-items.md`).
-
-Do these before asking anyone to validate the story. Then push and close the story's issue.
+**Branches, commits and finishing a story.** The rules are in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## Release
 
+How a story or epic is finished is in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). What exists today:
+
 | Step | Status |
 |---|---|
-| Per story: changelog and security report committed with the story | in use |
-| Per story: push the branch, close the story's issue with a short comment | in use |
-| Per epic: release note in `docs/release-notes/` (summary, changes, integration, security, code quality, test results) | arrives with Story 1.9 (`deploy/release-notes.sh`) |
-| Per story: pull request squash-merged to `main`, closes the story's issue | in use |
-| Per epic: closes the epic issue once every story is merged to `main` | in use |
+| Per story: changelog and security report, pull request squash-merged to `main` | in use |
+| Per epic: release note in `docs/release-notes/` | arrives with Story 1.9 (`deploy/release-notes.sh`) |
 | Images and artifacts built and published by CI | arrives with Story 1.8 |
-
-A release note links the changelogs and security reports of its stories, lists every active security exception, and lists images that do not come from Docker Hardened Images.
 
 ## Deployment
 

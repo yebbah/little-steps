@@ -2,6 +2,10 @@
 
 Project policies for everyone working in this repo, human or AI. They apply whatever tool or framework drives the work.
 
+## Documentation
+
+Prefer linking to an existing document over repeating its content. Each rule or fact lives in one place; every other document links to it. Before writing a rule or fact, search the docs for where it already lives, and add it there. This file is the source for project policies.
+
 ## Issues
 
 - Epic N is GitHub issue #N+1, labelled `epic` plus `P1` or `P2`.
@@ -27,15 +31,17 @@ One branch per level of the issue hierarchy: epic, issue (story) and sub-issue. 
 Example: `feature/epic-01-issue-28-hardened-local-infrastructure`.
 
 - Update `main` first (`git checkout main && git pull`), then branch.
+- **Always cut a new branch from `main` when starting a story**, even when the current branch is clean, recently merged or named for related work. Never build a story on top of another branch (for example a docs or policy branch). Agents must not ask which branch to use: switch to `main`, pull, and create the story branch.
 - Each branch is merged into `main` by PR. Merge a story before starting the next story that depends on it.
 - Write `Closes #N` in a PR body for the issue that PR completes. The epic's issue is closed only when the whole epic is done.
 - PRs are squash-merged. Never force-push a shared branch.
+- Commit messages are conventional (`feat:`, `fix:`, `docs:`, `chore:`) and reference the story issue.
+- The repository is public: no personal data, secret values or absolute local paths in any file.
 
 ## Security gate
 
-- Every commit must pass `deploy/security-scan.sh` (pre-commit hook in `.githooks/` and CI).
-- Any CVE that is in the CISA KEV catalog, or has a CVSS of 7.0 or more (High or Critical), must be fixed before committing.
-- Never use `--no-verify`.
+- Every commit must pass `deploy/security-scan.sh` (pre-commit hook in `.githooks/` and CI). The blocking rule (CISA KEV, CVSS 7.0 or more) and the exceptions are in [security/README.md](../security/README.md).
+- Never use `--no-verify`; CI repeats the scan, so a skipped hook still fails.
 - Use Grype for scanning, not Trivy. Pin GitHub Actions to commit SHAs.
 - Container images come from Docker Hardened Images (`dhi.io`) when the catalog has them. An image from elsewhere is listed as a warning in the epic's release note.
 - Background: AD-25, AD-26 and AD-27 in the architecture spine, NFR-20 to NFR-22, and the epic Definition of done.
@@ -55,14 +61,7 @@ Before a story's last commit:
 
 ## Deferred items
 
-Anything parked instead of fixed is tracked, not just noted: review findings routed to defer, known issues, accepted warnings that need a follow-up, and security exceptions. Full process, template and example: [deferred-items.md](deferred-items.md).
-
-1. **One GitHub issue per deferred item**, labelled `deferred`, created before the story's last commit from `.github/ISSUE_TEMPLATE/deferred.md`. The body starts with `Origin: #<story issue>`, and the origin issue lists it in its task list. The issue is the only place to read status.
-2. **Every issue carries a target date and a remediation suggestion** (what to change, who owns it, how to tell it is done). Use the suggested periods in deferred-items.md: exceptions before they expire (30 days at most), findings below 7.0 or unadopted fixes 30 days, correctness or test gaps 60 days, cleanup and policy 90 days.
-3. **Security exceptions share one issue per cause** (for example one image tag with 16 CVEs). The issue's target date equals the exceptions' `expires`, and the header of `security/exceptions.yaml` names the issue. Closing the issue means deleting the entries.
-4. **`.specs/implementation-artifacts/deferred-work.md` is a thin index**: one line per item with the issue number and target date, no details.
-5. **Close the loop**: close the issue, remove the index line (and the exceptions). The epic retrospective reviews every open `deferred` issue past its target date, and the release note lists those still open.
-6. The story's changelog and security report link to the deferred issues.
+Anything parked instead of fixed is tracked, not just noted. Every deferred item is **one GitHub issue** labelled `deferred`, linked to the story's issue (`Origin: #<story issue>`), with a target date and a remediation suggestion, created before the story's last commit. The story's changelog and security report link to these issues. The process, template, remediation periods and the rules for security exceptions are in [deferred-items.md](deferred-items.md).
 
 ## Finishing an epic
 
