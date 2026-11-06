@@ -45,7 +45,7 @@ Also add the story to the index in docs/changelogs/README.md.
 
 ## Operations impact
 
-| Area | What changes | README section |
+| Area | What changes (README is reviewed every story; write "reviewed, no change" if untouched) | README section |
 |---|---|---|
 | Setup | {new tool, install step, environment variable, or "No change"} | {section} |
 | Development | {new command or rule, or "No change"} | {section} |
