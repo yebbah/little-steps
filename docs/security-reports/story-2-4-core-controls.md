@@ -64,8 +64,8 @@ Reviewed in the [triage log](../../.specs/implementation-artifacts/spec-2-4-core
 | Item | Risk | Owner (story) |
 |---|---|---|
 | Succeeded above Tried can exist in a caller's state until it validates | A screen could save an inconsistent pair | Screens that use `PairedStepper` (Epic 8 and later) must validate on save |
-| Flaky Story 2.1 gallery focus test (triage row 15) | A false red in CI | `deferred` issue, to be created before the push |
+| Flaky Story 2.1 gallery focus test (triage row 15) | A false red in CI | [#116](https://github.com/yebbah/little-steps/issues/116), target 2027-01-05 |
 
 ## 10. Sign-off
 
-Pending the maintainer's validation.
+Validated by the maintainer on 2026-11-06.

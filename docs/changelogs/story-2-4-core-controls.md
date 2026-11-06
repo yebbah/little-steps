@@ -59,4 +59,4 @@ Also reviewed, no change: Prerequisites, Layout (`frontend/` entry still accurat
 
 ## Deferred and known issues
 
-- The Story 2.1 test "the focus ring is a real outline" presses Tab straight after `goto`, before the lazily loaded gallery has rendered, and failed once in about four full runs. To be logged as a `deferred` issue before the push (see the triage log, row 15).
+- The Story 2.1 test "the focus ring is a real outline" presses Tab straight after `goto`, before the lazily loaded gallery has rendered, and failed once in about four full runs. Logged as #116, target 2027-01-05 (triage log, row 15).

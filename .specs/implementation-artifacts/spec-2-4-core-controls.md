@@ -2,7 +2,7 @@
 title: 'Story 2.4: Core controls'
 type: 'feature'
 created: '2026-11-06'
-status: 'in-review'
+status: 'done'
 baseline_commit: '2e0e2fd3c4ad1e5cceff16790de5d6789bd7ec57'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -96,7 +96,7 @@ Reviewers: BH blind, EC edge, VG verification gap (three separate subagents; VG 
 | 12 | Literals `4.5rem`, `8rem`, `150ms` in CSS [EC claim] | low | rejected | No token exists for them; colours, spacing, radii and type all come from tokens |
 | 13 | No `aria-valuemax`, no region role on the disclosure panel, no RTL chevron, no controlled mode [BH] | low | rejected | Not required by DESIGN.md or EXPERIENCE.md; added when a screen needs them |
 | 14 | Errors are not announced [BH] | false | rejected | Intended: spec and EXPERIENCE.md say no live region in the stepper; errors are linked by `aria-describedby` |
-| 15 | Story 2.1 gallery focus test presses Tab before the lazy gallery renders; failed once in four full runs [run observation] | low | defer, issue to be created before the push (needs the user's go-ahead for a remote action) | `frontend/e2e/tests/tokens-theme.spec.ts` line 86 to 93; pre-existing, not changed by this story |
+| 15 | Story 2.1 gallery focus test presses Tab before the lazy gallery renders; failed once in four full runs [run observation] | low | defer #116 | `frontend/e2e/tests/tokens-theme.spec.ts` line 86 to 93; pre-existing, not changed by this story |
 | 16 | `e2e` locator `control.locator('+ span')` may not resolve [BH, EC] | false | rejected | The spec ran and passed it for radio and checkbox chips under both forced-colors modes |
 
 ## Design Notes
