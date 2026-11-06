@@ -64,4 +64,7 @@ Today's "Frontend" job runs lint, typecheck, Vitest and build. Story 2.7 adds a 
 ## Not set up
 
 - Contract (Pact) tests: the frontend calls its own backend in the same repo, so there is no separate provider boundary.
-- Write-time enforcement hook (`tea-enforce.cjs`): not installed. See the framework setup summary.
+
+## Write-time check (local AI tooling)
+
+When Claude Code works in this project, a hook (`.claude/hooks/tea-enforce.cjs`, configured in `.tea/enforce-config.json`, both outside this repository) blocks writes to test files that use hard waits, `.only` and similar patterns. Rules come from the test-review criteria registry. To exempt a rule, add its id to `disabledRules` in that config and say why. It does not run in CI.
