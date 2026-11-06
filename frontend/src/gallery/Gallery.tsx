@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { applyTheme, type ThemeChoice } from '../styles/theme.ts'
+import { applyTheme, readThemeChoice, type ThemeChoice } from '../styles/theme.ts'
 import tokensCss from '../styles/tokens.css?raw'
 import styles from './Gallery.module.css'
 import { g, sample } from './strings.ts'
@@ -15,7 +15,7 @@ const spacingTokens = [...tokensCss.matchAll(/^\s+--(space-[\w-]+):\s*(\d+px)\s*
 const radiusTokens = [...tokensCss.matchAll(/^\s+--(radius-[\w-]+):\s*(\d+px)\s*;/gm)].map(([, name, value]) => [name, value] as const)
 
 export function Gallery() {
-  const [mode, setMode] = useState<ThemeChoice>('system')
+  const [mode, setMode] = useState<ThemeChoice>(readThemeChoice)
   // The toggle changes the page for this visit only; the stored choice belongs to Settings (Story 2.9).
   const choose = (choice: ThemeChoice) => {
     setMode(choice)
@@ -33,6 +33,9 @@ export function Gallery() {
         </button>
         <button type="button" aria-pressed={mode === 'dark'} onClick={() => choose('dark')}>
           {g('dark')}
+        </button>
+        <button type="button" aria-pressed={mode === 'system'} onClick={() => choose('system')}>
+          {g('system')}
         </button>
       </div>
 

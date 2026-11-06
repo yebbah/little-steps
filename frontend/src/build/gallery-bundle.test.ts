@@ -41,3 +41,10 @@ test('[P0] AC-1 a production build ignores VITE_ENABLE_GALLERY=true set in the e
   expect(bundle).not.toContain(GALLERY_ROUTE)
   expect(bundle).not.toMatch(/gallery/i)
 }, 120_000)
+
+test('[P0] AC-1 a build in any mode other than development and test ignores the flag (staging)', async () => {
+  const bundle = await bundleText('staging', true)
+
+  expect(bundle).not.toContain(GALLERY_ROUTE)
+  expect(bundle).not.toMatch(/gallery/i)
+}, 120_000)

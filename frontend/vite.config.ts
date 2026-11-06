@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [react()],
   // The component gallery exists only in local and test builds (Story 2.1). The flag comes from
   // .env.development and .env.test; a production build ignores it, whatever the environment says.
-  define: mode === 'production' ? { 'import.meta.env.VITE_ENABLE_GALLERY': JSON.stringify('false') } : {},
+  define: mode !== 'development' && mode !== 'test' ? { 'import.meta.env.VITE_ENABLE_GALLERY': JSON.stringify('false') } : {},
   test: {
     // Vitest: unit tests live next to the code. The coverage report is uploaded by CI.
     include: ['src/**/*.test.{ts,tsx}'],

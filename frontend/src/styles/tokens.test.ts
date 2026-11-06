@@ -59,12 +59,47 @@ describe('colour tokens (UX-DR1, UX-DR2)', () => {
   })
 })
 
+describe('semantic layer', () => {
+  const names = [...tokensCss.split('/* Semantic colours')[0].matchAll(/^\s+--([\w-]+):\s*#/gm)]
+    .map(([, n]) => n)
+    .filter((n) => !n.endsWith('-dark'))
+  const decls = (block: string) => [...block.matchAll(/--color-([\w-]+):\s*var\(--([\w-]+)\)/g)].map(([, n, v]) => `${n}=${v}`)
+  const light = decls(tokensCss.split('/* Semantic colours, light')[1].split('/* Dark follows')[0])
+  const media = decls(tokensCss.split('@media (prefers-color-scheme: dark)')[1].split('/* Dark chosen')[0])
+  const explicit = decls(tokensCss.split("/* Dark chosen explicitly */")[1])
+
+  test('the light layer maps every colour to its light value', () => {
+    expect(light).toEqual(names.map((n) => `${n}=${n}`))
+  })
+
+  test('both dark blocks map every colour to its -dark twin, and are identical', () => {
+    expect(explicit).toEqual(names.map((n) => `${n}=${n}-dark`))
+    expect(media).toEqual(explicit)
+  })
+})
+
 describe('type, spacing and radii (UX-DR8 to UX-DR11)', () => {
   const css = cssTokens()
 
   test('the nine type tokens exist in rem', () => {
     for (const name of ['display', 'title', 'heading', 'section-label', 'body', 'body-sm', 'cue', 'label', 'meta']) {
       expect(css.get(`type-${name}-size`), name).toMatch(/^\d+(\.\d+)?rem$/)
+    }
+  })
+
+  test('the type scale matches DESIGN.md (size, weight, line height, tracking, font stack)', () => {
+    const typo = designMd().split('\ntypography:')[1].split('\nrounded:')[0]
+    const blocks = typo.split(/\n  (?=[\w-]+:\n)/).slice(1)
+    expect(blocks).toHaveLength(9)
+    for (const blk of blocks) {
+      const name = blk.match(/^([\w-]+):/)![1]
+      const get = (k: string) => blk.match(new RegExp(`${k}:\\s*'?([^'\\n]+)'?`))?.[1]
+      expect(css.get(`type-${name}-size`), name).toBe(get('fontSize'))
+      expect(css.get(`type-${name}-weight`), name).toBe(get('fontWeight'))
+      expect(css.get(`type-${name}-line`), name).toBe(get('lineHeight'))
+      expect(css.get(`type-${name}-tracking`), name).toBe(get('letterSpacing'))
+      expect(baseCss, name).toMatch(new RegExp(`\\.type-${name} \\{[^}]*var\\(--type-${name}-size\\)`))
+      expect(css.get('font-stack')?.replace(/'/g, '"')).toBe(get('fontFamily')?.replace(/'/g, '"'))
     }
   })
 
@@ -109,5 +144,34 @@ describe('theme before first paint', () => {
     expect(script).toContain(`'${THEME_STORAGE_KEY}'`)
     // The inline script comes before the module script, so it runs before anything renders.
     expect(html.indexOf('<script>')).toBeLessThan(html.indexOf('type="module"'))
+  })
+
+  describe('the inline script', () => {
+    const html = readFileSync(resolve(__dirname, '../../index.html'), 'utf8')
+    const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1] ?? ''
+    const run = (stored: string | null, throws = false) => {
+      const attrs = new Map<string, string>()
+      const localStorage = {
+        getItem: () => {
+          if (throws) throw new Error('blocked')
+          return stored
+        },
+      }
+      const document = { documentElement: { setAttribute: (k: string, v: string) => attrs.set(k, v) } }
+      new Function('localStorage', 'document', script)(localStorage, document)
+      return attrs.get('data-theme')
+    }
+
+    test('applies light and dark only', () => {
+      expect(run('dark')).toBe('dark')
+      expect(run('light')).toBe('light')
+      expect(run('system')).toBeUndefined()
+      expect(run('purple')).toBeUndefined()
+      expect(run(null)).toBeUndefined()
+    })
+
+    test('blocked storage does not throw', () => {
+      expect(run(null, true)).toBeUndefined()
+    })
   })
 })

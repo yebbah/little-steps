@@ -35,6 +35,13 @@ test.describe('theme and type', () => {
     await expect(page.locator('body')).toHaveCSS('background-color', FLOOR.dark)
   })
 
+  test('[P0] a stored Light choice stays light on a dark device', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await page.addInitScript(() => localStorage.setItem('littlesteps.theme', 'light'))
+    await page.goto('/')
+    await expect(page.locator('body')).toHaveCSS('background-color', FLOOR.light)
+  })
+
   test('[P0] body text renders at 17px at default zoom (UX-DR9)', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('body')).toHaveCSS('font-size', '17px')
@@ -84,5 +91,6 @@ test.describe('component gallery at /dev/gallery', () => {
     await expect(toggle).toHaveCSS('outline-width', '2px')
     await expect(toggle).toHaveCSS('outline-offset', '2px')
     await expect(toggle).toHaveCSS('outline-style', 'solid')
+    await expect(toggle).toHaveCSS('outline-color', 'rgb(51, 69, 127)')
   })
 })

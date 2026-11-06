@@ -6,6 +6,7 @@ const strings = {
   themeLabel: 'Colour mode',
   light: 'Light',
   dark: 'Dark',
+  system: 'System',
   colours: 'Colour tokens',
   coloursHint: 'Left: light value. Right: dark twin.',
   type: 'Type scale',

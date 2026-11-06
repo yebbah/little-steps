@@ -99,3 +99,29 @@ test('[P0] AC-2 the measure fails a pairing that misses AA (the test can fail)',
   expect(contrast('#555A66', '#17191F')).toBeLessThan(TEXT)
   expect(contrast('#23252B', '#FAF7F2')).toBeGreaterThan(TEXT)
 })
+
+// The sheet edge sits over the scrimmed page (DESIGN.md, Colors: scrim). The scrim is 8-digit hex, so it
+// is composited over the surface before measuring. Light: the card edge against the dimmed surface.
+// Dark: outline-strong-dark against the dimmed surface.
+function composite(scrimHex: string, surface: string): string {
+  const alpha = parseInt(scrimHex.slice(7, 9), 16) / 255
+  const mix = (i: number) => {
+    const fg = parseInt(scrimHex.slice(1 + i * 2, 3 + i * 2), 16)
+    const bg = parseInt(surface.slice(1 + i * 2, 3 + i * 2), 16)
+    return Math.round(fg * alpha + bg * (1 - alpha)).toString(16).padStart(2, '0')
+  }
+  return `#${mix(0)}${mix(1)}${mix(2)}`
+}
+
+test('[P0] AC-2 the sheet edge keeps 3:1 over the scrimmed floor, card and selected, in light and dark', () => {
+  const css = readFileSync(resolve(__dirname, 'tokens.css'), 'utf8')
+  const hex = (name: string) => css.match(new RegExp(`--${name}:\\s*(#[0-9A-Fa-f]{6,8})`))![1]
+  const misses: string[] = []
+  for (const surface of ['floor', 'card', 'selected']) {
+    const lightEdge = contrast(hex('card'), composite(hex('scrim'), hex(surface)))
+    const darkEdge = contrast(hex('outline-strong-dark'), composite(hex('scrim-dark'), hex(`${surface}-dark`)))
+    if (lightEdge < CONTROL_EDGE) misses.push(`light card edge over scrimmed ${surface}: ${lightEdge.toFixed(2)}`)
+    if (darkEdge < CONTROL_EDGE) misses.push(`dark outline-strong over scrimmed ${surface}: ${darkEdge.toFixed(2)}`)
+  }
+  expect(misses).toEqual([])
+})

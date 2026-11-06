@@ -32,3 +32,14 @@ test('the Light / Dark toggle switches the page mode without storing it', async 
   expect(document.documentElement.getAttribute('data-theme')).toBe('light')
   expect(localStorage.length).toBe(0)
 })
+
+test('the toggle starts on the applied choice and can return to System', async () => {
+  document.documentElement.setAttribute('data-theme', 'dark')
+  localStorage.setItem('littlesteps.theme', 'dark')
+  render(<Gallery />)
+  expect(screen.getByRole('button', { name: 'Dark' })).toHaveAttribute('aria-pressed', 'true')
+
+  await userEvent.click(screen.getByRole('button', { name: 'System' }))
+  expect(document.documentElement.hasAttribute('data-theme')).toBe(false)
+  localStorage.clear()
+})

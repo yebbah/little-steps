@@ -32,3 +32,5 @@
 - #87  2027-02-04  Count new positive and negative tests automatically in release notes  (origin #34, Story 1.9)
 - #101  2027-01-05  Check story status and epic bookkeeping at finish  (origin #2, Epic 1 retro)
 - #102  2027-01-05  CI: retry the dhi.io login on registry outages  (origin #33, Story 1.8)
+- #111  2027-01-05  Image-layer focus ring contrast and DESIGN.md ratio cross-check  (origin #35)
+- #112  2027-01-05  Root-font and 17px body check in WebKit  (origin #35)
