@@ -2,7 +2,7 @@
 title: 'Story 1.9: Release notes for each epic'
 type: 'feature'
 created: '2026-11-06'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'f66e007'
 route: 'dispatch'
 context:
