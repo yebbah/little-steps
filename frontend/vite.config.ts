@@ -7,6 +7,9 @@ export default defineConfig({
   test: {
     // Vitest: unit tests live next to the code. The coverage report is uploaded by CI.
     include: ['src/**/*.test.{ts,tsx}'],
+    // The JUnit file feeds the epic release note (deploy/release-notes.sh).
+    reporters: ['default', 'junit'],
+    outputFile: { junit: 'test-results/junit.xml' },
     coverage: { provider: 'v8', include: ['src/**'], reporter: ['text', 'lcov', 'json-summary'] },
   },
   server: {

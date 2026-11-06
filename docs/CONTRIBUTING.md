@@ -81,3 +81,10 @@ Anything parked instead of fixed is tracked, not just noted. Every deferred item
 ## Finishing an epic
 
 Write the release note in `docs/release-notes/` covering integration, changes, new features, security, code quality and test results (new positive and negative tests plus the non-regression suite). Link the epic's story security reports from it.
+
+1. Run the full scan, `./mvnw verify`, the frontend tests and `deploy/release-notes.sh shell-tests`, so the latest reports exist.
+2. Generate the note with `deploy/release-notes.sh <epic>`. It fills every fact it can from git, the compose and env files, `images.yaml` and the reports, and marks the rest `TODO(author)`.
+3. Write the narrative parts, remove every `TODO(author)`, set `Status: done`, and run `deploy/release-notes.sh check docs/release-notes/epic-NN-<slug>.md`. It fails on a remaining `TODO(author)` or a KEV or High/Critical count other than 0.
+4. After the epic's last PR is merged, tag the merge commit on `main` with `deploy/release-notes.sh tag <epic>` (it runs the check first) and push the tag. The next epic's note compares against it.
+
+Details: [release-notes/README.md](release-notes/README.md).
