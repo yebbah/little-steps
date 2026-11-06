@@ -6,6 +6,7 @@ LittleSteps is a modular-monolith web app: a Spring Boot backend and a React PWA
 
 | What | Where | Written |
 |---|---|---|
+| Contributing policies | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | branching, security gate, finishing a story or epic |
 | Changelog | [docs/changelogs/](docs/changelogs/) | one per story, when the story is implemented |
 | Security report | [docs/security-reports/](docs/security-reports/) | one per story, from the template |
 | Release note | [docs/release-notes/](docs/release-notes/) | one per completed epic (Story 1.9) |
