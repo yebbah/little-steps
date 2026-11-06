@@ -28,3 +28,5 @@
 - #59  2027-01-05  Recheck the Keycloak bash /dev/tcp healthcheck on DHI image updates  (origin #28, Story 1.3)
 - #60  2027-01-05  Automated stack smoke test: health, schema, PKCE token, Mailpit email  (origin #28, Story 1.3)
 - #61  2027-01-05  check-images.sh orphan, duplicate and digest-format checks  (origin #28, Story 1.3)
+- #65  2027-01-05  dev-up.sh does not check jq, git or a Compose version with --wait-timeout  (origin #29, Story 1.4)
+- #66  2027-01-05  Verify dev-up.sh health reporting against real docker compose ps output  (origin #29, Story 1.4)

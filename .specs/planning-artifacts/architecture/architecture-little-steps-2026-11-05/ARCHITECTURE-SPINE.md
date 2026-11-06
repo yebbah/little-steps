@@ -314,9 +314,10 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
 - **Prevents:** code paths that differ between local and shipping, configuration scattered across code, and each developer starting the stack a different way.
 - **Rule:**
   - One multi-stage `deploy/Dockerfile` builds the app image: the PWA build and the Spring Boot jar, with Spring Boot serving the PWA at the same origin as `/api`. Production runs this image. In local development the app usually runs from the IDE, and the Vite dev server proxies `/api`.
-  - Keycloak (realm imported from `deploy/keycloak/`), PostgreSQL, Mailpit (local only) and Presidio (P2) run from one `deploy/compose.yaml`, with an env-file per environment. Ollama runs natively on the host.
+  - Keycloak (realm imported from `deploy/keycloak/`; its database role and schema are created by a one-shot init service, because the DHI PostgreSQL image has no init-script folder), PostgreSQL, Mailpit (local only) and Presidio (P2) run from one `deploy/compose.yaml`, with an env-file per environment. Ollama runs natively on the host.
   - `deploy/dev-up.sh` and `deploy/dev-down.sh` are the only supported way to start and stop the local stack. They are idempotent bash scripts.
     - `dev-up.sh` checks prerequisites (Docker, Java, Node, Ollama and the configured model), creates `local.env` from the example if it is missing, starts the compose services, and waits for their health checks. `--full` also builds and runs the app image.
+    - `deploy/check-urls.sh` requests every local URL listed in the README (Keycloak, Mailpit, the database port) with `curl` and `nc`, sends no credentials, and exits non-zero if a required one fails. The app URL is informational until the app exists.
     - `dev-down.sh` stops everything and keeps data. `--wipe` also removes the volumes and the local storage folder.
   - Adapters are selected by Spring profile (`local`, `test`, `prod`) plus environment variables. There are no environment checks in code. Secrets come only from the environment.
 
@@ -362,8 +363,9 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
 - **Prevents:** unvetted base images, and image drift between machines.
 - **Rule:**
   - `deploy/images.yaml` is the manifest of every image used. For each one it records the name, the source (`dhi` or `other`), the tag, the digest, and for `other`, why no DHI image is used.
-  - Images are pulled from `dhi.io` when the catalog has one: PostgreSQL, and the Node build and Java/Temurin JRE runtime stages of the app image.
-  - Images with no DHI equivalent are pulled from their official publisher: Keycloak (`quay.io/keycloak`), Mailpit (local only) and Presidio (P2).
+  - Images are pulled from `dhi.io` when the catalog has one: PostgreSQL, Keycloak, and the Node build and Java/Temurin JRE runtime stages of the app image.
+  - Images with no DHI equivalent are pulled from their official publisher: Mailpit (local only) and Presidio (P2). A DHI catalog check precedes every pin, so an image moves to `dhi` as soon as the catalog has it (Keycloak did, in Story 1.3).
+  - An image that compose does not run yet (Presidio, P2) is marked `scan: deferred` in the manifest: the scan skips it with a notice, and the manifest check fails if a deferred image runs in compose. The marker is removed when the image is enabled.
   - Every image in `compose.yaml` and the `Dockerfile` is referenced by digest, matching the manifest. A CI check fails on any mismatch.
   - Each `other` image appears as a warning in every release note.
   - `dev-up.sh` checks that the developer is logged in to `dhi.io`.
@@ -416,8 +418,8 @@ Versions checked on the web on 2026-11-05. Pin the exact patch versions at scaff
 | Spring Modulith | 2.1.2 |
 | Spring AI | 2.0.2 |
 | Hibernate (7.4), Flyway, Spring Security, Testcontainers (2.x module names) | Spring Boot 4.1 BOM |
-| PostgreSQL | 18.6 |
-| Keycloak | 26.8.1 |
+| PostgreSQL | 18 (tag `18-alpine`, DHI, digest-pinned in `deploy/images.yaml`) |
+| Keycloak | 26.8.2 (DHI, digest-pinned) |
 | React | 19.3.1 |
 | Vite | 8.x |
 | vite-plugin-pwa | 2.0.0 |

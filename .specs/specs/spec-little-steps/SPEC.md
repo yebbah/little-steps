@@ -83,6 +83,7 @@ P1 is the first pilot slice. It must work end to end before P2 work starts.
     - On a Mac with the prerequisites installed, one start command brings up PostgreSQL, Keycloak with the realm imported, and Mailpit, all reporting healthy.
     - The start command names any missing prerequisite (Docker, Java, Node, Ollama, the configured model) with the step to fix it, and running it twice is harmless.
     - A full mode also builds and runs the app image, and a phone reaches the app over Tailscale HTTPS.
+    - A check command requests every local URL (identity provider, mail catcher, database port) and reports pass or fail for each, so nobody has to test them by hand.
     - The stop command stops everything and keeps the data. A wipe option resets the volumes and local files.
     - The README covers first-time setup in these commands.
 
