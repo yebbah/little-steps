@@ -6,6 +6,7 @@ Newest first. Add a line here with every new changelog.
 
 | Story | Title | Changelog |
 |---|---|---|
+| 2.6 | Message catalog and tone check | [story-2-6-message-catalog-and-tone-check.md](story-2-6-message-catalog-and-tone-check.md) |
 | 1.6 | Backend module skeleton and persistence baseline | [story-1-6-backend-module-skeleton-and-persistence-baseline.md](story-1-6-backend-module-skeleton-and-persistence-baseline.md) |
 | 1.7 | API contract, errors and safe logging | [story-1-7-api-contract-errors-and-safe-logging.md](story-1-7-api-contract-errors-and-safe-logging.md) |
 | 1.8 | Continuous integration with security and quality gates | [story-1-8-ci-security-quality-gates.md](story-1-8-ci-security-quality-gates.md) |

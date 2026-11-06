@@ -64,6 +64,8 @@ TODO(author): API changes, breaking changes, and the ordered upgrade steps, or w
 
 {{QUALITY}}
 
+UI review: feature epics link [ui-review-checklist.md](../ui-review-checklist.md) here and confirm it was applied.
+
 ## Test results
 
 {{TESTS}}

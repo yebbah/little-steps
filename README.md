@@ -119,7 +119,7 @@ deploy/security-scan.sh scan app-image    # scan the locally built app image (af
 (cd frontend && npm run api:types)                     # regenerate frontend/src/api/schema.d.ts (needs network the first time)
 ```
 
-The frontend has no hand-written API types and no inline UI text: sentences go in `frontend/src/i18n/messages.ts`.
+The frontend has no hand-written API types and no inline UI text: sentences go in `frontend/src/i18n/messages.ts` under stable keys, and a tone check (`frontend/src/i18n/tone.ts`, run by `npm test` and so by the Frontend CI job) fails on banned phrases. The banned UI patterns are in [docs/ui-review-checklist.md](docs/ui-review-checklist.md).
 
 **Design tokens, theme and the gallery.** Colours, type, spacing and radii are CSS custom properties in `frontend/src/styles/tokens.css`, taken from the UX `DESIGN.md` (a test compares every value). Components use the `--color-*` layer, which follows the device's light or dark setting, or the stored Light / Dark choice that `index.html` applies before first paint. The component gallery is at `/dev/gallery` when `VITE_ENABLE_GALLERY=true`, which `frontend/.env.development` and `.env.test` set; a production build ignores the flag and contains no gallery (a build test checks it).
 
@@ -184,7 +184,7 @@ security/           vulnerability scan exceptions
 .tools/             pinned scanners installed by the security scan (git-ignored)
 build/              generated output, such as security reports (git-ignored)
 data/               local storage folder, removed by `dev-down.sh --wipe` (git-ignored)
-docs/               contributing policies, changelogs, security reports, release notes, deferred items process
+docs/               contributing policies, changelogs, security reports, release notes, deferred items process, UI review checklist
 AGENTS.md           instructions for AI coding agents (CLAUDE.md points to it)
 ```
 

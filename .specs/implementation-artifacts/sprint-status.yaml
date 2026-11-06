@@ -53,7 +53,7 @@ development_status:
   2-3-app-shell-navigation-and-focus-management: backlog
   2-4-core-controls: backlog
   2-5-surfaces-feedback-and-labels: backlog
-  2-6-message-catalog-and-tone-check: backlog
+  2-6-message-catalog-and-tone-check: done
   2-10-catalog-copy-for-status-lines-banners-and-empty-states: backlog
   2-11-catalog-copy-for-errors-confirmations-and-security-notices: backlog
   2-7-responsive-reflow-and-accessibility-test-harness: backlog
