@@ -1,0 +1,229 @@
+# Continuous integration (Story 1.8). Repeats the local checks so a skipped hook still fails.
+# The rules (action pinning, security gate) are in docs/CONTRIBUTING.md; how CI is set up and
+# which secrets it needs is in the README ("Continuous integration").
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Only read access to the repository; no job needs more.
+permissions:
+  contents: read
+
+# A newer push to the same branch (or its pull request) makes the older run pointless; runs on main are never cancelled.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  JAVA_VERSION: "25"
+  NODE_VERSION: "24"
+
+jobs:
+  backend:
+    name: Backend (Maven verify, tests, coverage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Java 25 (Maven cache on)
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      # Runs every unit and integration test (ModularityTests, Testcontainers tests once they exist),
+      # JaCoCo coverage and the SBOM. The guardrail-eval tag is excluded in backend/pom.xml (Epic 13).
+      - name: "Backend: ./mvnw verify"
+        working-directory: backend
+        run: ./mvnw --batch-mode --no-transfer-progress verify
+
+      - name: Upload backend test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: backend-reports
+          path: |
+            backend/target/surefire-reports/
+            backend/target/failsafe-reports/
+            backend/target/site/jacoco/
+            backend/target/bom.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  frontend:
+    name: Frontend (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node 24 (npm cache on)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: "Frontend: npm ci"
+        run: npm ci
+
+      - name: "Frontend: lint"
+        run: npm run lint
+
+      - name: "Frontend: typecheck"
+        run: npm run typecheck
+
+      - name: "Frontend: Vitest with coverage"
+        run: npm run test:coverage
+
+      - name: "Frontend: build"
+        run: npm run build
+
+      # The OpenAPI type drift check arrives with Story 1.7 as the `api:check` script. Until it exists
+      # this step says so instead of passing silently; once it exists it runs and a drift fails the job.
+      - name: "Frontend: OpenAPI type drift check (api:check)"
+        run: |
+          if node -e 'process.exit(require("./package.json").scripts?.["api:check"] ? 0 : 1)'; then
+            npm run api:check
+          else
+            echo "::notice title=OpenAPI type drift check::skipped, the api:check script arrives with Story 1.7 (issue #32)"
+          fi
+
+      - name: Upload frontend coverage report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: frontend-reports
+          path: frontend/coverage/
+          if-no-files-found: warn
+          retention-days: 30
+
+  scripts:
+    name: Scripts and manifests (shellcheck, pinning, images.yaml)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: "Check: every GitHub Action is pinned to a commit SHA"
+        run: deploy/check-actions.sh
+
+      - name: "Check: shellcheck on deploy/*.sh, deploy/tests/*.sh and .githooks/*"
+        run: shellcheck deploy/*.sh deploy/tests/*.sh .githooks/*
+
+      - name: "Check: images.yaml matches compose.yaml and the Dockerfile (digests)"
+        run: deploy/check-images.sh
+
+      - name: "Check: tests of the check scripts"
+        run: |
+          deploy/tests/check-actions.test.sh
+          deploy/tests/ci-workflow.test.sh
+          deploy/tests/check-images.test.sh
+          deploy/tests/realm.test.sh
+          deploy/tests/dev-scripts.test.sh
+          deploy/tests/check-urls.test.sh
+
+  security:
+    name: Security scan (secrets, dependencies, images, app image)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # Nothing is staged in CI, so gitleaks scans the commit history instead.
+      LS_SECRETS_SCOPE: history
+    steps:
+      - name: Check out the repository (full history for the secret scan)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Java 25 (Maven cache on; the scan builds the backend SBOM)
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      # Only the Grype vulnerability database is cached. The pinned tools are re-downloaded and their
+      # checksums verified every run, and the KEV feed is fetched fresh, so a poisoned cache entry
+      # cannot replace a scanner binary or hide a KEV listing.
+      - name: Cache the vulnerability database
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/grype
+          key: grype-db-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: grype-db-${{ runner.os }}-
+
+      # The LS_* variables are test hooks that can weaken the scan (a different KEV file, exceptions file or
+      # root). Only the secret scope set above is allowed; anything else fails the job.
+      - name: "Security: no scan test override is set"
+        run: |
+          overrides="$(env | grep -E '^LS_' | grep -vE '^LS_SECRETS_SCOPE=' | cut -d= -f1 || true)"
+          if [ -n "$overrides" ]; then
+            echo "::error title=Scan test override::these LS_* test hooks are set and could weaken the scan: $overrides"
+            exit 1
+          fi
+
+      - name: "Security: install the pinned scan tools (checksums verified)"
+        run: deploy/security-scan.sh install-tools
+
+      # The DHI base images and the manifest images are pulled from dhi.io.
+      - name: "Security: log in to dhi.io (needs the DHI_USERNAME and DHI_TOKEN secrets)"
+        env:
+          DHI_USERNAME: ${{ secrets.DHI_USERNAME }}
+          DHI_TOKEN: ${{ secrets.DHI_TOKEN }}
+        run: |
+          if [ -z "$DHI_USERNAME" ] || [ -z "$DHI_TOKEN" ]; then
+            echo "::error title=dhi.io login::the DHI_USERNAME and DHI_TOKEN repository secrets are not available (a pull request from a fork never gets them). Add them under Settings, Secrets and variables, Actions."
+            exit 1
+          fi
+          printf '%s' "$DHI_TOKEN" | docker login dhi.io --username "$DHI_USERNAME" --password-stdin
+
+      - name: "Security: scan secrets, backend, frontend and images (deploy/security-scan.sh)"
+        run: deploy/security-scan.sh
+
+      # Built for scanning only: nothing is pushed anywhere.
+      - name: "Build: app image (deploy/Dockerfile, not pushed)"
+        run: docker build --file deploy/Dockerfile --tag littlesteps-app .
+
+      - name: "Security: scan the built app image"
+        run: deploy/security-scan.sh scan app-image
+
+      - name: Show the scan summary
+        if: always()
+        run: |
+          if [ -f build/security/summary.txt ]; then
+            { echo '### Security scan'; echo '```'; cat build/security/summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: security-reports
+          path: |
+            build/security/summary.txt
+            build/security/report.json
+            build/security/*.grype.json
+            build/security/*.log
+            build/security/*.err
+          if-no-files-found: warn
+          retention-days: 30

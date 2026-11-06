@@ -1,11 +1,14 @@
 # LittleSteps
 
+[![CI](https://github.com/yebbah/little-steps/actions/workflows/ci.yml/badge.svg)](https://github.com/yebbah/little-steps/actions/workflows/ci.yml)
+
 LittleSteps is a modular-monolith web app: a Spring Boot backend and a React PWA frontend, built to run end to end on a Mac with no paid services.
 
 ## Documentation
 
 | What | Where | Written |
 |---|---|---|
+| Continuous integration | [Continuous integration](#continuous-integration) below | jobs, secrets, artifacts, local equivalents |
 | Contributing policies | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | branching, security gate, finishing a story or epic |
 | Architecture diagrams | [docs/architecture.md](docs/architecture.md) | infrastructure (local and cloud) and components |
 | Deferred items process | [docs/deferred-items.md](docs/deferred-items.md) | issues, target dates, exceptions |
@@ -80,17 +83,20 @@ The phone cannot reach Keycloak on `localhost:8180` (that address is the phone i
 **Build and test**
 
 ```bash
-(cd backend && ./mvnw verify)                          # compile, tests (module boundaries, PWA fallback, problem responses, safe logging, OpenAPI drift, real PostgreSQL via Testcontainers; needs Docker), backend SBOM
+(cd backend && ./mvnw verify)                          # compile, tests (module boundaries, PWA fallback, problem responses, safe logging, OpenAPI drift, real PostgreSQL via Testcontainers; needs Docker), JaCoCo coverage, backend SBOM
 (cd frontend && npm ci && npm run build)               # type-check and bundle
-(cd frontend && npm run lint)                          # oxlint, including the rule against string literals in JSX
+(cd frontend && npm run lint && npm run typecheck)     # oxlint (including the rule against string literals in JSX), tsc
 (cd frontend && npm run lint:test)                     # tests for that lint rule
 (cd frontend && npm run api:check)                     # fails when src/api/schema.d.ts is out of date
+(cd frontend && npm run test:coverage)                 # Vitest with coverage (frontend/coverage/)
+deploy/check-actions.sh                                # every GitHub Action pinned to a commit SHA
+deploy/tests/check-actions.test.sh                     # tests for that check
 deploy/tests/security-scan.test.sh                     # tests for the security scan itself
 deploy/check-images.sh                                 # compose.yaml and images.yaml must agree
 deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh   # tests for the image check and the Keycloak realm
 deploy/tests/dev-scripts.test.sh                       # tests for dev-up.sh and dev-down.sh (stubs, no real Docker)
 deploy/tests/check-urls.test.sh                        # tests for check-urls.sh (stub curl and nc)
-shellcheck deploy/*.sh deploy/tests/*.sh    # brew install shellcheck
+shellcheck deploy/*.sh deploy/tests/*.sh .githooks/*    # brew install shellcheck
 ```
 
 If a command fails with a Java error, `JAVA_HOME` is not a JDK 25. The build stops with "Java 25 is required".
@@ -115,9 +121,27 @@ The frontend has no hand-written API types and no inline UI text: sentences go i
 
 **Day-to-day development.** The backend reads all its configuration from the environment and has no datasource unless a profile supplies one. Run it from the IDE (port 8080) with `SPRING_PROFILES_ACTIVE=local` and the variables of `deploy/local.env` exported (`LS_POSTGRES_DB`, `LS_POSTGRES_USER`, `LS_POSTGRES_PASSWORD`, and `LS_POSTGRES_PORT` if it is not 5432), after `deploy/dev-up.sh`. The `prod` profile takes `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`. Run the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
 
-Reports are written to `build/security/`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day). CI repeats the scan (Story 1.8).
+Reports are written to `build/security/`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day). CI repeats the scan (see "Continuous integration").
 
 **Branches, commits and finishing a story.** The rules are in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request, on free GitHub-hosted runners, in four parallel jobs. A failing step is named in the run, so the name says what failed.
+
+| Job | Runs |
+|---|---|
+| Backend | `./mvnw verify`: all tests, JaCoCo coverage, SBOM. Tests tagged `guardrail-eval` are excluded by default (wired up in Epic 13) |
+| Frontend | `npm ci`, lint, typecheck, Vitest with coverage, build, then the OpenAPI type drift check (`api:check`, arrives with Story 1.7) |
+| Scripts | `deploy/check-actions.sh` (every action pinned to a commit SHA, version in a comment), `shellcheck` on `deploy/*.sh`, `deploy/tests/*.sh` and `.githooks/*`, `deploy/check-images.sh`, and the tests of the check scripts |
+| Security | `deploy/security-scan.sh` over the commit history, backend, frontend and every image in `images.yaml`, a Docker build of the app image (not pushed) and `deploy/security-scan.sh scan app-image`; same KEV or CVSS 7.0+ rule as the hook |
+
+- **Secrets to add once** (Settings, Secrets and variables, Actions): `DHI_USERNAME` and `DHI_TOKEN`, a Docker Hardened Images account, used for `docker login dhi.io`. Without them the Security job fails at that step and says so. Pull requests from forks never receive secrets.
+- **Build artifacts** (30 days): `backend-reports` (surefire, JaCoCo, SBOM), `frontend-reports` (coverage) and `security-reports` (summary, report.json, Grype reports); they feed the epic release note.
+- **Caches**: Maven and npm (by the setup actions) and the Grype vulnerability database. The pinned scan tools and the KEV feed are fetched and verified every run, never cached.
+- **Adding or updating an action**: pin it to the full commit SHA of the release (`gh api repos/<owner>/<repo>/commits/<tag> -q .sha`) and put the version in a comment after it. `deploy/check-actions.sh` fails on a tag or branch.
+- **Run the same checks locally**: the commands under "Development" above; the Security job is `deploy/security-scan.sh` and `deploy/security-scan.sh scan app-image`.
+- **Branch protection** (require the four CI jobs before merge) is a repository setting, not code: set it under Settings, Branches.
 
 ## Release
 
@@ -127,7 +151,8 @@ How a story or epic is finished is in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.m
 |---|---|
 | Per story: changelog and security report, pull request squash-merged to `main` | in use |
 | Per epic: release note in `docs/release-notes/` | arrives with Story 1.9 (`deploy/release-notes.sh`) |
-| Images and artifacts built and published by CI | arrives with Story 1.8 |
+| App image built (not pushed) and reports uploaded as build artifacts by CI | in use (see "Continuous integration") |
+| Publishing images or artifacts | not available yet; CI never pushes an image |
 
 ## Deployment
 
@@ -150,7 +175,7 @@ eval/guardrails/    AI guardrail evaluation cases
 deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, `dev-up.sh`, `dev-down.sh` and `check-urls.sh`, tests, and the app `Dockerfile`
 security/           vulnerability scan exceptions
 .githooks/          git hooks (pre-commit runs the security scan)
-.github/            issue templates (deferred items); CI arrives with Story 1.8
+.github/            issue templates (deferred items) and the CI workflow (workflows/ci.yml)
 .specs/, .ideas/    product and design specs, input brief and project context
 .tools/             pinned scanners installed by the security scan (git-ignored)
 build/              generated output, such as security reports (git-ignored)

@@ -318,6 +318,18 @@ else
   check "staged fake secret blocks" 1 "FAIL\] secrets" env LS_ROOT="$R" "$SCAN" secrets
   out="$(LS_ROOT="$R" "$SCAN" secrets 2>&1)"
   if echo "$out" | grep -q "wJalrXUtnFEMI"; then fail=$((fail + 1)); echo "FAIL the secret value leaked into the output"; else pass=$((pass + 1)); echo "ok   no secret value in the output"; fi
+
+  # History scope (CI): nothing staged, the secret sits in a commit.
+  R="$(new_root)"; git -C "$R" init -q; git -C "$R" config user.email t@example.com; git -C "$R" config user.name t
+  echo "clean" > "$R/readme.txt"; git -C "$R" add readme.txt; git -C "$R" commit -q -m clean
+  check "history scope: clean history passes" 0 "PASS\] secrets: commit history clean" env LS_ROOT="$R" LS_SECRETS_SCOPE=history "$SCAN" secrets
+  printf 'aws_access_key_id = %s\naws_secret_access_key = %s\n' "$KEY" "wJalrXUtnFEMI/K7MDENG/bPxRfiCYzZpLmNqRsT" > "$R/config.txt"
+  git -C "$R" add config.txt; git -C "$R" commit -q -m leak
+  check "history scope: a committed secret blocks" 1 "FAIL\] secrets: gitleaks found a secret in the commit history" env LS_ROOT="$R" LS_SECRETS_SCOPE=history "$SCAN" secrets
+  check "an unknown secrets scope is refused, not treated as staged" 1 "LS_SECRETS_SCOPE must be staged or history" env LS_ROOT="$R" LS_SECRETS_SCOPE=History "$SCAN" secrets
+  git clone -q --depth 1 "file://$R" "$R-shallow" 2>/dev/null
+  check "history scope refuses a shallow clone" 1 "needs the full history" env LS_ROOT="$R-shallow" LS_SECRETS_SCOPE=history "$SCAN" secrets
+  check "staged scope (default) ignores a committed secret" 0 "PASS\] secrets: staged changes clean" env LS_ROOT="$R" "$SCAN" secrets
 fi
 
 # ---- scan app-image (stub docker and grype, no real Docker) ----

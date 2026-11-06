@@ -24,3 +24,6 @@
 - #81  2027-02-04  Lint rule: user-facing JSX props and string constants  (origin #32, Story 1.7)
 - #82  2027-02-04  Propagate request ID (MDC) to async work  (origin #32, Story 1.7)
 - #91  2027-01-05  Error references in responses, detailed exceptions stored internally by reference  (origin #32, Story 1.7)
+- #88  2027-01-05  Make the Story 1.6 and 1.7 checks mandatory in CI  (origin #33, Story 1.8)
+- #89  2027-02-04  Coverage thresholds for JaCoCo and Vitest  (origin #33, Story 1.8)
+- #90  2027-02-04  CI policy for fork and Dependabot PRs, and PR-scoped secret scan  (origin #33, Story 1.8)

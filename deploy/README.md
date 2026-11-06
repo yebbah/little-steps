@@ -1,11 +1,11 @@
 # deploy
 
 Dockerfile, `compose.yaml`, `images.yaml`, environment examples, Keycloak realm and bash scripts.
-Filled by Stories 1.2 (security scan), 1.3 (compose), 1.4 (start and stop scripts), 1.5 (app image and full mode) and 1.9 (release notes script).
+Filled by Stories 1.2 (security scan), 1.3 (compose), 1.4 (start and stop scripts), 1.5 (app image and full mode), 1.8 (`check-actions.sh`, the action pinning check) and 1.9 (release notes script).
 
 ## Security scan (Story 1.2)
 
-`security-scan.sh` is the one scan entry point. The git hook (`.githooks/pre-commit`) runs it before every commit, and CI repeats it (Story 1.8).
+`security-scan.sh` is the one scan entry point. The git hook (`.githooks/pre-commit`) runs it before every commit, and CI repeats it (Story 1.8, root [README.md](../README.md) "Continuous integration"). In CI nothing is staged, so `LS_SECRETS_SCOPE=history` makes the secret scan read the commit history instead; the default stays staged changes.
 
 ```bash
 deploy/security-scan.sh install-tools   # once: Grype, Syft and gitleaks, pinned, checksums verified, into .tools/
