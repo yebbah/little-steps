@@ -92,20 +92,53 @@ context:
 - A finding with no CVSS score at all that Grype rates High or Critical blocks (unknown is treated as the worst case). KEV is matched on the CVE and on CVE aliases of GHSA ids.
 - `images.yaml` is read as `name:` and `digest:` lines and scanned as `registry:name@digest`. Story 1.3 must keep those two keys, or adapt `cmd_images`.
 - First scan of Story 1.1's lockfiles: PASS, with three warnings (deepmerge 5.3 with no fix, glob 6.3, minimatch 6.9), all below 7.0 and not in KEV. These go in the Epic 1 release note.
-- Tests: 30 checks pass (policy, KEV cache, targets, live log4j, live lodash, real gitleaks secret). A real `git commit` with a staged fake secret was blocked by the hook. `LS_SCAN_LIVE_IMAGE` run on an alpine digest also passed.
+- Tests: 59 checks pass after the reviewer pass (policy, KEV cache, every target, SBOM regeneration with a stub mvnw, the full `run`, a real `git commit` through the hook, live log4j, live lodash in dependencies and devDependencies, real gitleaks secret). A real `git commit` with a staged fake secret was blocked by the hook. `LS_SCAN_LIVE_IMAGE` run on an alpine digest also passed.
 - `core.hooksPath` is set locally to `.githooks`; Story 1.4 automates this for other clones.
 
 ## Spec Change Log
 
 ## Review Triage Log
 
-Reviewer subagents were not launched (not requested). Inline self-review of the diff:
+Three reviewer subagents ran (Blind Hunter, Edge Case Hunter, Verification Gap) on the diff from `baseline_commit` to the first commit. Earlier inline self-review found rows 1 to 3.
 
 | # | Layer | Finding | Verdict | Evidence / route |
-|---|---|---|---|---|
-| 1 | inline | Frontend SBOM skipped dev dependencies (4 of 439 packages) | high | Found by checking the count against the lockfile. Patched with SYFT_JAVASCRIPT_INCLUDE_DEV_DEPENDENCIES. |
-| 2 | inline | No KEV cache and no network crashed in jq instead of failing cleanly | medium | Caught by a new test. Patched: KEV is resolved once up front. |
-| 3 | inline | Failure in the grouped scan was detected only by grepping the summary | medium | Patched: the group exit status now carries the result. |
+|---|-------|---------|---------|------------------|
+| 1 | inline | Frontend SBOM skipped devDependencies (4 of 439 packages) | high | Patched with SYFT_JAVASCRIPT_INCLUDE_DEV_DEPENDENCIES. |
+| 2 | inline | No KEV cache and no network crashed in jq | medium | Patched: KEV resolved once up front. |
+| 3 | inline | Failure in the grouped scan only detected by grepping the summary | medium | Patched: group exit status carries the result. |
+| 4 | gap | `run` (the hook path) has no test | high | Real: nothing called `cmd_run`. Patched: run tests for every target, hook test through real `git commit`. |
+| 5 | gap, edge | SBOM regeneration untested | medium | Patched: stub-mvnw tests for missing, fresh, newer-pom and staged-pom cases. |
+| 6 | gap | devDependency scanning unpinned by tests | medium | Patched: devDependency lodash fixture. |
+| 7 | blind, edge, gap | `tr 'A-Za-z0-9._-\n'` is a reversed range on GNU tr | medium | Real for Linux CI (Story 1.8). Patched: `-` moved last. |
+| 8 | blind, edge | Dependency scans read the working tree, commit takes the index | medium | Patched: a partly staged pom, package.json, lockfile or images.yaml fails. |
+| 9 | blind | Backend SBOM omitted test-scope dependencies | medium | Spec says all scopes. Patched: includeTestScope (55 to 93 components). |
+| 10 | edge | images.yaml entry without a digest silently never scanned | medium | Patched: parse error fails the scan. |
+| 11 | edge | Image report files collide when sanitised names match | low | Patched: index prefix. |
+| 12 | edge | grype inside a heredoc-fed loop can eat stdin | low | Patched: `</dev/null`. |
+| 13 | edge | Impossible date (2026-13-45) gave an opaque jq failure; broken exceptions check read as no errors | medium | Patched: clear message, check fails on evaluation error. |
+| 14 | edge | `scan` skipped the exceptions expiry check | low | Patched. |
+| 15 | edge | `grep -q` in a pipeline under pipefail can miss a staged pom | low | Patched: staged list read into a variable. |
+| 16 | edge | Corrupt KEV cache under a day old fails opaquely | medium | Patched: cache validated before use. |
+| 17 | edge | Old summary.txt and report.json survive an early failure | medium | Patched: removed at the start of `run`. |
+| 18 | edge | `unique_by` can drop the blocking duplicate | medium | Patched: block sorts first. |
+| 19 | edge | Repo `.gitleaks.toml` or GITLEAKS_CONFIG could weaken the secret scan | medium | Patched: explicit `deploy/gitleaks.toml`, env unset. |
+| 20 | blind | Installer leaks temp dir, needs `shasum` | low | Patched: cleanup and `sha256sum` fallback. |
+| 21 | blind | Unindented `- cve:` list item rejected | low | Patched (it failed closed). |
+| 22 | blind | `--help` truncated, `scan` undocumented | low | Patched. |
+| 23 | gap, blind | `"$(echo 0)"` and `sleep 1` oddities in tests | low | Patched. |
+| 24 | blind, edge | LS_* test overrides honoured in the production path | medium | Deferred to Story 1.8: CI must assert none is set. They replace inputs, not skip the scan. |
+| 25 | blind | Exceptions keyed by CVE only, no package scope | medium | Deferred: schema change. |
+| 26 | blind, edge | Unscored finding with Unknown severity passes | medium | Deferred: unknowable score, policy decision for the user. |
+| 27 | blind, edge | report.json omits secrets and failed targets | low | Deferred: summary.txt is complete. |
+| 28 | blind | Hook inactive until `core.hooksPath` is set, no fast path | medium | Deferred to Story 1.4 (dev-up.sh enables it). |
+| 29 | blind | CVSS pooled across v2, v3, v4 and related ids | false | Deliberate and in the approved intent: highest score reported for the CVE. |
+| 30 | blind | Stale KEV cache accepted offline | false | Deliberate and approved: warning, only a missing cache fails. |
+| 31 | blind | Grype database age unchecked | false | Grype itself refuses a database older than 5 days and the scan fails with a message. |
+| 32 | blind, edge | Zero-match image report passes | false | A clean image has no matches. An unreadable image makes Grype exit non-zero. Label only (deferred in row 27's family, cosmetic). |
+| 33 | edge | Hook regenerates when pom is newer than SBOM | false | Intended: the SBOM must reflect the pom. |
+| 34 | blind | Expired exception fails the scan even if the CVE is gone | false | Specified behaviour: an expired entry fails the scan. |
+| 35 | edge | Tool checksums verified only at install | low | Rejected: `.tools/` is local and git-ignored; anyone who can write there can edit the hook. |
+| 36 | blind | Invalid JSON reported as out of step; parent-POM changes ignored; summary lacks counts for secrets | low | Rejected: still fails closed, no named harm. |
 
 ## Verification
 

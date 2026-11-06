@@ -1,0 +1,6 @@
+# gitleaks configuration used by deploy/security-scan.sh (passed explicitly, so a stray
+# .gitleaks.toml or GITLEAKS_CONFIG cannot silently weaken the scan).
+title = "LittleSteps"
+
+[extend]
+useDefault = true

@@ -90,6 +90,7 @@
 					<outputFormat>json</outputFormat>
 					<outputName>bom</outputName>
 					<projectType>application</projectType>
+					<includeTestScope>true</includeTestScope>
 				</configuration>
 				<executions>
 					<execution>

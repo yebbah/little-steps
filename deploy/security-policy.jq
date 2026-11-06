@@ -40,4 +40,5 @@ def scores:
                       then "exception ignored: a fixed version exists, upgrade instead"
                       else null end),
       exceptionExpires: (if $exc != null then $exc.expires else null end) }
-] | unique_by([.package, .version, .cve])
+] | group_by([.package, .version, .cve])
+  | map(sort_by(if .status == "block" then 0 elif .status == "excepted" then 1 else 2 end) | first)

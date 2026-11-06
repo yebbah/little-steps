@@ -7,6 +7,7 @@
 #   deploy/security-scan.sh evaluate FILE [TARGET]
 #                                          apply the blocking policy to one Grype JSON report
 #   deploy/security-scan.sh images         print the image references from deploy/images.yaml
+#   deploy/security-scan.sh scan TARGET    one target only (backend, frontend or images), for tests
 #
 # Blocking rule: a finding whose CVE is in CISA KEV, or whose CVSS is 7.0 or above, fails the
 # scan. The only pass without a fix is a valid entry in security/exceptions.yaml.
@@ -85,8 +86,14 @@ install_one() { # name version
   esac
   tmp="$(mktemp -d)"
   echo "downloading $file"
-  curl --fail --silent --show-error --location --output "$tmp/$file" "$url" || die "download failed: $url"
-  actual="$(shasum -a 256 "$tmp/$file" | awk '{print $1}')"
+  if ! curl --fail --silent --show-error --location --output "$tmp/$file" "$url"; then
+    rm -rf "$tmp"; die "download failed: $url"
+  fi
+  if command -v shasum >/dev/null 2>&1; then
+    actual="$(shasum -a 256 "$tmp/$file" | awk '{print $1}')"
+  else
+    actual="$(sha256sum "$tmp/$file" | awk '{print $1}')"
+  fi
   if [ "$actual" != "$expected" ]; then
     rm -rf "$tmp"
     die "checksum mismatch for $file (expected $expected, got $actual). Not installed."
@@ -114,7 +121,8 @@ kev_path() {
   fi
   local cache="$CACHE_DIR/kev.json" tmp
   mkdir -p "$CACHE_DIR"
-  if [ -s "$cache" ] && [ -z "$(find "$cache" -mmin +1440 2>/dev/null)" ]; then
+  if [ -s "$cache" ] && [ -z "$(find "$cache" -mmin +1440 2>/dev/null)" ] \
+     && jq -e '(.vulnerabilities | length) > 0' "$cache" >/dev/null 2>&1; then
     echo "$cache"; return
   fi
   tmp="$cache.download"
@@ -124,7 +132,7 @@ kev_path() {
     echo "$cache"; return
   fi
   rm -f "$tmp"
-  if [ -s "$cache" ]; then
+  if [ -s "$cache" ] && jq -e '(.vulnerabilities | length) > 0' "$cache" >/dev/null 2>&1; then
     note "WARNING: could not refresh the KEV feed, using the cached copy older than a day"
     echo "$cache"; return
   fi
@@ -148,10 +156,10 @@ exceptions_raw() {
     /^[ \t]*#/ || /^[ \t]*$/ { next }
     /^exceptions:[ \t]*\[\][ \t]*(#.*)?$/ { seen = 1; next }
     /^exceptions:[ \t]*(#.*)?$/ { seen = 1; next }
-    /^[ \t]+-[ \t]+[a-z_]+:/ {
+    /^[ \t]*-[ \t]+[a-z_]+:/ {
       if (!seen) { bad("entry before exceptions:"); next }
       flush(); inentry = 1
-      line = $0; sub(/^[ \t]+-[ \t]+/, "", line)
+      line = $0; sub(/^[ \t]*-[ \t]+/, "", line)
       k = line; sub(/:.*/, "", k); v = line; sub(/^[^:]*:/, "", v); put(k, v); next
     }
     /^[ \t]+[a-z_]+:/ {
@@ -172,7 +180,7 @@ today() { echo "${LS_SCAN_TODAY:-$(date +%Y-%m-%d)}"; }
 # Prints {"valid":[...],"errors":[...]}. Any error fails the scan.
 exceptions_checked() {
   exceptions_raw | jq -c --arg today "$(today)" '
-    def epoch: (. + "T00:00:00Z") | fromdateiso8601;
+    def epoch: (. + "T00:00:00Z") | try fromdateiso8601 catch -1;
     ($today | epoch) as $t
     | .items as $items
     | ( [ if .parseError != "" then "exceptions.yaml: " + .parseError else empty end ]
@@ -183,7 +191,10 @@ exceptions_checked() {
       + [ $items[] | select((.expires // "") != "" and ((.expires | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")) | not))
           | "exceptions.yaml \(.cve): malformed expiry \(.expires), use YYYY-MM-DD" ]
       + [ $items[] | select((.expires // "") | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$"))
-          | select((.expires | epoch) < $t)
+          | select((.expires | epoch) == -1)
+          | "exceptions.yaml \(.cve): malformed expiry \(.expires), not a real date" ]
+      + [ $items[] | select((.expires // "") | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$"))
+          | select((.expires | epoch) != -1 and (.expires | epoch) < $t)
           | "exceptions.yaml \(.cve): EXPIRED on \(.expires)" ]
       + [ $items[] | select((.expires // "") | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$"))
           | select((.expires | epoch) > $t + 30 * 86400)
@@ -216,8 +227,12 @@ render_result() { # JSON on stdin -> text
 }
 
 check_exceptions_or_fail() {
-  local errs
-  errs="$(exceptions_checked | jq -r '.errors[]')"
+  local checked errs
+  if ! checked="$(exceptions_checked)" || [ -z "$checked" ]; then
+    echo "[FAIL] exceptions: security/exceptions.yaml could not be evaluated"
+    return 1
+  fi
+  errs="$(echo "$checked" | jq -r '.errors[]')"
   if [ -n "$errs" ]; then
     echo "[FAIL] exceptions"
     echo "$errs" | sed 's/^/  /'
@@ -243,7 +258,8 @@ cmd_secrets() {
   require_tools
   cd "$ROOT"
   git rev-parse --git-dir >/dev/null 2>&1 || die "not a git repository: $ROOT"
-  if "$(tool_bin gitleaks "$GITLEAKS_VERSION")" git --pre-commit --staged --redact --no-banner --log-level warn "$ROOT"; then
+  if env -u GITLEAKS_CONFIG -u GITLEAKS_CONFIG_TOML "$(tool_bin gitleaks "$GITLEAKS_VERSION")" git --pre-commit --staged \
+       --config "$SCRIPT_DIR/gitleaks.toml" --redact --no-banner --log-level warn "$ROOT"; then
     echo "[PASS] secrets: staged changes clean"
   else
     echo "[FAIL] secrets: gitleaks found a secret in the staged changes (values redacted above)"
@@ -258,11 +274,16 @@ grype_scan() { # SBOM-FILE OUT-FILE
 
 # Results are appended to $RESULTS_FILE, one JSON object per line.
 scan_backend() {
-  local pom="$ROOT/backend/pom.xml" bom="$ROOT/backend/target/bom.json" regen=0
+  local pom="$ROOT/backend/pom.xml" bom="$ROOT/backend/target/bom.json" regen=0 staged
   [ -f "$pom" ] || { echo "[FAIL] backend: backend/pom.xml not found"; return 1; }
   [ -f "$bom" ] || regen=1
   [ "$pom" -nt "$bom" ] && regen=1
-  if git -C "$ROOT" diff --cached --name-only 2>/dev/null | grep -qx 'backend/pom.xml'; then regen=1; fi
+  staged="$(git -C "$ROOT" diff --cached --name-only 2>/dev/null || true)"
+  case "
+$staged
+" in *"
+backend/pom.xml
+"*) regen=1 ;; esac
   if [ "$regen" = 1 ]; then
     note "regenerating the backend SBOM (pom.xml changed or SBOM missing)"
     (cd "$ROOT/backend" && ./mvnw -q "$CYCLONEDX_PLUGIN:makeBom" >"$OUT_DIR/maven-sbom.log" 2>&1) \
@@ -293,11 +314,24 @@ scan_frontend() {
 }
 
 # Prints "name@digest" for each image in deploy/images.yaml (name:, digest: lines).
+# An entry with a name but no digest (or a digest before its name) is an error: an image must
+# never be skipped silently.
 cmd_images() {
   awk '
-    /^[ \t]*-?[ \t]*name:/ { v=$0; sub(/^[^:]*:[ \t]*/, "", v); gsub(/["\047]/, "", v); name=v }
-    /^[ \t]*digest:/       { v=$0; sub(/^[^:]*:[ \t]*/, "", v); gsub(/["\047]/, "", v); if (name != "") print name "@" v; name="" }
-  ' "${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}"
+    function val(s) { sub(/^[^:]*:[ \t]*/, "", s); gsub(/["\047]/, "", s); return s }
+    /^[ \t]*-?[ \t]*name:/ {
+      if (name != "") { print "image " name " has no digest" > "/dev/stderr"; bad = 1 }
+      name = val($0)
+    }
+    /^[ \t]*digest:/ {
+      if (name == "") { print "digest " val($0) " has no name before it" > "/dev/stderr"; bad = 1 }
+      else print name "@" val($0)
+      name = ""
+    }
+    END {
+      if (name != "") { print "image " name " has no digest" > "/dev/stderr"; bad = 1 }
+      exit bad
+    }' "${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}"
 }
 
 scan_images() {
@@ -311,13 +345,13 @@ scan_images() {
     printf '%s\n' '{"target":"images","components":0,"findings":[],"status":"SKIP"}' >> "$RESULTS_FILE"
     return 0
   fi
-  refs="$(cmd_images)"
+  refs="$(cmd_images)" || { echo "[FAIL] images: deploy/images.yaml has an entry without a digest (see above)"; return 1; }
   [ -n "$refs" ] || { echo "[FAIL] images: deploy/images.yaml lists no image with a digest"; return 1; }
   while IFS= read -r ref; do
     n=$((n + 1))
-    safe="$(echo "$ref" | tr -c 'A-Za-z0-9._-\n' '_')"
+    safe="$n-$(echo "$ref" | tr -c 'A-Za-z0-9._\n-' '_')"
     out="$OUT_DIR/image-$safe.grype.json"
-    if ! "$(tool_bin grype "$GRYPE_VERSION")" "registry:$ref" -o json --quiet > "$out" 2>"$OUT_DIR/image-$safe.err"; then
+    if ! "$(tool_bin grype "$GRYPE_VERSION")" "registry:$ref" -o json --quiet > "$out" 2>"$OUT_DIR/image-$safe.err" </dev/null; then
       echo "[FAIL] image $ref could not be pulled or scanned (see build/security/image-$safe.err; dhi.io images need 'docker login dhi.io')"
       failed=1; continue
     fi
@@ -332,7 +366,7 @@ EOF
 # FILE is already a grype report. An empty target fails: an empty SBOM must not pass silently.
 finish_target() {
   local name="$1" file="$2" count="$3" mode="${4:-sbom}" report result safe
-  safe="$(echo "$name" | tr -c 'A-Za-z0-9._-\n' '_')"
+  safe="$(echo "$name" | tr -c 'A-Za-z0-9._\n-' '_')"
   if [ "$count" -eq 0 ] && [ "$mode" = sbom ]; then
     echo "[FAIL] $name: zero components found, the SBOM is empty"
     return 1
@@ -349,11 +383,27 @@ finish_target() {
   [ "$(echo "$result" | jq -r .status)" = PASS ]
 }
 
+# The dependency scans read the working tree, but a commit takes the index. When one of the
+# scanned inputs is only partly staged (git add -p), the scan would describe the wrong content.
+check_partial_staging() {
+  local f bad=0
+  git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1 || return 0
+  for f in backend/pom.xml frontend/package.json frontend/package-lock.json deploy/images.yaml; do
+    [ -e "$ROOT/$f" ] || continue
+    if ! git -C "$ROOT" diff --cached --quiet -- "$f" && ! git -C "$ROOT" diff --quiet -- "$f"; then
+      echo "[FAIL] $f is partly staged: the scan reads the working copy, the commit takes the staged one. Stage the whole file or stash the rest."
+      bad=1
+    fi
+  done
+  return "$bad"
+}
+
 cmd_run() {
   local failed=0 summary="$OUT_DIR/summary.txt"
+  mkdir -p "$OUT_DIR"
+  rm -f "$summary" "$OUT_DIR/report.json"   # never leave a previous run's PASS behind
   [ -f "$EXCEPTIONS_FILE" ] || die "missing $EXCEPTIONS_FILE"
   require_tools
-  mkdir -p "$OUT_DIR"
   LS_KEV_FILE="$(kev_path)" || exit 1
   export LS_KEV_FILE
   RESULTS_FILE="$OUT_DIR/results.ndjson"
@@ -365,6 +415,7 @@ cmd_run() {
   } | tee -a "$summary" >&2
   {
     check_exceptions_or_fail || failed=1
+    check_partial_staging || failed=1
     cmd_secrets || failed=1
     scan_backend || failed=1
     scan_frontend || failed=1
@@ -387,6 +438,9 @@ cmd_run() {
 cmd_scan() {
   require_tools
   mkdir -p "$OUT_DIR"
+  check_exceptions_or_fail || exit 1
+  LS_KEV_FILE="$(kev_path)" || exit 1
+  export LS_KEV_FILE
   RESULTS_FILE="$OUT_DIR/results.ndjson"
   : > "$RESULTS_FILE"
   case "${1:-}" in
@@ -404,6 +458,6 @@ case "${1:-run}" in
   evaluate)      shift; cmd_evaluate "$@" ;;
   images)        cmd_images ;;
   scan)          shift; cmd_scan "$@" ;;
-  -h|--help|help) sed -n '2,12p' "$0" ;;
+  -h|--help|help) sed -n '2,/^set -euo/p' "$0" | sed '$d' ;;
   *)             die "unknown command: $1 (try --help)" ;;
 esac

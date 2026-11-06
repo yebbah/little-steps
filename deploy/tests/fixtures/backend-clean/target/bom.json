@@ -1,0 +1,16 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": { "component": { "type": "application", "name": "fixture", "version": "0.0.0" } },
+  "components": [
+    {
+      "type": "library",
+      "group": "org.slf4j",
+      "name": "slf4j-api",
+      "version": "2.0.17",
+      "purl": "pkg:maven/org.slf4j/slf4j-api@2.0.17?type=jar",
+      "bom-ref": "pkg:maven/org.slf4j/slf4j-api@2.0.17?type=jar"
+    }
+  ]
+}
