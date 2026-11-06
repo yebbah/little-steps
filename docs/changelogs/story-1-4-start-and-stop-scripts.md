@@ -17,7 +17,8 @@
 
 - `deploy/dev-up.sh`: lists every missing prerequisite (Docker daemon, `dhi.io` login, Java 25, Node, Grype, Syft, gitleaks) with one fix step each and exits non-zero before changing anything. Then sets `core.hooksPath`, checks Ollama and `OLLAMA_MODEL` (warning while `LS_AI_REQUIRED=false`, error with the `ollama pull` step otherwise), creates `deploy/local.env` if missing (never overwrites), runs `docker compose up -d --wait`, names the unhealthy service on timeout, reports service state and prints the local URLs using ports from `local.env`. Safe to re-run.
 - `deploy/dev-down.sh`: `down` keeping volumes and `data/`; `--wipe` asks for the word `wipe`, then runs `down --volumes --remove-orphans` and removes `data/`; `--yes` skips the prompt; anything else aborts with exit 1.
-- `deploy/local.env.example`: `LS_AI_REQUIRED=false` and `OLLAMA_MODEL`.
+- `deploy/check-urls.sh` (scope added on request): curls every URL in the README table with ports from `local.env` (Keycloak admin, realm metadata issuer, account console, Mailpit inbox and API, PostgreSQL port via `nc`), PASS or FAIL per URL, exit 1 on a failure; the app on 8080 is informational until Story 1.5. No credentials are used. `dev-up.sh` ends by pointing to it.
+- `deploy/local.env.example`: `LS_AI_REQUIRED=false` and `OLLAMA_MODEL=qwen3:8b`.
 - `deploy/tests/dev-scripts.test.sh` (46 checks), using stub `docker`, `java`, `node` and `ollama` on a temp `PATH` and a temp repo copy.
 - README: "Local URLs to test" table (single source; `dev-up.sh` prints the same list).
 
@@ -41,8 +42,8 @@ No change to the scan, compose services or images. `deploy/security-scan.sh` pas
 
 | Area | What changes (README is reviewed every story; write "reviewed, no change" if untouched) | README section |
 |---|---|---|
-| Setup | New one-command start, stop and reset; new `local.env` variables `LS_AI_REQUIRED`, `OLLAMA_MODEL` | Setup (rewritten), Prerequisites (dhi.io login now checked by the script) |
-| Development | New test and `shellcheck` commands | Development (updated) |
+| Setup | New one-command start, stop and reset; new `local.env` variables `LS_AI_REQUIRED`, `OLLAMA_MODEL` | Setup (rewritten, `check-urls.sh` added), Prerequisites (dhi.io login now checked by the script) |
+| Development | New tests, `shellcheck` and `check-urls.sh` commands | Development (updated) |
 | Release | Reviewed, no change | Release |
 | Deployment | Local development mode now available via `dev-up.sh`; rest still planned | Deployment (updated), Layout (updated), Versions (reviewed, no change) |
 
@@ -55,6 +56,7 @@ No change to the scan, compose services or images. `deploy/security-scan.sh` pas
 ## Tests
 
 - New: `deploy/tests/dev-scripts.test.sh`, 46 checks: each missing prerequisite (no daemon, no login, Java 21, no tools, no Node) and nothing changed; fresh clone; re-run; `local.env` not overwritten; health timeout names the service; Ollama optional or required; stop keeps data; wipe confirmed, declined, EOF and `--yes`; bad arguments; failed init service named, empty `ps` fallback, similar model name, `LS_AI_REQUIRED=True`, quoted and CRLF values, `--wipe` with Docker down.
+- New: `deploy/tests/check-urls.test.sh`, 8 checks: all up, app answering, Mailpit down, wrong issuer, PostgreSQL port closed, ports from `local.env`, no secrets in output, `nc` missing.
 - Non-regression: `check-images.test.sh` 15, `realm.test.sh` 21, `security-scan.test.sh` 63, all passing. `shellcheck` clean on the three new scripts. `deploy/check-images.sh` OK.
 - Not run here: a real `dev-up.sh` twice and `dev-down.sh` once on a live Docker stack (manual check in the spec).
 

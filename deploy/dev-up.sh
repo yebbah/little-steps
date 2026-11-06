@@ -135,6 +135,8 @@ print_urls() { # keep in step with "Local URLs to test" in README.md
   echo "  Mailpit inbox                      http://localhost:${mail}"
   echo "  Mailpit API                        http://localhost:${mail}/api/v1/info"
   echo "  PostgreSQL                         psql -h localhost -p ${pg} -U ${user} ${db}"
+  echo
+  echo "Check them all at once: deploy/check-urls.sh"
 }
 
 report_state() {

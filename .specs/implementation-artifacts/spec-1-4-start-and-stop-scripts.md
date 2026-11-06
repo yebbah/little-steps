@@ -28,6 +28,7 @@ context:
 - Running `dev-up.sh` again with everything up is harmless and reports state (services and health).
 - `dev-down.sh` runs `docker compose ... down` and keeps volumes and the local storage folder (`/data/` at the repo root). `--wipe` asks for typed confirmation (the word `wipe`), then runs `down --volumes --remove-orphans` and removes the storage folder; `--yes` skips the prompt. Anything else typed aborts with nothing removed.
 - Add `LS_AI_REQUIRED=false` and `OLLAMA_MODEL` placeholders to `deploy/local.env.example`.
+- `deploy/check-urls.sh` (scope added by the human on 2026-11-06) requests every URL in the README "Local URLs to test" table with `curl`, using ports from `local.env`, and prints PASS or FAIL per URL: Keycloak admin console, realm metadata (issuer is the `littlesteps` realm), account console, Mailpit inbox, Mailpit API (JSON), and a TCP check of the PostgreSQL port. The app on port 8080 is informational: "not running" is not a failure until Story 1.5. Exit non-zero if any required URL fails. No credentials are sent or printed. `dev-up.sh` ends by pointing to it.
 - README: first-time setup uses only these scripts, plus the optional Tailscale step. Review all README sections per AGENTS.md and list them in the changelog.
 
 **Never:**
@@ -47,6 +48,8 @@ context:
 | Stop | stack running | Containers stop, volumes and `/data/` kept | N/A |
 | Wipe confirmed | typed `wipe`, or `--yes` | Containers, volumes, `/data/` removed | N/A |
 | Wipe declined | anything else typed | Nothing removed | Exit non-zero with "aborted" |
+| URL check, all up | every service answers | PASS per URL, app reported as not running | Exit 0 |
+| URL check, one down | e.g. Mailpit refuses, or realm metadata has the wrong issuer | FAIL line naming the URL | Exit non-zero |
 
 </frozen-after-approval>
 
@@ -72,11 +75,14 @@ context:
 **Acceptance Criteria:**
 - Given the scripts, when `shellcheck` runs on them and the new test, then it passes.
 - Given a real Mac with the prerequisites, when `dev-up.sh` runs twice and `dev-down.sh` once, then the stack comes up healthy, the second run changes nothing, and the stop keeps volumes.
+- Given the stack is up, when `deploy/check-urls.sh` runs, then every required URL prints PASS and the exit code is 0; given a service is down, then its URL prints FAIL and the exit code is non-zero.
 - Given the new and existing tests, when run, then all pass.
 
 ## Implementation Notes
 
 ## Spec Change Log
+
+- 2026-11-06, human-requested scope increase (frozen block renegotiated): added `deploy/check-urls.sh`, its matrix rows, acceptance criterion and test, so the README URL table is verified by a script instead of by hand. KEEP: dev-up.sh and dev-down.sh behaviour, the 46 existing checks, and the README table as the single list.
 
 ## Review Triage Log
 
@@ -104,8 +110,8 @@ Layers run: blind-hunter, edge-case-hunter, verification-gap (iteration 1).
 ## Verification
 
 **Commands:**
-- `shellcheck deploy/dev-up.sh deploy/dev-down.sh deploy/tests/dev-scripts.test.sh` -- expected: no output
-- `deploy/tests/dev-scripts.test.sh && deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh && deploy/tests/security-scan.test.sh` -- expected: all pass
+- `shellcheck deploy/dev-up.sh deploy/dev-down.sh deploy/check-urls.sh deploy/tests/dev-scripts.test.sh deploy/tests/check-urls.test.sh` -- expected: no output
+- `deploy/tests/dev-scripts.test.sh && deploy/tests/check-urls.test.sh && deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh && deploy/tests/security-scan.test.sh` -- expected: all pass
 - `deploy/check-images.sh` -- expected: exit 0
 - `deploy/security-scan.sh` -- expected: PASS
 
@@ -122,4 +128,4 @@ Layers run: blind-hunter, edge-case-hunter, verification-gap (iteration 1).
 | App (arrives with Story 1.5) | http://localhost:8080 | connection refused until then |
 
 **Manual checks:**
-- Run `deploy/dev-up.sh` from another directory: stack healthy, URLs printed; open each URL in the table above; run again: reports state; `deploy/dev-down.sh`: containers stopped, data kept.
+- Run `deploy/dev-up.sh` from another directory: stack healthy, URLs printed; run `deploy/check-urls.sh` instead of opening each URL by hand; run again: reports state; `deploy/dev-down.sh`: containers stopped, data kept.

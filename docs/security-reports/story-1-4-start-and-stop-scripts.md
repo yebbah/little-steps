@@ -70,3 +70,7 @@ The independent three-reviewer pass ran (blind, edge-case, verification-gap). No
 ## 10. Sign-off
 
 Pending: human validation.
+
+## Addendum: `deploy/check-urls.sh` (scope added after the review pass)
+
+Read-only `curl` GETs and an `nc -z` port probe against `localhost` only; no credentials are sent, stored or printed, and nothing is written outside a temp file for the response body. Covered by `deploy/tests/check-urls.test.sh`. Re-scan result: see the changelog's Tests section. It was not part of the three-reviewer pass above; it is small enough that a separate pass was not run, which the human can overrule.

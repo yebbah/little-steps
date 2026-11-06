@@ -50,7 +50,7 @@ deploy/dev-down.sh --wipe --yes           # same without the prompt
 | Optional, phone access over Tailscale: install Tailscale and log in, then set `LS_TAILSCALE_HOST` in `deploy/local.env` to your machine's `<machine>.<tailnet>.ts.net` name (it feeds the realm redirect URI; reset the realm with `dev-down.sh --wipe` if the stack already ran). The `tailscale serve` command and the app itself arrive with Story 1.5 | optional |
 | Known issue: 16 Keycloak 26.8.2 CVEs with no upstream fix are covered by written exceptions that expire 2026-12-04 (tracked in issue #56) | replace the Keycloak digest in `deploy/images.yaml` and `deploy/compose.yaml` when DHI publishes a newer one; see `security/exceptions.yaml` |
 
-**Local URLs to test** (ports come from `deploy/local.env`; defaults shown). `dev-up.sh` prints the same list.
+**Local URLs to test** (ports come from `deploy/local.env`; defaults shown). `dev-up.sh` prints the same list, and `deploy/check-urls.sh` requests all of them for you and prints PASS or FAIL per URL (the app on 8080 is informational until Story 1.5).
 
 | What | URL | Expect |
 |---|---|---|
@@ -74,7 +74,8 @@ deploy/tests/security-scan.test.sh                     # tests for the security 
 deploy/check-images.sh                                 # compose.yaml and images.yaml must agree
 deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh   # tests for the image check and the Keycloak realm
 deploy/tests/dev-scripts.test.sh                       # tests for dev-up.sh and dev-down.sh (stubs, no real Docker)
-shellcheck deploy/*.sh deploy/tests/*.sh               # brew install shellcheck
+deploy/tests/check-urls.test.sh                        # tests for check-urls.sh (stub curl and nc)
+shellcheck deploy/dev-up.sh deploy/dev-down.sh deploy/check-urls.sh deploy/tests/dev-scripts.test.sh deploy/tests/check-urls.test.sh   # brew install shellcheck
 ```
 
 If a command fails with a Java error, `JAVA_HOME` is not a JDK 25. The build stops with "Java 25 is required".
@@ -116,7 +117,7 @@ backend/            Spring Boot, Maven, root package app.littlesteps
 frontend/           React + Vite PWA
 content/            curated content YAML
 eval/guardrails/    AI guardrail evaluation cases
-deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, `dev-up.sh` and `dev-down.sh`, tests; Dockerfile arrives with Story 1.5
+deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, `dev-up.sh`, `dev-down.sh` and `check-urls.sh`, tests; Dockerfile arrives with Story 1.5
 security/           vulnerability scan exceptions
 .githooks/          git hooks (pre-commit runs the security scan)
 .github/            issue templates (deferred items); CI arrives with Story 1.8
