@@ -6,6 +6,7 @@ Newest first. Add a line here with every new changelog.
 
 | Story | Title | Changelog |
 |---|---|---|
+| 2.11 | Catalog copy for errors, confirmations and security notices | [story-2-11-catalog-copy-for-errors-confirmations-and-security-notices.md](story-2-11-catalog-copy-for-errors-confirmations-and-security-notices.md) |
 | 2.4 | Core controls | [story-2-4-core-controls.md](story-2-4-core-controls.md) |
 | 2.10 | Catalog copy for status lines, banners and empty states | [story-2-10-catalog-copy-for-status-lines-banners-and-empty-states.md](story-2-10-catalog-copy-for-status-lines-banners-and-empty-states.md) |
 | 2.6 | Message catalog and tone check | [story-2-6-message-catalog-and-tone-check.md](story-2-6-message-catalog-and-tone-check.md) |

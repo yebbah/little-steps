@@ -49,7 +49,7 @@ export const messages = {
   'empty.noPlan': 'Pick a few activities for this week?',
   'empty.planDone': "That's this week's plan. Anything extra is a bonus.",
 
-  // In-progress and limited states (Story 2.10), no errors (Story 2.11 owns those).
+  // In-progress and limited states (Story 2.10), errors follow below (Story 2.11).
   'state.generatingSummary': 'Drafting your summary…',
   'state.readingPage': 'Reading the page…',
   'state.needsConnection': 'Needs a connection',
@@ -58,6 +58,46 @@ export const messages = {
   'state.fewObservations': 'too few to show a trend',
   'state.limitedData': 'limited data',
   'state.ready': 'Ready when you are.',
+
+  // Errors and honest failures (Story 2.11): calm, never blaming, the draft is always kept.
+  'error.saveRejected': "Couldn't save just now. Your review is kept — try again.",
+  'error.retry': 'Retry',
+  'error.offlineKept': "We'll keep your review on this device and sync when you're back online.",
+  'error.cameraDenied':
+    'Camera access is off. You can upload a photo or PDF instead, or turn the camera on in your browser settings.',
+  'error.cannotReadPage': "We couldn't read the text on this page",
+  'error.checkThis': 'Please check this',
+  'error.checkThisLeft': 'Please check this ({count} left)',
+  'error.removedFromFamily': "You're no longer part of this family.",
+
+  // Invites (Story 2.11).
+  'invite.send': 'Send invite',
+  'invite.sent': 'Invite sent {date}',
+  'invite.resend': 'Resend',
+  'invite.cancel': 'Cancel',
+  'invite.expired': 'This invite has expired. Ask the person who invited you to send a new one.',
+
+  // Consent and permissions (Story 2.11).
+  'consent.notGiven':
+    "LittleSteps needs your agreement to keep your family's information. You can read the cards again whenever you're ready.",
+  'consent.pushDeclined': "You'll see a gentle nudge in the app instead.",
+
+  // Confirmations before something leaves the family or is removed (Story 2.11).
+  'confirm.typeDelete': 'Type DELETE to confirm',
+  'confirm.deleteFamily': 'All family data will be deleted on {date}. Any caregiver can undo this until then.',
+  'confirm.removeCaregiver': '{caregiver} will lose access now. Everything they logged stays.',
+  'confirm.leaveFamily': "You'll lose access to this family. Everything you logged stays.",
+  'confirm.deleteOriginal': 'The goals you confirmed stay. The file is removed.',
+  'confirm.shareLeaving': 'This will leave your family. Your summary will be shared outside LittleSteps.',
+  'confirm.share': 'Share',
+  'confirm.notNow': 'Not now',
+
+  // Security notices (Story 2.11): membership changes and Family deletion, shown to the other Caregivers.
+  'security.caregiverLeft': '{caregiver} is no longer part of your family ({date}). See the audit log.',
+  'security.caregiverJoined': '{caregiver} joined your family ({date}).',
+  'security.deletionRequested':
+    '{caregiver} asked to delete all family data. It will be deleted on {date}. You can undo this in Settings → Privacy.',
+  'security.deletionCancelled': 'Family deletion was cancelled.',
 } as const satisfies Record<string, string>
 
 export type MessageKey = keyof typeof messages
