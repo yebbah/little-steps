@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2001,SC2016  # sed prefixes output lines; the jq filters keep a literal ${...} placeholder in single quotes
 # Tests for deploy/keycloak/littlesteps-realm.json and the env wiring. Plain bash plus jq, no Docker.
 #   deploy/tests/realm.test.sh
 

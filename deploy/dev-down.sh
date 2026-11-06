@@ -14,7 +14,8 @@ ENV_FILE="$SCRIPT_DIR/local.env"
 COMPOSE_FILE="$SCRIPT_DIR/compose.yaml"
 STORAGE_DIR="$ROOT/data"
 
-compose() { docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" "$@"; }
+# --profile full so the app service (Story 1.5) is stopped too, whether or not it is running.
+compose() { docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" --profile full "$@"; }
 
 WIPE=0
 YES=0

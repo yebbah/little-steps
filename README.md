@@ -33,9 +33,12 @@ deploy/security-scan.sh install-tools     # pinned, checksum-verified Grype, Syf
 docker login dhi.io                       # Docker Hardened Images account
 (cd frontend && npm ci)                   # frontend dependencies
 deploy/dev-up.sh                          # checks prerequisites, enables the git hook, starts the stack
+deploy/dev-up.sh --full                   # same, plus builds and runs the app image (the product as it ships)
 ```
 
-`deploy/dev-up.sh` works from any directory. It checks every prerequisite first and prints one fix step for anything missing, before changing anything. Then it sets `git config core.hooksPath .githooks` (the pre-commit security scan), checks Ollama, creates `deploy/local.env` from the example if it is missing (change the placeholder values when you like), starts PostgreSQL, Keycloak and Mailpit and waits until they are healthy. Running it again while the stack is up only reports the state.
+`deploy/dev-up.sh` works from any directory. It checks every prerequisite first and prints one fix step for anything missing, before changing anything. Then it sets `git config core.hooksPath .githooks` (the pre-commit security scan), checks Ollama, creates `deploy/local.env` from the example if it is missing (change the placeholder values when you like), starts PostgreSQL, Keycloak and Mailpit and waits until they are healthy. Running it again while the stack is up changes nothing and reports the state; with `--full` it also rebuilds the image (cached layers are reused) and checks the app's health again.
+
+With `--full` it also builds `deploy/Dockerfile` (Docker reuses the layer cache), runs the app on the compose network with the `local` Spring profile on `http://localhost:8080` (change with `LS_APP_PORT` in `deploy/local.env`), and waits until `/actuator/health` reports UP. A failed build shows the build output and starts nothing; an app that never reports UP is named and the script exits non-zero. `dev-down.sh` stops the app too.
 
 ```bash
 deploy/dev-down.sh                        # stop the containers; volumes and the local data/ folder are kept
@@ -47,10 +50,10 @@ deploy/dev-down.sh --wipe --yes           # same without the prompt
 |---|---|
 | Start, stop and reset (`dev-up.sh`, `dev-down.sh`; details and the realm reset in `deploy/README.md`) | available |
 | Ollama (optional): while `LS_AI_REQUIRED=false` in `deploy/local.env` (the default) a missing Ollama or `OLLAMA_MODEL` is only a warning; when it is `true`, run `ollama pull <model>` first | available |
-| Optional, phone access over Tailscale: install Tailscale and log in, then set `LS_TAILSCALE_HOST` in `deploy/local.env` to your machine's `<machine>.<tailnet>.ts.net` name (it feeds the realm redirect URI; reset the realm with `dev-down.sh --wipe` if the stack already ran). The `tailscale serve` command and the app itself arrive with Story 1.5 | optional |
+| Optional, phone access over Tailscale: install Tailscale and log in, then set `LS_TAILSCALE_HOST` in `deploy/local.env` to your machine's `<machine>.<tailnet>.ts.net` name (it feeds the realm redirect URI; reset the realm with `dev-down.sh --wipe` if the stack already ran). Then see "Open the app on your phone" below | optional |
 | Known issue: 16 Keycloak 26.8.2 CVEs with no upstream fix are covered by written exceptions that expire 2026-12-04 (tracked in issue #56) | replace the Keycloak digest in `deploy/images.yaml` and `deploy/compose.yaml` when DHI publishes a newer one; see `security/exceptions.yaml` |
 
-**Local URLs to test** (ports come from `deploy/local.env`; defaults shown). `dev-up.sh` prints the same list, and `deploy/check-urls.sh` requests all of them for you and prints PASS or FAIL per URL (the app on 8080 is informational until Story 1.5).
+**Local URLs to test** (ports come from `deploy/local.env`; defaults shown). `dev-up.sh` prints the same list, and `deploy/check-urls.sh` requests all of them for you and prints PASS or FAIL per URL (the app on 8080 is informational: reported as running when it answers).
 
 | What | URL | Expect |
 |---|---|---|
@@ -60,14 +63,23 @@ deploy/dev-down.sh --wipe --yes           # same without the prompt
 | Mailpit inbox | http://localhost:8025 | empty inbox UI |
 | Mailpit API | http://localhost:8025/api/v1/info | JSON with version |
 | PostgreSQL (not HTTP) | `psql -h localhost -p 5432 -U littlesteps littlesteps` | connects (password from `local.env`) |
-| App (arrives with Story 1.5) | http://localhost:8080 | connection refused until then |
+| App (only with `dev-up.sh --full`, or the backend run from the IDE) | http://localhost:8080 | the PWA; `/actuator/health` answers `{"status":"UP"}`; a deep link such as `/children/1` returns the same page |
+
+**Open the app on your phone (Tailscale HTTPS).** A phone needs HTTPS for the PWA to install, and Tailscale provides it.
+
+1. Install Tailscale on the Mac and the phone, log in to the same tailnet, and enable MagicDNS and HTTPS certificates for the tailnet in the Tailscale admin console.
+2. Set `LS_TAILSCALE_HOST` in `deploy/local.env` to the Mac's `<machine>.<tailnet>.ts.net` name (reset the realm with `dev-down.sh --wipe` if the stack already ran).
+3. Run `deploy/dev-up.sh --full`. If `tailscale` is installed and logged in, it prints the command and the HTTPS URL, for example `tailscale serve --bg --https=443 http://localhost:8080`.
+4. Run that command once on the Mac, then open `https://<machine>.<tailnet>.ts.net` on the phone. Stop sharing with `tailscale serve --https=443 off`.
+
+The phone cannot reach Keycloak on `localhost:8180` (that address is the phone itself), so signing in over Tailscale arrives with the authentication stories; until then the phone shows the app shell only.
 
 ## Development
 
 **Build and test**
 
 ```bash
-(cd backend && ./mvnw verify)                          # compile, tests, backend SBOM
+(cd backend && ./mvnw verify)                          # compile, tests (incl. the PWA fallback), backend SBOM
 (cd frontend && npm ci && npm run build)               # type-check and bundle
 (cd frontend && npm run lint)                          # oxlint
 deploy/tests/security-scan.test.sh                     # tests for the security scan itself
@@ -75,7 +87,7 @@ deploy/check-images.sh                                 # compose.yaml and images
 deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh   # tests for the image check and the Keycloak realm
 deploy/tests/dev-scripts.test.sh                       # tests for dev-up.sh and dev-down.sh (stubs, no real Docker)
 deploy/tests/check-urls.test.sh                        # tests for check-urls.sh (stub curl and nc)
-shellcheck deploy/dev-up.sh deploy/dev-down.sh deploy/check-urls.sh deploy/tests/dev-scripts.test.sh deploy/tests/check-urls.test.sh   # brew install shellcheck
+shellcheck deploy/*.sh deploy/tests/*.sh    # brew install shellcheck
 ```
 
 If a command fails with a Java error, `JAVA_HOME` is not a JDK 25. The build stops with "Java 25 is required".
@@ -84,7 +96,10 @@ If a command fails with a Java error, `JAVA_HOME` is not a JDK 25. The build sto
 
 ```bash
 deploy/security-scan.sh                   # run the scan by hand
+deploy/security-scan.sh scan app-image    # scan the locally built app image (after dev-up.sh --full)
 ```
+
+**Day-to-day development.** Run the backend from the IDE (port 8080) and the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
 
 Reports are written to `build/security/`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day). CI repeats the scan (Story 1.8).
 
@@ -102,11 +117,12 @@ How a story or epic is finished is in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.m
 
 ## Deployment
 
-Not available yet. What is planned:
+Production hosting is not available yet. What exists:
 
-- **Local, full mode** (Story 1.5): one app image in which Spring Boot serves the built PWA at the same origin as `/api`, running as a non-root user on a Docker Hardened Images Java runtime.
-- **Local, development mode**: infrastructure in Docker Compose, started with `deploy/dev-up.sh` (available); the backend run from the IDE and the Vite dev server proxying `/api` arrive with Story 1.5.
-- **Production hosting**: decided at launch. Every component is a standard container or protocol, so it can move to inexpensive hosting without code changes. All configuration and secrets come from the environment, through the Spring profiles `local`, `test` and `prod`.
+- **Local, full mode**: `deploy/dev-up.sh --full` builds `deploy/Dockerfile` (Node build of the PWA, Maven build of the jar with the PWA inside, then a Docker Hardened Images Java 25 JRE runtime running as the non-root user 65532) and runs it as the `app` service (compose profile `full`). Spring Boot serves the PWA at `/` and `/actuator/health` from one origin, and unknown non-API paths without a file extension return `index.html`. Roll back by stopping it with `deploy/dev-down.sh`.
+- **Local, development mode**: infrastructure in Docker Compose with `deploy/dev-up.sh`, the backend run from the IDE and the Vite dev server proxying `/api` and `/actuator`.
+- **Still planned**:
+  - **Production hosting**: decided at launch. Every component is a standard container or protocol, so it can move to inexpensive hosting without code changes. All configuration and secrets come from the environment, through the Spring profiles `local`, `test` and `prod`.
 
 When a deployment step exists, it is documented here with its commands, its configuration and how to roll back.
 
@@ -117,7 +133,7 @@ backend/            Spring Boot, Maven, root package app.littlesteps
 frontend/           React + Vite PWA
 content/            curated content YAML
 eval/guardrails/    AI guardrail evaluation cases
-deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, `dev-up.sh`, `dev-down.sh` and `check-urls.sh`, tests; Dockerfile arrives with Story 1.5
+deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, `dev-up.sh`, `dev-down.sh` and `check-urls.sh`, tests, and the app `Dockerfile`
 security/           vulnerability scan exceptions
 .githooks/          git hooks (pre-commit runs the security scan)
 .github/            issue templates (deferred items); CI arrives with Story 1.8

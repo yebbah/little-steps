@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2001,SC2015  # sed prefixes output lines; 'A && pass || fail' is a deliberate test idiom where pass cannot fail
 # Tests for deploy/security-scan.sh. Plain bash, no framework.
 # Policy cases use fixture Grype reports and a fixture KEV file, so they need no network.
 # Live cases run the real pinned tools on fixture SBOMs, lockfiles and a throwaway git repo.
@@ -318,6 +319,33 @@ else
   out="$(LS_ROOT="$R" "$SCAN" secrets 2>&1)"
   if echo "$out" | grep -q "wJalrXUtnFEMI"; then fail=$((fail + 1)); echo "FAIL the secret value leaked into the output"; else pass=$((pass + 1)); echo "ok   no secret value in the output"; fi
 fi
+
+# ---- scan app-image (stub docker and grype, no real Docker) ----
+AI_STUBS="$TMP/ai-stubs"; AI_TOOLS="$TMP/ai-tools"; AI_ROOT="$TMP/ai-root"
+mkdir -p "$AI_STUBS" "$AI_ROOT"
+cat > "$AI_STUBS/docker" <<'STUB'
+#!/usr/bin/env bash
+# only `docker image inspect NAME` is used; succeeds when NAME is STUB_IMAGE
+[ "$1 $2" = "image inspect" ] && [ "$3" = "${STUB_IMAGE:-}" ]
+STUB
+chmod +x "$AI_STUBS/docker"
+for t in grype:GRYPE syft:SYFT gitleaks:GITLEAKS; do
+  n="${t%%:*}"; v="$(grep -E "^${t##*:}_VERSION=" "$SCAN" | head -n 1)"; v="${v#*=}"
+  mkdir -p "$AI_TOOLS/$n-$v"; printf '#!/bin/sh\nexit 0\n' > "$AI_TOOLS/$n-$v/$n"; chmod +x "$AI_TOOLS/$n-$v/$n"
+  if [ "$n" = grype ]; then
+    cat > "$AI_TOOLS/$n-$v/$n" <<'STUB'
+#!/bin/sh
+[ -z "$STUB_GRYPE_FAIL" ] || exit 1
+cat "$STUB_GRYPE_REPORT"
+STUB
+  fi
+done
+echo '{"matches":[]}' > "$TMP/ai-clean.json"
+app_image() { env PATH="$AI_STUBS:$PATH" LS_ROOT="$AI_ROOT" LS_TOOLS_DIR="$AI_TOOLS" LS_APP_IMAGE=demo-app STUB_GRYPE_REPORT="$TMP/ai-clean.json" "$@" "$SCAN" scan app-image; }
+check "app-image: missing local image fails and says how to build it" 1 "\[FAIL\] app-image.*dev-up.sh --full" app_image STUB_IMAGE=other
+check "app-image: grype failure fails" 1 "\[FAIL\] app-image.*could not scan" app_image STUB_IMAGE=demo-app STUB_GRYPE_FAIL=1
+check "app-image: blocking finding fails" 1 "BLOCK.*CVE-2030-0002" app_image STUB_IMAGE=demo-app STUB_GRYPE_REPORT="$TMP/high.json"
+check "app-image: clean report passes" 0 "PASS\] app-image demo-app" app_image STUB_IMAGE=demo-app
 
 echo
 echo "$pass passed, $fail failed"
