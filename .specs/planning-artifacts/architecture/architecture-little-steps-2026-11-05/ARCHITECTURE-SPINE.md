@@ -331,6 +331,9 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
   - The service worker (vite-plugin-pwa, Workbox) precaches the app shell only, never API responses.
   - Server data is never mirrored into a global client store.
   - UI primitives come from Radix, styled with plain CSS modules that use DESIGN.md tokens exposed as CSS custom properties. The frontend uses npm.
+  - Routing uses React Router. Route changes follow the focus and title rules in UX-DR116 and UX-DR117.
+  - The component gallery (`/dev/gallery`) is registered only when `VITE_ENABLE_GALLERY=true`, which is set for dev and test modes and never for the production build.
+  - Frontend accessibility tests use Playwright with axe-core and run as their own CI job against a test-mode build. Style rules (no shadows, no unreplaced `outline: none`) use stylelint beside oxlint.
 
 ### AD-24 — Tests run against real infrastructure, and guardrails are a release gate
 
@@ -426,6 +429,7 @@ Versions checked on the web on 2026-11-05. Pin the exact patch versions at scaff
 | TanStack Query | 5.x |
 | Dexie | 4.4.7 |
 | Radix Primitives | latest at scaffold |
+| React Router, Playwright, axe-core (`@axe-core/playwright`), stylelint | current major at first use (Epic 2), then pinned |
 | TypeScript (app) | 7.0.x |
 | openapi-typescript (codegen, run with its own TypeScript 5.9.3) | 7.13.0 |
 | springdoc-openapi | 3.2.0 |
