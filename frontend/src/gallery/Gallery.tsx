@@ -2,7 +2,11 @@ import { useState } from 'react'
 import { applyTheme, readThemeChoice, type ThemeChoice } from '../styles/theme.ts'
 import tokensCss from '../styles/tokens.css?raw'
 import styles from './Gallery.module.css'
-import { g, sample } from './strings.ts'
+import { DomainTag } from '../domain/DomainTag.tsx'
+import { domainTint } from '../domain/domainTint.ts'
+import { IconTile, type IconTileSize } from '../icons/IconTile.tsx'
+import { NAV_ICON_NAMES, SAMPLE_ICON_NAMES } from '../icons/names.ts'
+import { g, sample, sampleDomains } from './strings.ts'
 
 // Reads the token sheet itself, so a token added to tokens.css shows up here without a gallery edit.
 const colours = [...tokensCss.matchAll(/^\s+--([\w-]+):\s*(#[0-9A-Fa-f]{6,8})\s*;/gm)]
@@ -13,6 +17,8 @@ const colours = [...tokensCss.matchAll(/^\s+--([\w-]+):\s*(#[0-9A-Fa-f]{6,8})\s*
 const typeTokens = ['display', 'title', 'heading', 'section-label', 'body', 'body-sm', 'cue', 'label', 'meta']
 const spacingTokens = [...tokensCss.matchAll(/^\s+--(space-[\w-]+):\s*(\d+px)\s*;/gm)].map(([, name, value]) => [name, value] as const)
 const radiusTokens = [...tokensCss.matchAll(/^\s+--(radius-[\w-]+):\s*(\d+px)\s*;/gm)].map(([, name, value]) => [name, value] as const)
+
+const tileSizes: IconTileSize[] = [76, 56, 36]
 
 export function Gallery() {
   const [mode, setMode] = useState<ThemeChoice>(readThemeChoice)
@@ -98,6 +104,36 @@ export function Gallery() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className={styles.section} aria-labelledby="gallery-tints">
+        <h2 id="gallery-tints" className="type-heading">
+          {g('tints')}
+        </h2>
+        <p className="type-body-sm">{g('tintsHint')}</p>
+        <ul className={styles.tags}>
+          {sampleDomains.map((domain) => (
+            <li key={domain}>
+              <DomainTag domain={domain} />
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className={styles.section} aria-labelledby="gallery-icons">
+        <h2 id="gallery-icons" className="type-heading">
+          {g('icons')}
+        </h2>
+        <p className="type-body-sm">{g('iconsHint')}</p>
+        {tileSizes.map((size) => (
+          <ul key={size} className={styles.tiles}>
+            {[...NAV_ICON_NAMES, ...SAMPLE_ICON_NAMES].map((name, i) => (
+              <li key={name} title={name}>
+                <IconTile name={name} size={size} tint={domainTint(sampleDomains[i % sampleDomains.length])} />
+              </li>
+            ))}
+          </ul>
+        ))}
       </section>
     </main>
   )
