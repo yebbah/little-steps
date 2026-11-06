@@ -90,22 +90,22 @@ Layers run: blind-hunter, edge-case-hunter, verification-gap (iteration 1).
 
 | # | Finding | Verdict | Route | Evidence |
 |---|---------|---------|-------|----------|
-| 1 | Failed one-shot (`keycloak-db-init` exit non-zero) skipped by `report_unhealthy`; fallback names nothing; stub test circular (VG, EC, BH) | medium | patch | `dev-up.sh:429` skips every `exited` row with empty health; `keycloak` waits on the init with `service_completed_successfully`, so a failed init is the likely first-run failure |
-| 2 | `java_major` mishandles `25-ea` / odd output (EC) | low | patch | `out` keeps `25-ea`, fails `!= "25"`; direct fix with sed |
-| 3 | `env_value`: CR, quotes, inline comment, missing key; `LS_AI_REQUIRED=True` read as false (EC, BH) | low | patch | `${line#*=}` verbatim; case-sensitive compare; direct fix |
-| 4 | `$model` used as regex, `llama3.2` matches `llama3x2` (EC, BH, VG) | low | patch | `dev-up.sh:392` `grep -Eq` unescaped; use fixed-string match |
-| 5 | `dev-down.sh` has no Docker preflight; `--wipe` prompts before failing (EC, BH) | low | patch | one-line `docker info` check before the prompt |
-| 6 | Tests: hardcoded tool versions; global git `core.hooksPath` leaks into fixtures; circular "no password echoed" test (BH, EC) | low | patch | fixture `new_repo` hardcodes pins; `hook()` reads global config; password test greps a run that cannot print credentials |
-| 7 | README has no optional Tailscale step; spec (frozen) requires it in first-time setup (BH) | medium | patch | README only has a table row saying "arrives with Story 1.5"; epic AC at line 159 requires the step; add a short README step, the `tailscale serve` command itself stays Story 1.5 |
-| 8 | `jq`, `git`, Compose version not checked by `dev-up.sh` (BH) | low | defer | spec's prerequisite list is explicit and excludes them; `jq` absence breaks `security-scan.sh`, not this story's scripts |
+| 1 | Failed one-shot (`keycloak-db-init` exit non-zero) skipped by `report_unhealthy`; fallback names nothing; stub test circular (VG, EC, BH) | medium | patch, fixed | `dev-up.sh:429` skips every `exited` row with empty health; `keycloak` waits on the init with `service_completed_successfully`, so a failed init is the likely first-run failure |
+| 2 | `java_major` mishandles `25-ea` / odd output (EC) | low | patch, fixed | `out` keeps `25-ea`, fails `!= "25"`; direct fix with sed |
+| 3 | `env_value`: CR, quotes, inline comment, missing key; `LS_AI_REQUIRED=True` read as false (EC, BH) | low | patch, fixed | `${line#*=}` verbatim; case-sensitive compare; direct fix |
+| 4 | `$model` used as regex, `llama3.2` matches `llama3x2` (EC, BH, VG) | low | patch, fixed | `dev-up.sh:392` `grep -Eq` unescaped; use fixed-string match |
+| 5 | `dev-down.sh` has no Docker preflight; `--wipe` prompts before failing (EC, BH) | low | patch, fixed | one-line `docker info` check before the prompt |
+| 6 | Tests: hardcoded tool versions; global git `core.hooksPath` leaks into fixtures; circular "no password echoed" test (BH, EC) | low | patch, fixed | fixture `new_repo` hardcodes pins; `hook()` reads global config; password test greps a run that cannot print credentials |
+| 7 | README has no optional Tailscale step; spec (frozen) requires it in first-time setup (BH) | medium | patch, fixed | README only has a table row saying "arrives with Story 1.5"; epic AC at line 159 requires the step; add a short README step, the `tailscale serve` command itself stays Story 1.5 |
+| 8 | `jq`, `git`, Compose version not checked by `dev-up.sh` (BH) | low | defer #65 | spec's prerequisite list is explicit and excludes them; `jq` absence breaks `security-scan.sh`, not this story's scripts |
 | 9 | Java 26+ rejected (BH) | false | rejected | README, build and spec all pin Java 25; the build stops with "Java 25 is required" |
 | 10 | Re-run recreates containers / sets hook again; Ollama error after hook set (BH, EC) | false | rejected | `compose up -d` is a no-op for an unchanged stack and `git config` writes the same value; spec orders hook before Ollama |
 | 11 | `LS_WAIT_TIMEOUT` unvalidated; `docker info` can hang; HOME unset; `rm -rf` failure message; `ollama list` server-down vs missing; `up` failure misreported as health timeout; host binaries on safe PATH (EC, BH) | low | rejected | unlikely in everyday use and each fix adds guards or branches; `compose up` stderr is not captured so real errors print |
 | 12 | `dhi.io` check is a config.json presence test (BH, EC) | low | rejected | Docker Desktop writes `auths."dhi.io"` on login; stale token cannot be told apart without a network call |
 | 13 | Spec copy of URL table, README/`print_urls` sync test, realm user hint (BH, VG) | low | rejected | fix is to edit this build's spec, or adds a test for a comment-guarded list |
 | 14 | `git config` outside a repo; `data/` vs `/data/`; symlink claim untested; node fix names node@24; fix steps chain two actions (BH, EC) | low | rejected | not reachable in normal use or matches the spec text |
-| 15 | Story not ready: unchecked tasks, empty logs, review pass not recorded, deferred list (BH) | medium | patch | process items; completed in the finish step (tasks, this log, changelog review section, deferred issue for #8) |
-| 16 | No real-Docker verification of `ps --format` (VG, EC) | medium | defer | cannot be settled without a live stack; stays the manual acceptance check and is recorded as unverified |
+| 15 | Story not ready: unchecked tasks, empty logs, review pass not recorded, deferred list (BH) | medium | patch, fixed | process items; completed in the finish step (tasks, this log, changelog review section, deferred issue for #8) |
+| 16 | No real-Docker verification of `ps --format` (VG, EC) | medium | defer #66 | cannot be settled without a live stack; stays the manual acceptance check and is recorded as unverified |
 
 ## Verification
 
