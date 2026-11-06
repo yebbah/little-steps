@@ -341,12 +341,12 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
   - The guardrail evaluation set (at least 30 cases) lives in `eval/guardrails/*.yaml` and runs as the JUnit tag `guardrail-eval` against the model configured for an environment.
   - A pilot release needs a passing report for that environment's model.
 
-### AD-25 — Every commit and every image passes a vulnerability gate
+### AD-25 — Every commit passes a vulnerability gate, and every release passes the image scans
 
 - **Binds:** all code, dependencies, container images and CI; NFR-20
 - **Prevents:** a known-exploited or high-severity vulnerability reaching a commit or a release, and each developer or agent scanning differently, or not at all.
 - **Rule:**
-  - `deploy/security-scan.sh` is the one scan entry point. It is run by a git pre-commit hook (`.githooks/`, enabled through `core.hooksPath` by `dev-up.sh`) and again in CI. Commits are never made with `--no-verify`, and CI repeats the scan, so a skipped hook still fails.
+  - `deploy/security-scan.sh` is the one scan entry point. It is run by a git pre-commit hook (`.githooks/`, enabled through `core.hooksPath` by `dev-up.sh`) and again in CI. Commits are never made with `--no-verify`, and CI repeats the secret and dependency scans, so a skipped hook still fails. Image scans (`scan images`, `scan app-image`) and the app image build are not in CI, because base-image CVEs change daily and would fail unrelated pull requests; the hook scans images on every commit, and they are run by hand before a release and recorded in the release note.
   - It checks:
     - secrets in staged changes (gitleaks)
     - backend and frontend dependencies, through CycloneDX SBOMs (Maven plugin, npm lockfile) scanned by Grype
@@ -428,11 +428,12 @@ Versions checked on the web on 2026-11-05. Pin the exact patch versions at scaff
 | Radix Primitives | latest at scaffold |
 | TypeScript (app) | 7.0.x |
 | openapi-typescript (codegen, run with its own TypeScript 5.9.3) | 7.13.0 |
-| springdoc-openapi | latest compatible with Spring Boot 4.1 |
+| springdoc-openapi | 3.2.0 |
 | openhtmltopdf (`io.github.openhtmltopdf`) | 1.1.108 |
 | zerodep-web-push-java | 2.1.5 |
 | Presidio (P2, `ghcr.io/data-privacy-stack/presidio-*`) | 2.2.366 |
-| Mailpit, Ollama | latest (local only) |
+| Mailpit | v1.33.0 (local only, digest-pinned per AD-26) |
+| Ollama | latest (local only, native on the host) |
 | Grype (vulnerability scan), Syft/CycloneDX (SBOM), gitleaks (secrets) | pinned at scaffold, checksum-verified |
 | Docker Hardened Images (`dhi.io`) | digest-pinned per `deploy/images.yaml` |
 
