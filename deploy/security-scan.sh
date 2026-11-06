@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2001  # sed prefixes every line of a multi-line variable; ${//} cannot
 # Security scan (AD-25): the single entry point run by .githooks/pre-commit and by CI.
 #
 #   deploy/security-scan.sh                run every check (default)
@@ -8,14 +9,16 @@
 #                                          apply the blocking policy to one Grype JSON report
 #   deploy/security-scan.sh images         print the image references from deploy/images.yaml
 #                                          (entries marked `scan: deferred` are listed on stderr, not scanned)
-#   deploy/security-scan.sh scan TARGET    one target only (backend, frontend or images), for tests
+#   deploy/security-scan.sh scan TARGET    one target only (backend, frontend, images or app-image)
+#   deploy/security-scan.sh scan app-image scan the locally built app image (docker:littlesteps-app,
+#                                          built by deploy/dev-up.sh --full), same blocking rule
 #
 # Blocking rule: a finding whose CVE is in CISA KEV, or whose CVSS is 7.0 or above, fails the
 # scan. The only pass without a fix is a valid entry in security/exceptions.yaml.
 # There is no switch that skips the scan. Never commit with --no-verify.
 #
 # Test hooks (used by deploy/tests): LS_ROOT, LS_KEV_FILE, LS_EXCEPTIONS_FILE, LS_SCAN_TODAY,
-# LS_TOOLS_DIR.
+# LS_TOOLS_DIR, LS_APP_IMAGE (default littlesteps-app).
 
 set -euo pipefail
 
@@ -369,6 +372,20 @@ EOF
   return "$failed"
 }
 
+# The locally built app image (docker compose --profile full build). Scanned from the Docker daemon.
+scan_app_image() {
+  local image="${LS_APP_IMAGE:-littlesteps-app}" out="$OUT_DIR/app-image.grype.json"
+  if ! docker image inspect "$image" >/dev/null 2>&1; then
+    echo "[FAIL] app-image: no local image named $image. Build it first: deploy/dev-up.sh --full (or docker compose --env-file deploy/local.env -f deploy/compose.yaml --profile full build)"
+    return 1
+  fi
+  if ! "$(tool_bin grype "$GRYPE_VERSION")" "docker:$image" -o json --quiet > "$out" 2>"$OUT_DIR/app-image.err" </dev/null; then
+    echo "[FAIL] app-image: grype could not scan $image (see build/security/app-image.err)"
+    return 1
+  fi
+  finish_target "app-image $image" "$out" "$(jq '[.matches[]?.artifact.id] | unique | length' "$out")" report
+}
+
 # finish_target NAME FILE COUNT [report]: FILE is an SBOM (run grype) unless the 4th arg says
 # FILE is already a grype report. An empty target fails: an empty SBOM must not pass silently.
 finish_target() {
@@ -441,7 +458,7 @@ cmd_run() {
   fi
 }
 
-# scan TARGET: run a single target (used by tests): backend, frontend or images.
+# scan TARGET: run a single target: backend, frontend, images or app-image.
 cmd_scan() {
   require_tools
   mkdir -p "$OUT_DIR"
@@ -454,7 +471,8 @@ cmd_scan() {
     backend)  scan_backend ;;
     frontend) scan_frontend ;;
     images)   scan_images ;;
-    *)        die "usage: security-scan.sh scan backend|frontend|images" ;;
+    app-image) scan_app_image ;;
+    *)        die "usage: security-scan.sh scan backend|frontend|images|app-image" ;;
   esac
 }
 

@@ -4,7 +4,8 @@
 #   deploy/check-urls.sh
 #
 # Ports come from deploy/local.env (the example if missing). Sends no credentials. Exit 1 if a
-# required URL fails. The app on port 8080 is informational until Story 1.5.
+# required URL fails. The app (deploy/dev-up.sh --full, or the IDE) is informational: reported as
+# running when it answers.
 
 set -euo pipefail
 
@@ -19,6 +20,7 @@ env_port() { # KEY DEFAULT
   echo "${value:-$2}"
 }
 
+APP="$(env_port LS_APP_PORT 8080)"
 KC="$(env_port LS_KEYCLOAK_PORT 8180)"
 MAIL="$(env_port LS_MAILPIT_UI_PORT 8025)"
 PG="$(env_port LS_POSTGRES_PORT 5432)"
@@ -59,10 +61,10 @@ else
   fail "PostgreSQL port           localhost:${PG}" "nc not found, cannot check the port"
 fi
 
-if curl -sS --max-time 3 -o /dev/null "http://localhost:8080" 2>/dev/null; then
-  echo "INFO  App                      http://localhost:8080 answers"
+if curl -sS --max-time 3 -o /dev/null "http://localhost:${APP}" 2>/dev/null; then
+  echo "INFO  App                      http://localhost:${APP} running"
 else
-  echo "INFO  App                      http://localhost:8080 not running (expected until Story 1.5)"
+  echo "INFO  App                      http://localhost:${APP} not running (start it with deploy/dev-up.sh --full)"
 fi
 
 if [ "$FAILED" -gt 0 ]; then

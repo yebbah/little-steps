@@ -5,6 +5,9 @@
 # `scan: deferred` skips the image in deploy/security-scan.sh (it still has to match compose via check-images.sh).
 # Use it only for images that do not run yet; each one needs an entry in
 # .specs/implementation-artifacts/deferred-work.md. Remove it when the image is enabled.
+# node and eclipse-temurin appear more than once: the -dev entries are the Dockerfile build stages (Story 1.5),
+# the plain eclipse-temurin entry is the runtime. Build stages are scanned like every other image; the
+# alpine -dev variants were chosen because they pass the blocking rule (the Debian ones do not).
 # Digests are the multi-arch index digests, read 2026-11-06.
 images:
   - name: dhi.io/postgres
@@ -15,6 +18,18 @@ images:
     source: dhi
     tag: "26.8.2"
     digest: sha256:aeda9dd828bc6760a29f14365d5ef9b6cd56ac0c7b90ab9dd0384b8bbf341aa0
+  - name: dhi.io/node
+    source: dhi
+    tag: "24-alpine3.23-dev"
+    digest: sha256:9df89cda122c694157c12ca34b132297268064f879e84716616b46b75e8798ca
+  - name: dhi.io/eclipse-temurin
+    source: dhi
+    tag: "25-jdk-alpine3.23-dev"
+    digest: sha256:2a412585b3e916c7093c02308880f4c81f32cdd12debec324b25a1513a1d9efa
+  - name: dhi.io/eclipse-temurin
+    source: dhi
+    tag: "25"
+    digest: sha256:f4c6cc2c00486a97b929972a7511f1f892a7f8b807ffe54abe29744b5a607f5d
   - name: axllent/mailpit
     source: other
     tag: "v1.33.0"

@@ -5,13 +5,15 @@
 #
 # Checks: every compose image (commented Presidio refs included) is in the manifest with the same
 # tag and digest; every manifest entry has a digest; every `other` has a reason; every `dhi`
-# entry is from dhi.io. Test hooks: LS_COMPOSE_FILE, LS_IMAGES_FILE.
+# entry is from dhi.io. Every FROM line in deploy/Dockerfile gets the same checks (a digest, a tag,
+# a manifest entry, matching tag and digest). Test hooks: LS_COMPOSE_FILE, LS_IMAGES_FILE, LS_DOCKERFILE.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE="${LS_COMPOSE_FILE:-$SCRIPT_DIR/compose.yaml}"
 MANIFEST="${LS_IMAGES_FILE:-$SCRIPT_DIR/images.yaml}"
+DOCKERFILE="${LS_DOCKERFILE:-$SCRIPT_DIR/Dockerfile}"
 
 [ -f "$COMPOSE" ] || { echo "check-images: missing $COMPOSE" >&2; exit 1; }
 [ -f "$MANIFEST" ] || { echo "check-images: missing $MANIFEST" >&2; exit 1; }
@@ -66,22 +68,51 @@ while IFS='|' read -r name source tag digest reason scan; do
   fi
 done <<< "$rows"
 
-# Compose refs against the manifest.
-while IFS= read -r ref; do
-  [ -n "$ref" ] || continue
+# check_ref WHERE REF: REF must be name:tag@digest and match the manifest.
+check_ref() {
+  local where="$1" ref="$2" digest nametag tag name row mtag mdigest
   case "$ref" in
     *@sha256:*) ;;
-    *) fail "compose image $ref has no @sha256 digest"; continue ;;
+    *) fail "$where image $ref has no @sha256 digest"; return ;;
   esac
   digest="${ref#*@}"; nametag="${ref%@*}"
+  case "$nametag" in *:*) ;; *) fail "$where image $ref has no tag"; return ;; esac
   tag="${nametag##*:}"; name="${nametag%:*}"
-  case "$nametag" in *:*) ;; *) fail "compose image $ref has no tag"; continue ;; esac
-  row="$(printf '%s\n' "$rows" | awk -F'|' -v n="$name" '$1 == n { print; exit }')"
-  if [ -z "$row" ]; then fail "compose image $name is not in the manifest"; continue; fi
+  # An image name may be listed with several tags: prefer the entry with the same tag.
+  row="$(printf '%s\n' "$rows" | awk -F'|' -v n="$name" -v t="$tag" '$1 == n && $3 == t { print; exit }')"
+  [ -n "$row" ] || row="$(printf '%s\n' "$rows" | awk -F'|' -v n="$name" '$1 == n { print; exit }')"
+  if [ -z "$row" ]; then fail "$where image $name is not in the manifest"; return; fi
   IFS='|' read -r _ _ mtag mdigest _ _ <<< "$row"
-  [ "$tag" = "$mtag" ] || fail "tag mismatch for $name: compose has $tag, manifest has $mtag"
-  [ "$digest" = "$mdigest" ] || fail "digest mismatch for $name: compose has $digest, manifest has $mdigest"
+  [ "$tag" = "$mtag" ] || fail "tag mismatch for $name: $where has $tag, manifest has $mtag"
+  [ "$digest" = "$mdigest" ] || fail "digest mismatch for $name: $where has $digest, manifest has $mdigest"
+}
+
+while IFS= read -r ref; do
+  [ -n "$ref" ] || continue
+  check_ref compose "$ref"
 done <<< "$(compose_refs)"
+
+# Dockerfile -> the external image of each FROM line (stage references and scratch are skipped).
+dockerfile_refs() {
+  awk '
+    toupper($1) == "FROM" {
+      i = 2
+      while (i <= NF && $i ~ /^--/) i++
+      ref = $i
+      if (ref in stages || tolower(ref) == "scratch") { } else print ref
+      for (k = i + 1; k < NF; k++) if (toupper($k) == "AS") stages[$(k + 1)] = 1
+    }' "$DOCKERFILE"
+}
+
+if [ ! -f "$DOCKERFILE" ]; then
+  # A missing Dockerfile would leave its FROM lines unchecked. Only the test hook may point elsewhere.
+  [ -n "${LS_DOCKERFILE:-}" ] || fail "missing $DOCKERFILE (its FROM lines must be checked)"
+else
+  while IFS= read -r ref; do
+    [ -n "$ref" ] || continue
+    check_ref Dockerfile "$ref"
+  done <<< "$(dockerfile_refs)"
+fi
 
 if [ "$errors" -gt 0 ]; then
   echo "check-images: FAIL ($errors problem(s))" >&2

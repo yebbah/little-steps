@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2001  # sed prefixes every line of the captured output
 # Tests for deploy/check-images.sh. Plain bash, no framework, no network.
 #   deploy/tests/check-images.test.sh
 
@@ -55,7 +56,8 @@ services:
   #   image: ghcr.io/data-privacy-stack/presidio-analyzer:2.2.366@$D2
 EOT
 
-run() { env LS_COMPOSE_FILE="$1" LS_IMAGES_FILE="$2" "$CHECK"; }
+# The tests use their own Dockerfile (none unless a test passes one), never the real one.
+run() { env LS_COMPOSE_FILE="$1" LS_IMAGES_FILE="$2" LS_DOCKERFILE="${3:-$TMP/no-such-Dockerfile}" "$CHECK"; }
 
 check "real compose and manifest agree" 0 "OK" "$CHECK"
 check "matching refs pass" 0 "OK" run "$GOOD_COMPOSE" "$GOOD_MANIFEST"
@@ -138,6 +140,62 @@ check "an unknown source fails and names the entry" 1 "dhi.io/postgres has sourc
 
 printf 'services:\n  mailpit:\n    image: axllent/mailpit@%s\n' "$D2" > "$TMP/c-notag.yaml"
 check "a compose image with a digest but no tag fails" 1 "has no tag" run "$TMP/c-notag.yaml" "$GOOD_MANIFEST"
+
+# ---- Dockerfile FROM lines ----
+GOOD_DF="$TMP/Dockerfile.good"
+cat > "$GOOD_DF" <<EOT
+FROM dhi.io/postgres:18@$D1 AS build
+RUN true
+FROM --platform=linux/amd64 axllent/mailpit:v1.33.0@$D2
+COPY --from=build /x /x
+FROM build AS again
+FROM scratch
+EOT
+check "Dockerfile with pinned, listed FROM lines passes (stage refs and scratch skipped)" 0 "OK" run "$GOOD_COMPOSE" "$GOOD_MANIFEST" "$GOOD_DF"
+
+printf 'FROM dhi.io/postgres:18\n' > "$TMP/Dockerfile.nodigest"
+check "Dockerfile FROM without a digest fails and names it" 1 "Dockerfile image dhi.io/postgres:18 has no @sha256 digest" run "$GOOD_COMPOSE" "$GOOD_MANIFEST" "$TMP/Dockerfile.nodigest"
+
+printf 'FROM example.org/unlisted:1@%s\n' "$D1" > "$TMP/Dockerfile.unlisted"
+check "Dockerfile FROM missing from the manifest fails and names it" 1 "Dockerfile image example.org/unlisted is not in the manifest" run "$GOOD_COMPOSE" "$GOOD_MANIFEST" "$TMP/Dockerfile.unlisted"
+
+printf 'FROM dhi.io/postgres:17@%s\n' "$D1" > "$TMP/Dockerfile.tag"
+check "Dockerfile tag mismatch fails" 1 "tag mismatch for dhi.io/postgres: Dockerfile has 17" run "$GOOD_COMPOSE" "$GOOD_MANIFEST" "$TMP/Dockerfile.tag"
+
+printf 'FROM dhi.io/postgres:18@%s\n' "$D2" > "$TMP/Dockerfile.digest"
+check "Dockerfile digest mismatch fails" 1 "digest mismatch for dhi.io/postgres: Dockerfile has $D2" run "$GOOD_COMPOSE" "$GOOD_MANIFEST" "$TMP/Dockerfile.digest"
+
+printf 'FROM dhi.io/postgres@%s\n' "$D1" > "$TMP/Dockerfile.notag"
+check "Dockerfile FROM with a digest but no tag fails" 1 "Dockerfile image .* has no tag" run "$GOOD_COMPOSE" "$GOOD_MANIFEST" "$TMP/Dockerfile.notag"
+
+write_manifest "$TMP/m-twotags.yaml" <<EOT
+  - name: dhi.io/postgres
+    source: dhi
+    tag: "18-dev"
+    digest: $D2
+  - name: dhi.io/postgres
+    source: dhi
+    tag: "18"
+    digest: $D1
+  - name: axllent/mailpit
+    source: other
+    tag: "v1.33.0"
+    digest: $D2
+    reason: Not in the DHI catalog.
+  - name: ghcr.io/data-privacy-stack/presidio-analyzer
+    source: other
+    tag: "2.2.366"
+    digest: $D2
+    reason: Not in the DHI catalog.
+EOT
+printf 'FROM dhi.io/postgres:18-dev@%s AS build\nFROM dhi.io/postgres:18@%s\n' "$D2" "$D1" > "$TMP/Dockerfile.twotags"
+check "one image name with two tags: each tag matches its own entry" 0 "OK" run "$GOOD_COMPOSE" "$TMP/m-twotags.yaml" "$TMP/Dockerfile.twotags"
+printf 'FROM dhi.io/postgres:18-dev@%s\n' "$D1" > "$TMP/Dockerfile.twotags-bad"
+check "one image name with two tags: wrong digest for a tag fails" 1 "digest mismatch for dhi.io/postgres" run "$GOOD_COMPOSE" "$TMP/m-twotags.yaml" "$TMP/Dockerfile.twotags-bad"
+
+mkdir -p "$TMP/nodf"; cp "$CHECK" "$GOOD_COMPOSE" "$GOOD_MANIFEST" "$TMP/nodf/"
+mv "$TMP/nodf/good-compose.yaml" "$TMP/nodf/compose.yaml"; mv "$TMP/nodf/good-images.yaml" "$TMP/nodf/images.yaml"
+check "missing deploy/Dockerfile fails" 1 "missing .*Dockerfile" "$TMP/nodf/check-images.sh"
 
 echo
 echo "passed: $pass, failed: $fail"

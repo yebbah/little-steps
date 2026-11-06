@@ -38,17 +38,32 @@ case "$1" in
   info) [ -z "${STUB_NO_DAEMON:-}" ] || exit 1; exit 0 ;;
   compose)
     case " $* " in
+      *" build "*) [ -z "${STUB_BUILD_FAIL:-}" ] || { echo "ERROR: build failed: compile error in app"; exit 1; } ;;
+      *" logs "*) echo "app log: crashed on start"; exit 0 ;;
       *" up "*) [ -z "${STUB_UP_FAIL:-}" ] || exit 1 ;;
       *" ps "*)
         case "$*" in
           *"{{.Service}}|"*)
             [ -z "${STUB_PS_EMPTY:-}" ] || exit 0
+            [ -z "${STUB_APP_EXITED:-}" ] || echo "app|exited||1"
             echo "postgres|running|healthy|0"; echo "keycloak|running|${STUB_KC_HEALTH:-healthy}|0"; echo "keycloak-db-init|exited||${STUB_INIT_EXIT:-0}" ;;
           *) echo "  postgres: running healthy"; echo "  keycloak: running healthy" ;;
         esac ;;
     esac ;;
 esac
 exit 0
+STUB
+cat > "$STUBS/curl" <<'STUB'
+#!/usr/bin/env bash
+echo "curl $*" >> "$STUB_LOG"
+[ -z "${STUB_APP_DOWN:-}" ] || exit 7
+echo '{"status":"UP"}'
+STUB
+cat > "$STUBS/tailscale" <<'STUB'
+#!/usr/bin/env bash
+echo "tailscale $*" >> "$STUB_LOG"
+[ -z "${STUB_TS_LOGGED_OUT:-}" ] || exit 1
+echo "{\"BackendState\":\"${STUB_TS_STATE:-Running}\",\"Self\":{\"DNSName\":\"mymac.tail1234.ts.net.\"}}"
 STUB
 cat > "$STUBS/java" <<'STUB'
 #!/usr/bin/env bash
@@ -85,7 +100,14 @@ NOLOGIN_CFG="$TMP/nologin"; mkdir -p "$NOLOGIN_CFG"; echo '{"auths":{}}' > "$NOL
 
 export STUB_LOG="$TMP/docker.log"
 # up REPO [ENV=VALUE...]: run dev-up.sh from another directory with the stub PATH
-up() { local r="$1"; shift; ( cd "$TMP" && env PATH="$STUBS:$SAFE_PATH" DOCKER_CONFIG="$DOCKER_CFG" JAVA_HOME= HOME="$TMP" "$@" "$r/deploy/dev-up.sh" ); }
+# Arguments with = are environment, the rest (--full ...) go to the script.
+run_up() { # STUBDIR REPO ARGS...
+  local stubdir="$1" r="$2"; shift 2
+  local envs=() args=() a
+  for a in "$@"; do case "$a" in *=*) envs+=("$a") ;; *) args+=("$a") ;; esac; done
+  ( cd "$TMP" && env PATH="$stubdir:$SAFE_PATH" DOCKER_CONFIG="$DOCKER_CFG" JAVA_HOME= HOME="$TMP" ${envs[@]+"${envs[@]}"} "$r/deploy/dev-up.sh" ${args[@]+"${args[@]}"} )
+}
+up() { run_up "$STUBS" "$@"; }
 down() { local r="$1"; shift; ( cd "$TMP" && env PATH="$STUBS:$SAFE_PATH" "$@" ); }
 hook() { git -C "$1" config --local --get core.hooksPath || true; }
 no_state_change() { # REPO: no hook, no local.env, no compose up
@@ -165,9 +187,62 @@ R="$(new_repo crlf)"; mkdir -p "$R/deploy"; : > "$STUB_LOG"
 { cat "$R/deploy/local.env.example"; printf 'LS_AI_REQUIRED="true" # strict\r\nOLLAMA_MODEL=qwen3:8b # model\r\n'; } > "$R/deploy/local.env"
 check "quotes, CR and inline comment in local.env are read correctly" 1 "error: Ollama model qwen3:8b is not pulled" up "$R"
 
+# ---- dev-up --full ------------------------------------------------------------------------------
+# Tailscale is only present in the stub dir for the tests that want it.
+NOTS="$TMP/nots-stubs"; mkdir -p "$NOTS"; cp "$STUBS/docker" "$STUBS/java" "$STUBS/node" "$STUBS/ollama" "$STUBS/curl" "$NOTS/"
+upnots() { run_up "$NOTS" "$@"; }
+
+R="$(new_repo full-ok)"; : > "$STUB_LOG"
+check "--full: builds, starts, app UP, URL list shows the app running" 0 "building the app image.*app is UP.*App \(running\) +http://localhost:8080" upnots "$R" --full
+assert "--full: built with --profile full build" grep -q -- "--profile full build" "$STUB_LOG"
+assert "--full: build ran before up" bash -c "awk '/ build\$/ {b=NR} / up / {u=NR} END {exit !(b && u && b < u)}' '$STUB_LOG'"
+assert "--full: polled /actuator/health on the app port" grep -q "localhost:8080/actuator/health" "$STUB_LOG"
+assert "--full: tailscale not called when absent" bash -c "! grep -q '^tailscale' '$STUB_LOG'"
+OUT="$(upnots "$R" --full 2>&1)"
+assert "--full without tailscale: prints nothing about Tailscale" bash -c "! grep -qi tailscale <<< \"\$1\"" _ "$OUT"
+
+R="$(new_repo plain)"; : > "$STUB_LOG"
+upnots "$R" >/dev/null 2>&1
+assert "plain dev-up: no build, no profile, no health poll" bash -c "! grep -q -e ' build' -e '--profile' -e 'curl' '$STUB_LOG'"
+check "plain dev-up: app listed as not running" 0 "App \(not running\).*deploy/dev-up.sh --full" upnots "$R"
+
+R="$(new_repo full-ts)"; : > "$STUB_LOG"
+check "--full with tailscale logged in: prints the serve command and the HTTPS URL" 0 "tailscale serve --bg --https=443 http://localhost:8080.*https://mymac.tail1234.ts.net" up "$R" --full
+check "--full with tailscale logged out: nothing about Tailscale" 0 "App \(running\)" up "$R" STUB_TS_LOGGED_OUT=1 --full
+OUT="$(up "$R" STUB_TS_LOGGED_OUT=1 --full 2>&1)"
+assert "--full with tailscale logged out: no serve command" bash -c "! grep -qi 'tailscale serve' <<< \"\$1\"" _ "$OUT"
+
+R="$(new_repo full-port)"; mkdir -p "$R/deploy"; cp "$R/deploy/local.env.example" "$R/deploy/local.env"; sed -i.bak 's/^LS_APP_PORT=.*/LS_APP_PORT=9090/' "$R/deploy/local.env"; : > "$STUB_LOG"
+check "--full uses LS_APP_PORT from local.env" 0 "App \(running\) +http://localhost:9090" up "$R" --full
+assert "--full custom port: health polled on it" grep -q "localhost:9090/actuator/health" "$STUB_LOG"
+
+R="$(new_repo full-buildfail)"; : > "$STUB_LOG"
+check "--full build failure: output shown, exit 1" 1 "build failed: compile error in app.*Nothing was started" up "$R" STUB_BUILD_FAIL=1 --full
+assert "--full build failure: nothing started" bash -c "! grep -q ' up ' '$STUB_LOG'"
+
+R="$(new_repo full-never)"; : > "$STUB_LOG"
+check "--full app never UP: names app, exit 1" 1 "service not healthy: app .*did not report UP within 1s" up "$R" STUB_APP_DOWN=1 LS_WAIT_TIMEOUT=1 LS_POLL_INTERVAL=1 --full
+
+R="$(new_repo full-crash)"; : > "$STUB_LOG"
+check "--full app container exited: fails at once (not after the timeout), logs shown, names app" 1 "service failed: app .*exited.*app log: crashed on start" up "$R" STUB_APP_DOWN=1 STUB_APP_EXITED=1 LS_WAIT_TIMEOUT=300 --full
+
+R="$(new_repo full-needslogin)"; : > "$STUB_LOG"
+OUT="$(up "$R" STUB_TS_STATE=NeedsLogin --full 2>&1)"
+assert "--full with tailscale NeedsLogin: no Tailscale hint" bash -c "! grep -qi 'tailscale serve' <<< \"\$1\"" _ "$OUT"
+assert "--full with tailscale NeedsLogin: app still reported running" bash -c "grep -q 'App (running)' <<< \"\$1\"" _ "$OUT"
+
+R="$(new_repo full-prereq)"; : > "$STUB_LOG"
+check "--full: same prerequisite checks first, nothing built" 1 "missing: dhi.io login" up "$R" DOCKER_CONFIG="$NOLOGIN_CFG" --full
+assert "--full missing prerequisite: no build" bash -c "! grep -q 'build' '$STUB_LOG'"
+
+R="$(new_repo badflag)"; : > "$STUB_LOG"
+check "unknown flag: usage, exit non-zero" 2 "usage: deploy/dev-up.sh \[--full\]" up "$R" --bogus
+assert "unknown flag: nothing changed" no_state_change "$R"
+
 # ---- dev-down -----------------------------------------------------------------------------------
 R="$(new_repo down)"; mkdir -p "$R/data"; echo x > "$R/data/file"; : > "$STUB_LOG"
 check "stop: keeps volumes and data/" 0 "Volumes and the local storage folder .* are kept" down "$R" "$R/deploy/dev-down.sh"
+assert "stop: also stops the app service (profile full)" grep -q -- "--profile full down" "$STUB_LOG"
 assert "stop: plain down, no --volumes" bash -c "grep -q ' down\$' '$STUB_LOG' && ! grep -q -- '--volumes' '$STUB_LOG'"
 assert "stop: data/ kept" test -f "$R/data/file"
 

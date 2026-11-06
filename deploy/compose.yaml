@@ -2,7 +2,8 @@
 #   cp deploy/local.env.example deploy/local.env     # then edit the values
 #   docker compose --env-file deploy/local.env -f deploy/compose.yaml up -d --wait
 # Image references are literal name:tag@digest and must match deploy/images.yaml
-# (checked by deploy/check-images.sh). dev-up.sh arrives with Story 1.4.
+# (checked by deploy/check-images.sh). The app service is built, not pulled: it is in profile `full`
+# (deploy/dev-up.sh --full), and deploy/Dockerfile's FROM lines are checked against the manifest too.
 name: littlesteps
 
 services:
@@ -92,6 +93,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
+
+  # The app as it ships (Story 1.5): the PWA and the Spring Boot app in one non-root image.
+  # Only with the `full` profile: docker compose --profile full up -d app
+  app:
+    profiles: ["full"]
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "127.0.0.1:${LS_APP_PORT:-8080}:8080"
     restart: unless-stopped
 
   # P2 (Epic 18): Presidio. Uncomment when the privacy pipeline arrives.

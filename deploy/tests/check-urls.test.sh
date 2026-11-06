@@ -33,7 +33,7 @@ done
 echo "curl $url" >> "$STUB_LOG"
 if [ -n "${STUB_DOWN:-}" ] && [[ "$url" == *"$STUB_DOWN"* ]]; then printf '000'; exit 7; fi
 case "$url" in
-  *:8080*) [ -n "${STUB_APP_UP:-}" ] || exit 7; exit 0 ;;
+  *:8080*|*:9090*) [ -n "${STUB_APP_UP:-}" ] || exit 7; exit 0 ;;
   *openid-configuration) body="{\"issuer\": \"http://localhost:8180/realms/${STUB_BAD_ISSUER:-littlesteps}\"}" ;;
   *api/v1/info) body='{"Version":"v1.0"}' ;;
   *) body="<html>ok</html>" ;;
@@ -54,7 +54,8 @@ run() { local r="$1"; shift; ( cd "$TMP" && env PATH="$STUBS:/usr/bin:/bin" "$@"
 
 R="$(new_repo all)"
 check "all up: every URL passes, app not running, exit 0" 0 "PASS.*admin.*PASS.*metadata.*PASS.*account.*PASS.*inbox.*PASS.*Mailpit API.*PASS.*PostgreSQL.*INFO.*not running.*all required URLs passed" run "$R"
-check "app answering is reported, not required" 0 "INFO.*8080 answers" run "$R" STUB_APP_UP=1
+check "app answering is reported, not required" 0 "INFO.*8080 running" run "$R" STUB_APP_UP=1
+check "app not answering: informational, says not running" 0 "INFO.*8080 not running.*dev-up.sh --full" run "$R"
 check "Mailpit down: FAIL names the URL, exit 1" 1 "FAIL.*Mailpit inbox.*localhost:8025.*FAIL.*Mailpit API.*2 required check" run "$R" STUB_DOWN=8025
 check "wrong issuer: metadata FAIL, exit 1" 1 "FAIL.*realm metadata.*unexpected body.*1 required check" run "$R" STUB_BAD_ISSUER=other
 check "PostgreSQL port closed: FAIL, exit 1" 1 "FAIL.*PostgreSQL port.*connection refused" run "$R" STUB_NC_FAIL=1
@@ -65,6 +66,8 @@ check "ports come from local.env (CR, quotes, comment handled)" 0 "9180/admin.*9
 no_secret() { # the output of a run must not contain any placeholder password from the example
   local out; out="$(run "$R" 2>&1)"; ! printf '%s' "$out" | grep -q 'change-me'
 }
+printf 'LS_APP_PORT=9090\n' >> "$R/deploy/local.env"
+check "LS_APP_PORT from local.env: app reported running on 9090" 0 "INFO.*localhost:9090 running" run "$R" STUB_APP_UP=1
 check "no password or secret in the output" 0 "" bash -c "$(declare -f run no_secret); R='$R' TMP='$TMP' STUBS='$STUBS' STUB_LOG='$STUB_LOG'; no_secret"
 
 MINBIN="$TMP/minbin"; mkdir -p "$MINBIN"

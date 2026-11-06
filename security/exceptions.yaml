@@ -78,3 +78,8 @@ exceptions:
     reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
     mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
     expires: 2026-12-04
+  # Story 1.5: build stage dhi.io/eclipse-temurin:25-jdk-alpine3.23-dev (never shipped). Tracked in the `deferred` issue #68 (target date = expires).
+  - cve: CVE-2026-56109
+    reason: No fixed version published; alsa-lib 1.2.14-r2 in dhi.io/eclipse-temurin:25-jdk-alpine3.23-dev, the newest DHI tag on 2026-11-06.
+    mitigation: Build-stage image only, not in the shipped app image. The build runs no audio or ALSA code and parses no untrusted ALSA configuration. Re-scanned on every commit; replace the digest when DHI publishes a newer one.
+    expires: 2026-12-04
