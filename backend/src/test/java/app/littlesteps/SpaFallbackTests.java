@@ -78,4 +78,10 @@ class SpaFallbackTests extends IntegrationTest {
 		assertThat(body("/actuator/health", HttpStatus.OK)).contains("\"status\":\"UP\"");
 	}
 
+	@Test
+	void apiDocsPathIsNotTheSpaFallback() {
+		assertThat(SpaFallbackConfig.SpaResolver.isClientRoute("/v3/api-docs")).isFalse();
+		assertThat(SpaFallbackConfig.SpaResolver.isClientRoute("v3")).isFalse();
+	}
+
 }

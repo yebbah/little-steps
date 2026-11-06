@@ -19,3 +19,8 @@
 - #83  2027-01-05  Test the startup resubmission and the local/prod profiles for real  (origin #31, Story 1.6)
 - #92  2027-01-05  Production profiles from env files and least-privilege database role  (origin #31, Story 1.6)
 - #84  2027-02-04  Executor and context propagation for async listeners; clear prod datasource error  (origin #31, Story 1.6)
+- #79  2027-01-05  Problem responses for container-level errors and security exceptions  (origin #32, Story 1.7)
+- #80  2027-01-05  Document the real problem+json shape in openapi.json  (origin #32, Story 1.7)
+- #81  2027-02-04  Lint rule: user-facing JSX props and string constants  (origin #32, Story 1.7)
+- #82  2027-02-04  Propagate request ID (MDC) to async work  (origin #32, Story 1.7)
+- #91  2027-01-05  Error references in responses, detailed exceptions stored internally by reference  (origin #32, Story 1.7)

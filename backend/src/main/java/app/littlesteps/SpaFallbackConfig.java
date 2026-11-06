@@ -48,7 +48,8 @@ class SpaFallbackConfig implements WebMvcConfigurer {
 
 		static boolean isClientRoute(String path) {
 			String p = path.startsWith("/") ? path.substring(1) : path;
-			if (p.equals("api") || p.startsWith("api/") || p.equals("actuator") || p.startsWith("actuator/")) {
+			if (p.equals("api") || p.startsWith("api/") || p.equals("actuator") || p.startsWith("actuator/")
+					|| p.equals("v3") || p.startsWith("v3/")) {
 				return false;
 			}
 			String last = p.substring(p.lastIndexOf('/') + 1);

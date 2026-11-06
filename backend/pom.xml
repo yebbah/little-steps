@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>25</java.version>
 		<spring-modulith.version>2.1.2</spring-modulith.version>
+		<springdoc.version>3.2.0</springdoc.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -74,6 +75,11 @@
 		<dependency>
 			<groupId>org.springframework.modulith</groupId>
 			<artifactId>spring-modulith-starter-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+			<version>${springdoc.version}</version>
 		</dependency>
 
 		<dependency>
