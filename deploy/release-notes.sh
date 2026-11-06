@@ -145,7 +145,7 @@ sec_security() {
       END{flush()}' "$ROOT/deploy/images.yaml" 2>/dev/null || true)"
     printf '%s\n' "${rows:-None.}"
     echo
-    sboms="$(cd "$ROOT" && ls build/security/*sbom*.json backend/target/bom.json backend/target/classes/META-INF/sbom/*.json 2>/dev/null | sed 's/^/`/; s/$/`/' | paste -sd, - | sed 's/,/, /g' || true)"
+    sboms="$(cd "$ROOT" 2>/dev/null; ls build/security/*sbom*.json backend/target/bom.json backend/target/classes/META-INF/sbom/*.json 2>/dev/null | sed 's/^/`/; s/$/`/' | paste -sd, - | sed 's/,/, /g' || true)"
     echo "SBOM location (CycloneDX, not committed): ${sboms:-$TODO: no SBOM found, run deploy/security-scan.sh}."
     echo
     echo "Story security reports:"
@@ -292,7 +292,7 @@ cmd_generate() {
 cmd_check() {
   local file="" strict=0 a status fails=0 todos
   for a in "$@"; do case "$a" in --strict) strict=1 ;; *) file="$a" ;; esac; done
-  [ -n "$file" ] && [ -f "$file" ] || die "usage: release-notes.sh check [--strict] <note.md>"
+  if [ -z "$file" ] || [ ! -f "$file" ]; then die "usage: release-notes.sh check [--strict] <note.md>"; fi
   local orig="$file" tmp
   tmp="$(mktemp)"
   # CRLF tolerated; HTML comments (the template's own instructions) are not content.
