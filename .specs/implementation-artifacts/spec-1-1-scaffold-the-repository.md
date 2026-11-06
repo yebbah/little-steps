@@ -97,15 +97,15 @@ context:
 
 | # | Layer | Finding | Verdict | Evidence / route |
 |---|-------|---------|---------|------------------|
-| 1 | verification-gap | No test pins health-only actuator exposure | medium | Pre-verified: widening exposure keeps the suite green. Patch: assert `/actuator/env` and `/actuator/beans` return 404. |
-| 2 | blind | Health test doesn't check other endpoints are closed | medium | Same root cause as #1. Patch (grouped). |
-| 3 | edge, blind | README build block runs `cd frontend` from inside `backend/` | low | A single-shell run fails. Direct correction with subshells. Patch. |
-| 4 | edge, blind | README says "Node 24 or later" but engines is `>=24 <25` | low | Contradicts the pin. Direct correction. Patch. |
-| 5 | edge, blind | Unanchored `build/` and `data/` in the root .gitignore | medium | A future `data` package or `src/build` would be silently ignored. Patch: `/build/`, `/data/`. |
-| 6 | blind | Only `local.env` is ignored, but env files arrive in Story 1.3 | low | Real secret-commit risk with a one-line fix. Patch: ignore `*.env`, keep `!*.env.example`. |
-| 7 | blind | Vite demo page presents Vite's community links as the product's | low | It ships in the Story 1.5 image and on localhost. Direct correction: a minimal LittleSteps page, with demo CSS and assets deleted. Patch. |
-| 8 | blind | Empty Initializr placeholders in pom.xml | low | Deletion plus a description. Patch. |
-| 9 | blind | Frontend package name is `frontend` | low | Trivial rename to `littlesteps-frontend`. Patch. |
+| 1 | verification-gap | No test pins health-only actuator exposure | medium | Pre-verified: widening exposure keeps the suite green. patch, fixed: assert `/actuator/env` and `/actuator/beans` return 404. |
+| 2 | blind | Health test doesn't check other endpoints are closed | medium | Same root cause as #1. patch, fixed (grouped). |
+| 3 | edge, blind | README build block runs `cd frontend` from inside `backend/` | low | A single-shell run fails. Direct correction with subshells. patch, fixed. |
+| 4 | edge, blind | README says "Node 24 or later" but engines is `>=24 <25` | low | Contradicts the pin. Direct correction. patch, fixed. |
+| 5 | edge, blind | Unanchored `build/` and `data/` in the root .gitignore | medium | A future `data` package or `src/build` would be silently ignored. patch, fixed: `/build/`, `/data/`. |
+| 6 | blind | Only `local.env` is ignored, but env files arrive in Story 1.3 | low | Real secret-commit risk with a one-line fix. patch, fixed: ignore `*.env`, keep `!*.env.example`. |
+| 7 | blind | Vite demo page presents Vite's community links as the product's | low | It ships in the Story 1.5 image and on localhost. Direct correction: a minimal LittleSteps page, with demo CSS and assets deleted. patch, fixed. |
+| 8 | blind | Empty Initializr placeholders in pom.xml | low | Deletion plus a description. patch, fixed. Checked 2026-11-06: description added; the empty `<licenses>`, `<developers>`, `<scm>` blocks stay on purpose, with a comment, because deleting them re-inherits the Spring Boot parent's entries. |
+| 9 | blind | Frontend package name is `frontend` | low | Trivial rename to `littlesteps-frontend`. patch, fixed. |
 | 10 | blind | package-lock.json missing | false | The file exists and is staged. The review diff excluded it on purpose. |
 | 11 | blind | mvnw scripts missing | false | `backend/mvnw` exists with mode 100755. The review diff excluded it on purpose. |
 | 12 | blind | Frontend assets missing | false | `src/assets/*` and `public/*.svg` exist. The review diff excluded them on purpose. |

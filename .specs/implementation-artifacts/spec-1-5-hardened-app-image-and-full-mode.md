@@ -100,8 +100,8 @@ Layers run: blind-hunter, edge-case-hunter, verification-gap (iteration 1).
 | 8 | images.yaml header contradicts entries (EC, BH) | medium | patch, fixed | header says deferred = not running yet |
 | 9 | Plain shellcheck not clean, only `-S warning` (EC) | medium | patch, fixed | spec Verification expects no output |
 | 10 | Docs: "only reports state" stale with --full; phone cannot reach Keycloak (BH) | low | patch, fixed | direct doc fix |
-| 11 | Exceptions expire 2026-12-04, `scan app-image` then fails (EC, BH) | medium | defer | covered by #56 and #68 renewal; noted in security report |
-| 12 | App container hardening: read_only, cap_drop, no-new-privileges, JVM flags (BH) | medium | defer | not in spec; deferred issue #70 |
+| 11 | Exceptions expire 2026-12-04, `scan app-image` then fails (EC, BH) | medium | defer #68 | covered by #56 and #68 renewal; noted in security report |
+| 12 | App container hardening: read_only, cap_drop, no-new-privileges, JVM flags (BH) | medium | defer #70 | not in spec |
 | 13 | `/API/x` case-sensitive; dotted last segment 404; Accept header; later prefixes (EC, BH) | false | rejected | spec rule is "no file extension", paths are case-sensitive in Spring; prefixes are added when those endpoints exist |
 | 14 | Jar glob / -plain jar; mvn vs mvnw (EC, BH) | low | rejected | repackage makes one jar; spec mandates the DHI Maven stage; unlikely |
 | 15 | Dockerfile parsing: stage case, continuations, ARG, unused images (EC, BH) | low | rejected | not used in this Dockerfile; orphan check is #61 |

@@ -24,7 +24,19 @@ How work that is parked instead of fixed is tracked. The rule (one `deferred` is
 2. **Set the target date** from the table below, and write a remediation: what to change, who owns it (story or epic), and how to tell it is done.
 3. **Add one index line** to `deferred-work.md`: `- #<issue>  <target date>  <short title>  (origin #<story issue>)`.
 4. **Link the issue** from the story's changelog ("Deferred and known issues") and security report ("Residual risks").
-5. **Close the loop.** When the work is done, close the issue, remove the index line, and (for an exception) delete the entries from `exceptions.yaml`. The epic retrospective reviews every open `deferred` issue whose target date has passed, and the release note lists the ones still open.
+5. **Mark the triage row.** In the story's Review Triage Log, write the issue number in the route of every `defer` row (`defer #65`). Do not write "logged in deferred-work.md": the index has no details and changes.
+6. **Close the loop.** When the work is done, close the issue, remove the index line, and (for an exception) delete the entries from `exceptions.yaml`. The epic retrospective reviews every open `deferred` issue whose target date has passed, and the release note lists the ones still open.
+
+## Keeping it fresh (one command, at story finish)
+
+Run it before the last commit and fix any difference: open issues missing from the index, or index lines whose issue is closed.
+
+```sh
+diff <(gh issue list -l deferred -s open -L 200 --json number -q '.[].number' | sort -n) \
+     <(grep -oE '^- #[0-9]+' .specs/implementation-artifacts/deferred-work.md | tr -dc '0-9\n' | sort -n)
+```
+
+Nothing else is rewritten: closed stories keep their spec, changelog and report as written, and the issue is the live status. Only the `defer` route in the triage log gets an issue number (step 5), so a reader can follow it from the frozen record to the live item.
 
 ## Suggested remediation periods
 

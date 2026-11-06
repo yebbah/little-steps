@@ -52,12 +52,27 @@ Before a story's last commit:
 
 **Order rule:** produce the review pass, changelog and security report first, then ask the human to validate. Never ask for validation, a decision or a sign-off on a story before those three artifacts exist. If a blocker remains (for example a failing scan), the security report records it as the verdict and the open decision, so the human reviews the full picture in one go. Fill sections that depend on a later step (such as review findings) as soon as that step is done; do not hand over a report with "pending" sections when the step can be run.
 
-1. Run an independent review pass with three separate reviewers: blind (diff only), edge cases, and verification gaps. Triage every finding with evidence, fix the real ones, and record the triage in the story's spec or review log. A self-review does not replace this.
+0. **Scan cadence.** Run `deploy/security-scan.sh` exactly twice per story outside the commit hook: once before handing the story to the human for validation (its numbers feed the security report), and once after every fix required by the review triage log is done (the final gate, before the last commit). Do not re-run it after each intermediate fix; the pre-commit hook still scans each commit.
+1. Run an independent review pass with three separate reviewers: blind (diff only), edge cases, and verification gaps. Triage every finding with evidence, fix the real ones, and record the triage in the story's spec or review log. Every `patch` row ends as `patch, fixed` once the fix is in the code and a test or check shows it; no row may stay plain `patch` at the second scan or the last commit. A row not fixed is changed to `defer #<issue>` or `rejected` with the reason. A self-review does not replace this.
 2. Write the changelog: `docs/changelogs/story-<N>-<M>-<slug>.md` from `docs/changelogs/TEMPLATE.md`, plus a row in the index in that folder. Changelogs are per story, not per epic.
 3. Write the security report: `docs/security-reports/story-<N>-<M>-<slug>.md` from `docs/security-reports/TEMPLATE.md`. Fill every section, with numbers from `build/security/summary.txt` and `report.json`. Security reports are per story, not per epic.
 4. Review and update `README.md` in every story, whether or not the story seems to touch it: check Prerequisites, Setup, Development, Release, Deployment, Layout and Versions against the code and the story's changes, and fix anything stale. Record each section touched, or "reviewed, no change", in the changelog's Operations impact table. Mark steps that do not exist yet as "arrives with Story X"; never document what does not exist.
-5. Log every deferred item as a GitHub issue (see "Deferred items" below) before pushing.
+5. Log every deferred item as a GitHub issue (see "Deferred items" below) before pushing, put the issue number in the triage log's `defer` rows, and run the index sync check in [deferred-items.md](deferred-items.md#keeping-it-fresh-one-command-at-story-finish).
 6. Push the branch and close the story's issue with a short comment (commit, result, links to the deferred issues).
+
+## Review triage log format
+
+One table per story, in the story's spec under `## Review Triage Log`, with these columns:
+
+| # | Finding | Verdict | Route | Evidence |
+|---|---------|---------|-------|----------|
+
+- **Finding:** what was found, with the reviewer layers in brackets (BH blind, EC edge, VG gap).
+- **Verdict:** `high`, `medium`, `low` or `false`.
+- **Route:** `patch, fixed`, `defer #<issue>`, `rejected`, or `intent_gap, resolved`. Plain `patch` is only allowed while the fix is in progress (see step 1 above).
+- **Evidence:** the file, test or check that shows the outcome.
+
+Stories 1.1 to 1.3 predate this layout (a Layer column, no Route column); their `patch, fixed` token sits in the evidence text. Do not restructure them.
 
 ## Deferred items
 

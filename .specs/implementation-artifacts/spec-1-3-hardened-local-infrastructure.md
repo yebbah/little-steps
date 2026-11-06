@@ -83,7 +83,7 @@ context:
 - Tags moved to the newest available on 2026-11-06 to clear scan findings: `dhi.io/postgres:18-alpine` (0 findings; the `18` Debian tag had 70+ unfixed High/Critical CVEs), `dhi.io/keycloak:26.8.2` (was 26.8.1), Presidio `2.2.366-distroless`. The frozen text names `postgres` 18 and Keycloak 26.8.1; these are the same products at newer or hardened tags.
 - The DHI PostgreSQL image has no `docker-entrypoint-initdb.d`. Keycloak's role and schema come from the one-shot `keycloak-db-init` service running `deploy/postgres/init/keycloak-schema.sh` on the same pinned image.
 - The DHI Keycloak image has bash but no curl or grep, so the healthcheck uses `/dev/tcp` against management port 9000. Keycloak is published on 8180 (8080 is the app's).
-- Scan status: PASS for PostgreSQL and Mailpit, and for Keycloak through 16 exceptions (no fix upstream, expire 2026-12-04). The P2 Presidio images (one CVE, fix not yet rebuilt; 2.2.366 is the newest release) are marked `scan: deferred` in `images.yaml`: `security-scan.sh` skips them with a notice, and `check-images.sh` fails if a deferred image runs in compose. This is a small manifest-driven change to `cmd_images` in `security-scan.sh`, approved by the human. Logged in `deferred-work.md`; 16 Keycloak exceptions were written.
+- Scan status: PASS for PostgreSQL and Mailpit, and for Keycloak through 16 exceptions (no fix upstream, expire 2026-12-04). The P2 Presidio images (one CVE, fix not yet rebuilt; 2.2.366 is the newest release) are marked `scan: deferred` in `images.yaml`: `security-scan.sh` skips them with a notice, and `check-images.sh` fails if a deferred image runs in compose. This is a small manifest-driven change to `cmd_images` in `security-scan.sh`, approved by the human. Tracked as #56 to #58; 16 Keycloak exceptions were written.
 
 ## Spec Change Log
 
@@ -95,23 +95,23 @@ Three reviewer subagents ran in parallel (Blind Hunter, Edge Case Hunter, Verifi
 
 | # | Layer | Finding | Verdict | Evidence / route |
 |---|-------|---------|---------|------------------|
-| 1 | gap | No tests for an unknown `scan` value, an unknown `source`, or a compose image with a digest but no tag | medium | Real: the guard presented as mitigating the new bypass was unpinned. Patched: three negative tests in `check-images.test.sh`. |
-| 2 | edge | `active_refs \| grep -q` under pipefail can SIGPIPE; the name is used as a regex; an untagged ref is missed | low | Real but unlikely. Patched: refs captured once, exact-prefix match in awk (name followed by `:` or `@`). |
-| 3 | edge | `scan:` line before any `name:` leaks onto the first entry; a duplicate `digest:` line is no longer rejected | medium | Real: the first would silently skip an image. Patched in `cmd_images`: both are errors. |
-| 4 | blind | `scan: "deferred"` treated as deferred by `check-images.sh` but as scanned by `security-scan.sh` | low | Real, mild. Patched: `cmd_images` strips quotes and trailing comments like `check-images.sh`. |
-| 5 | edge, gap | Security-scan test relies on stderr/stdout ordering | low | Real fragility. Patched: separate assertions for the notice and the listed image. |
-| 6 | blind | Realm test redirect checks use `startswith` and would accept a look-alike host | medium | Real. Patched: exact strings plus a count of exactly three URIs. |
-| 7 | blind, edge | Missing-env test counts as FAIL when Docker is absent | low | Real. Patched: skip with a notice. |
-| 8 | edge | `LS_KEYCLOAK_DB_USER` equal to the superuser would overwrite the superuser role | medium | Real. Patched: `keycloak-schema.sh` exits with a message. |
-| 9 | blind | `REVOKE ALL ON SCHEMA public FROM keycloak` revokes nothing (rights come from PUBLIC); password passed on the `psql` command line | low | Real: misleading line and an exposed argument. Patched: line removed, values read with `\getenv`. Verified by a clean re-run and a second run. |
-| 10 | blind, edge | Keycloak waits on Mailpit with `service_started`; DB variables lack the `:?` guard | low | Real. Patched: `service_healthy` and guards added. |
-| 11 | blind | Management port 9000 published to the host without need | low | Real, mild. Patched: mapping and `LS_KEYCLOAK_MGMT_PORT` removed. |
-| 12 | blind | No brute-force protection in the realm | low | Patched: `bruteForceProtected` on (verified in the live realm). |
-| 13 | blind, edge | Realm import skips an existing realm, so edited passwords or redirect URIs do nothing; `$` or `}` in passwords is mangled | medium | Real, documentation gap. Patched: reset steps in `deploy/README.md`, password character note in `local.env.example`. |
-| 14 | blind | Nothing tells contributors that commits fail while the Keycloak scan is red | medium | Real. Patched: known-issue line in the root README. |
-| 15 | gap | PKCE token request and Mailpit email are verified by hand only; no smoke test for the DB init, volume or healthcheck | medium | Defer: needs Docker and `dhi.io` in the test path, which the other tests avoid. Logged in `deferred-work.md`. |
-| 16 | blind, edge | `check-images.sh` does not flag orphan or duplicate manifest entries, validate digest format, or handle single-quoted, multi-line or `|`-containing values | low | Defer (orphan and duplicate checks) and reject the rest as unlikely with a more than trivial fix. Logged in `deferred-work.md`. |
-| 17 | blind | Presidio fix version differs between `deferred-work.md` and the report; `CVE-2026-12345` looks like a placeholder | false | The two fix versions belong to different CVEs (115557 vs 114583 and 12345). Both IDs are verbatim from the Grype output of 2026-11-06. |
+| 1 | gap | No tests for an unknown `scan` value, an unknown `source`, or a compose image with a digest but no tag | medium | Real: the guard presented as mitigating the new bypass was unpinned. patch, fixed: three negative tests in `check-images.test.sh`. |
+| 2 | edge | `active_refs \| grep -q` under pipefail can SIGPIPE; the name is used as a regex; an untagged ref is missed | low | Real but unlikely. patch, fixed: refs captured once, exact-prefix match in awk (name followed by `:` or `@`). |
+| 3 | edge | `scan:` line before any `name:` leaks onto the first entry; a duplicate `digest:` line is no longer rejected | medium | Real: the first would silently skip an image. patch, fixed in `cmd_images`: both are errors. |
+| 4 | blind | `scan: "deferred"` treated as deferred by `check-images.sh` but as scanned by `security-scan.sh` | low | Real, mild. patch, fixed: `cmd_images` strips quotes and trailing comments like `check-images.sh`. |
+| 5 | edge, gap | Security-scan test relies on stderr/stdout ordering | low | Real fragility. patch, fixed: separate assertions for the notice and the listed image. |
+| 6 | blind | Realm test redirect checks use `startswith` and would accept a look-alike host | medium | Real. patch, fixed: exact strings plus a count of exactly three URIs. |
+| 7 | blind, edge | Missing-env test counts as FAIL when Docker is absent | low | Real. patch, fixed: skip with a notice. |
+| 8 | edge | `LS_KEYCLOAK_DB_USER` equal to the superuser would overwrite the superuser role | medium | Real. patch, fixed: `keycloak-schema.sh` exits with a message. |
+| 9 | blind | `REVOKE ALL ON SCHEMA public FROM keycloak` revokes nothing (rights come from PUBLIC); password passed on the `psql` command line | low | Real: misleading line and an exposed argument. patch, fixed: line removed, values read with `\getenv`. Verified by a clean re-run and a second run. |
+| 10 | blind, edge | Keycloak waits on Mailpit with `service_started`; DB variables lack the `:?` guard | low | Real. patch, fixed: `service_healthy` and guards added. |
+| 11 | blind | Management port 9000 published to the host without need | low | Real, mild. patch, fixed: mapping and `LS_KEYCLOAK_MGMT_PORT` removed. |
+| 12 | blind | No brute-force protection in the realm | low | patch, fixed: `bruteForceProtected` on (verified in the live realm). |
+| 13 | blind, edge | Realm import skips an existing realm, so edited passwords or redirect URIs do nothing; `$` or `}` in passwords is mangled | medium | Real, documentation gap. patch, fixed: reset steps in `deploy/README.md`, password character note in `local.env.example`. |
+| 14 | blind | Nothing tells contributors that commits fail while the Keycloak scan is red | medium | Real. patch, fixed: known-issue line in the root README. |
+| 15 | gap | PKCE token request and Mailpit email are verified by hand only; no smoke test for the DB init, volume or healthcheck | medium | Defer: needs Docker and `dhi.io` in the test path, which the other tests avoid. Deferred: #60. |
+| 16 | blind, edge | `check-images.sh` does not flag orphan or duplicate manifest entries, validate digest format, or handle single-quoted, multi-line or `|`-containing values | low | Defer (orphan and duplicate checks) and reject the rest as unlikely with a more than trivial fix. Deferred: #61. |
+| 17 | blind | Presidio fix version differs between the deferred issues and the report; `CVE-2026-12345` looks like a placeholder | false | The two fix versions belong to different CVEs (115557 vs 114583 and 12345). Both IDs are verbatim from the Grype output of 2026-11-06. |
 | 18 | edge | All entries `scan: deferred` would pass the images scan with nothing scanned | false | `scan_images` already fails with "lists no image with a digest" when no reference is left. |
 | 19 | blind | Branching policy text in `AGENTS.md`, `CONTRIBUTING.md` and the README is mixed into this story | false | Those edits were already in the working tree before this story started; this story only added the finishing-order rule. |
 | 20 | blind | `sslRequired: none`, default `change-me` passwords, placeholder Tailscale host registered as a redirect URI | low | Reject: local development defaults, documented in the example file and README; the fix would add warnings for no demonstrated harm. |

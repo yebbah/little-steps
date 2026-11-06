@@ -103,29 +103,29 @@ Three reviewer subagents ran (Blind Hunter, Edge Case Hunter, Verification Gap) 
 
 | # | Layer | Finding | Verdict | Evidence / route |
 |---|-------|---------|---------|------------------|
-| 1 | inline | Frontend SBOM skipped devDependencies (4 of 439 packages) | high | Patched with SYFT_JAVASCRIPT_INCLUDE_DEV_DEPENDENCIES. |
-| 2 | inline | No KEV cache and no network crashed in jq | medium | Patched: KEV resolved once up front. |
-| 3 | inline | Failure in the grouped scan only detected by grepping the summary | medium | Patched: group exit status carries the result. |
-| 4 | gap | `run` (the hook path) has no test | high | Real: nothing called `cmd_run`. Patched: run tests for every target, hook test through real `git commit`. |
-| 5 | gap, edge | SBOM regeneration untested | medium | Patched: stub-mvnw tests for missing, fresh, newer-pom and staged-pom cases. |
-| 6 | gap | devDependency scanning unpinned by tests | medium | Patched: devDependency lodash fixture. |
-| 7 | blind, edge, gap | `tr 'A-Za-z0-9._-\n'` is a reversed range on GNU tr | medium | Real for Linux CI (Story 1.8). Patched: `-` moved last. |
-| 8 | blind, edge | Dependency scans read the working tree, commit takes the index | medium | Patched: a partly staged pom, package.json, lockfile or images.yaml fails. |
-| 9 | blind | Backend SBOM omitted test-scope dependencies | medium | Spec says all scopes. Patched: includeTestScope (55 to 93 components). |
-| 10 | edge | images.yaml entry without a digest silently never scanned | medium | Patched: parse error fails the scan. |
-| 11 | edge | Image report files collide when sanitised names match | low | Patched: index prefix. |
-| 12 | edge | grype inside a heredoc-fed loop can eat stdin | low | Patched: `</dev/null`. |
-| 13 | edge | Impossible date (2026-13-45) gave an opaque jq failure; broken exceptions check read as no errors | medium | Patched: clear message, check fails on evaluation error. |
-| 14 | edge | `scan` skipped the exceptions expiry check | low | Patched. |
-| 15 | edge | `grep -q` in a pipeline under pipefail can miss a staged pom | low | Patched: staged list read into a variable. |
-| 16 | edge | Corrupt KEV cache under a day old fails opaquely | medium | Patched: cache validated before use. |
-| 17 | edge | Old summary.txt and report.json survive an early failure | medium | Patched: removed at the start of `run`. |
-| 18 | edge | `unique_by` can drop the blocking duplicate | medium | Patched: block sorts first. |
-| 19 | edge | Repo `.gitleaks.toml` or GITLEAKS_CONFIG could weaken the secret scan | medium | Patched: explicit `deploy/gitleaks.toml`, env unset. |
-| 20 | blind | Installer leaks temp dir, needs `shasum` | low | Patched: cleanup and `sha256sum` fallback. |
-| 21 | blind | Unindented `- cve:` list item rejected | low | Patched (it failed closed). |
-| 22 | blind | `--help` truncated, `scan` undocumented | low | Patched. |
-| 23 | gap, blind | `"$(echo 0)"` and `sleep 1` oddities in tests | low | Patched. |
+| 1 | inline | Frontend SBOM skipped devDependencies (4 of 439 packages) | high | patch, fixed with SYFT_JAVASCRIPT_INCLUDE_DEV_DEPENDENCIES. |
+| 2 | inline | No KEV cache and no network crashed in jq | medium | patch, fixed: KEV resolved once up front. |
+| 3 | inline | Failure in the grouped scan only detected by grepping the summary | medium | patch, fixed: group exit status carries the result. |
+| 4 | gap | `run` (the hook path) has no test | high | Real: nothing called `cmd_run`. patch, fixed: run tests for every target, hook test through real `git commit`. |
+| 5 | gap, edge | SBOM regeneration untested | medium | patch, fixed: stub-mvnw tests for missing, fresh, newer-pom and staged-pom cases. |
+| 6 | gap | devDependency scanning unpinned by tests | medium | patch, fixed: devDependency lodash fixture. |
+| 7 | blind, edge, gap | `tr 'A-Za-z0-9._-\n'` is a reversed range on GNU tr | medium | Real for Linux CI (Story 1.8). patch, fixed: `-` moved last. |
+| 8 | blind, edge | Dependency scans read the working tree, commit takes the index | medium | patch, fixed: a partly staged pom, package.json, lockfile or images.yaml fails. |
+| 9 | blind | Backend SBOM omitted test-scope dependencies | medium | Spec says all scopes. patch, fixed: includeTestScope (55 to 93 components). |
+| 10 | edge | images.yaml entry without a digest silently never scanned | medium | patch, fixed: parse error fails the scan. |
+| 11 | edge | Image report files collide when sanitised names match | low | patch, fixed: index prefix. |
+| 12 | edge | grype inside a heredoc-fed loop can eat stdin | low | patch, fixed: `</dev/null`. |
+| 13 | edge | Impossible date (2026-13-45) gave an opaque jq failure; broken exceptions check read as no errors | medium | patch, fixed: clear message, check fails on evaluation error. |
+| 14 | edge | `scan` skipped the exceptions expiry check | low | patch, fixed. |
+| 15 | edge | `grep -q` in a pipeline under pipefail can miss a staged pom | low | patch, fixed: staged list read into a variable. |
+| 16 | edge | Corrupt KEV cache under a day old fails opaquely | medium | patch, fixed: cache validated before use. |
+| 17 | edge | Old summary.txt and report.json survive an early failure | medium | patch, fixed: removed at the start of `run`. |
+| 18 | edge | `unique_by` can drop the blocking duplicate | medium | patch, fixed: block sorts first. |
+| 19 | edge | Repo `.gitleaks.toml` or GITLEAKS_CONFIG could weaken the secret scan | medium | patch, fixed: explicit `deploy/gitleaks.toml`, env unset. |
+| 20 | blind | Installer leaks temp dir, needs `shasum` | low | patch, fixed: cleanup and `sha256sum` fallback. |
+| 21 | blind | Unindented `- cve:` list item rejected | low | patch, fixed (it failed closed). |
+| 22 | blind | `--help` truncated, `scan` undocumented | low | patch, fixed. |
+| 23 | gap, blind | `"$(echo 0)"` and `sleep 1` oddities in tests | low | patch, fixed. |
 | 24 | blind, edge | LS_* test overrides honoured in the production path | medium | Deferred to Story 1.8: CI must assert none is set. They replace inputs, not skip the scan. |
 | 25 | blind | Exceptions keyed by CVE only, no package scope | medium | Deferred: schema change. |
 | 26 | blind, edge | Unscored finding with Unknown severity passes | medium | Deferred: unknowable score, policy decision for the user. |
