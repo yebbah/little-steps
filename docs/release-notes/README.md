@@ -1,6 +1,6 @@
 # docs/release-notes
 
-One release note per completed epic, `epic-NN-<slug>.md`, generated from [TEMPLATE.md](TEMPLATE.md) by `deploy/release-notes.sh`. The steps to close an epic are in [CONTRIBUTING.md](../CONTRIBUTING.md#finishing-an-epic).
+One release note per completed epic, `epic-NN-<slug>.md`, generated from [TEMPLATE.md](TEMPLATE.md) by `deploy/release-notes.sh`. The steps to close an epic are in [CONTRIBUTING.md](../CONTRIBUTING.md#finishing-an-epic). A feature epic's note also links the [UI review checklist](../ui-review-checklist.md) under "Code quality".
 
 ```bash
 deploy/release-notes.sh shell-tests            # run deploy/tests/*.test.sh, record counts for the note

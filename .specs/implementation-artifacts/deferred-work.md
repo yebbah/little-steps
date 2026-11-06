@@ -32,3 +32,4 @@
 - #87  2027-02-04  Count new positive and negative tests automatically in release notes  (origin #34, Story 1.9)
 - #101  2027-01-05  Check story status and epic bookkeeping at finish  (origin #2, Epic 1 retro)
 - #102  2027-01-05  CI: retry the dhi.io login on registry outages  (origin #33, Story 1.8)
+- #110  2027-02-04  Tone and catalog coverage beyond catalog values (attributes, key usage, variants)  (origin #40, Story 2.6)

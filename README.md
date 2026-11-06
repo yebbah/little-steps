@@ -119,7 +119,7 @@ deploy/security-scan.sh scan app-image    # scan the locally built app image (af
 (cd frontend && npm run api:types)                     # regenerate frontend/src/api/schema.d.ts (needs network the first time)
 ```
 
-The frontend has no hand-written API types and no inline UI text: sentences go in `frontend/src/i18n/messages.ts`.
+The frontend has no hand-written API types and no inline UI text: sentences go in `frontend/src/i18n/messages.ts` under stable keys, and a tone check (`frontend/src/i18n/tone.ts`, run by `npm test` and so by the Frontend CI job) fails on banned phrases. The banned UI patterns are in [docs/ui-review-checklist.md](docs/ui-review-checklist.md).
 
 **Day-to-day development.** The backend reads all its configuration from the environment and has no datasource unless a profile supplies one. Run it from the IDE (port 8080) with `SPRING_PROFILES_ACTIVE=local` and the variables of `deploy/local.env` exported (`LS_POSTGRES_DB`, `LS_POSTGRES_USER`, `LS_POSTGRES_PASSWORD`, and `LS_POSTGRES_PORT` if it is not 5432), after `deploy/dev-up.sh`. The `prod` profile takes `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`. Run the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
 
@@ -182,7 +182,7 @@ security/           vulnerability scan exceptions
 .tools/             pinned scanners installed by the security scan (git-ignored)
 build/              generated output, such as security reports (git-ignored)
 data/               local storage folder, removed by `dev-down.sh --wipe` (git-ignored)
-docs/               contributing policies, changelogs, security reports, release notes, deferred items process
+docs/               contributing policies, changelogs, security reports, release notes, deferred items process, UI review checklist
 AGENTS.md           instructions for AI coding agents (CLAUDE.md points to it)
 ```
 
