@@ -19,3 +19,12 @@
 - source_spec: `.specs/implementation-artifacts/spec-1-2-security-scan-before-every-commit.md`
   summary: Story 1.4's dev-up.sh must set core.hooksPath to .githooks, and the hook may need a fast path for commits that touch no dependency files.
   evidence: The hook is inactive in a fresh clone until hooksPath is set.
+
+# Index of deferred items that have a GitHub issue (see docs/deferred-items.md).
+# The issue is the tracker; this list is only an index. Format: issue, target date, title (origin).
+- #56  2026-12-04  Replace the Keycloak image and remove 16 security exceptions  (origin #28, Story 1.3)
+- #57  2026-12-06  Bump Presidio image digests, CVE-2026-115557 fix not yet published  (origin #28, Story 1.3)
+- #58  2027-02-04  Remove `scan: deferred` from the Presidio entries when Epic 18 enables them  (origin #28, Story 1.3)
+- #59  2027-01-05  Recheck the Keycloak bash /dev/tcp healthcheck on DHI image updates  (origin #28, Story 1.3)
+- #60  2027-01-05  Automated stack smoke test: health, schema, PKCE token, Mailpit email  (origin #28, Story 1.3)
+- #61  2027-01-05  check-images.sh orphan, duplicate and digest-format checks  (origin #28, Story 1.3)

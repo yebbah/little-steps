@@ -9,4 +9,72 @@
 #     reason: No fixed version published by the maintainer.
 #     mitigation: The vulnerable code path is not reachable (feature disabled).
 #     expires: 2099-01-30
-exceptions: []
+#
+# Story 1.3: Debian base packages in dhi.io/keycloak:26.8.2 (the newest tag on 2026-11-06).
+# Renew or remove these by 2026-12-04, as soon as DHI publishes a newer Keycloak digest.
+# Tracked in the `deferred` GitHub issue for this set (see docs/deferred-items.md); the issue's target date is the same as `expires`. Issue: #56.
+exceptions:
+  - cve: CVE-2017-18018
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2018-20796
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2019-1010022
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2019-1010023
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2019-9192
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2025-69720
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-102010
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-19499
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-5435
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-54369
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-54370
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-54371
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-56109
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-84243
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-85091
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
+  - cve: CVE-2026-95619
+    reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
+    mitigation: Local development container only, published on 127.0.0.1, holding fictional data. Not deployed. Re-scanned on every commit; replace the image when DHI publishes a newer digest.
+    expires: 2026-12-04
