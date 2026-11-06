@@ -299,4 +299,4 @@ So that anyone integrating or reviewing the epic sees what changed, how to adopt
 
 **Given** Epic 1 is complete
 **When** its release note is generated and finished
-**Then** `docs/release-notes/epic-01-local-environment.md` exists and passes the check. It lists Keycloak and Mailpit as non-DHI warnings, and shows the full Epic 1 test results.
+**Then** `docs/release-notes/epic-01-local-environment.md` exists and passes the check. It lists Mailpit and the Presidio images as non-DHI warnings (Keycloak is a DHI image, with its time-limited exceptions listed under Security), and shows the full Epic 1 test results.
