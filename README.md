@@ -90,6 +90,7 @@ The phone cannot reach Keycloak on `localhost:8180` (that address is the phone i
 (cd frontend && npm run lint:test)                     # tests for that lint rule
 (cd frontend && npm run api:check)                     # fails when src/api/schema.d.ts is out of date
 (cd frontend && npm run test:coverage)                 # Vitest with coverage (frontend/coverage/)
+(cd frontend && npm run test:e2e:install && npm run test:e2e)  # Playwright and axe against a test-mode build with the gallery on (first run downloads Chromium); see frontend/e2e/README.md
 deploy/check-actions.sh                                # every GitHub Action pinned to a commit SHA
 deploy/tests/check-actions.test.sh                     # tests for that check
 deploy/tests/security-scan.test.sh                     # tests for the security scan itself
