@@ -31,3 +31,6 @@ Thumbs.db
 *.ipr
 .vscode/
 *.swp
+
+# Pinned security tools (installed by deploy/security-scan.sh install-tools)
+.tools/

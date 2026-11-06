@@ -1,0 +1,8 @@
+{
+  "name": "fixture-vulnerable-npm",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "lodash": "4.17.15"
+  }
+}

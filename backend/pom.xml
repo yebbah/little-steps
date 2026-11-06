@@ -83,6 +83,25 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.cyclonedx</groupId>
+				<artifactId>cyclonedx-maven-plugin</artifactId>
+				<version>2.9.3</version>
+				<configuration>
+					<outputFormat>json</outputFormat>
+					<outputName>bom</outputName>
+					<projectType>application</projectType>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-sbom</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>makeBom</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
