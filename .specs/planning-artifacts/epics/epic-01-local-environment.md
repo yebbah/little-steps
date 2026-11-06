@@ -106,14 +106,14 @@ So that the same vetted services run the same way on every machine.
 **When** it is read
 **Then** it lists every image with its name, source (`dhi` or `other`), tag and digest, plus a reason for each `other`:
 - PostgreSQL 18 from `dhi.io` (`dhi`)
-- Keycloak 26.8.1 from `quay.io/keycloak` (`other`: no DHI image)
+- Keycloak 26.8.2 from `dhi.io` (`dhi`: the catalog check found a DHI image)
 - Mailpit (`other`: no DHI image, local only)
 
 Before pinning, the story checks the live DHI catalog: any image that has become available there moves to `dhi`.
 
 **Given** `deploy/compose.yaml` and `deploy/local.env.example`
 **When** the services are started with docker compose
-**Then** PostgreSQL (named volume), Keycloak (dev mode, its own schema) and Mailpit start and report healthy. Every image is referenced by the digest in `images.yaml`.
+**Then** PostgreSQL (named volume), Keycloak (dev mode, its own schema, created by a one-shot init service) and Mailpit start and report healthy. Every image is referenced by the digest in `images.yaml`.
 **And** Keycloak imports the `littlesteps` realm from `deploy/keycloak/littlesteps-realm.json`. The realm has:
 - a public client `littlesteps-pwa` with PKCE (S256) and rotating refresh tokens
 - redirect URIs for `http://localhost:5173`, `http://localhost:8080`, and a Tailscale host from env
@@ -121,8 +121,8 @@ Before pinning, the story checks the live DHI catalog: any image that has become
 - outgoing mail sent to Mailpit
 
 **And** every port and credential comes from `local.env`, with defaults in the example file and no secrets committed.
-**And** Presidio is a commented-out service marked "P2 (Epic 18)", already listed in `images.yaml` as `other`.
-**And** the security scan now covers these images, and none has a blocking finding.
+**And** Presidio is a commented-out service marked "P2 (Epic 18)", already listed in `images.yaml` as `other`, marked `scan: deferred` so the scan skips it until Epic 18 enables it (the manifest check fails if a deferred image runs in compose).
+**And** the security scan now covers these images, and none has a blocking finding, or each blocking finding with no upstream fix is covered by a written exception that expires within 30 days (Story 1.3 needed 16 for Keycloak 26.8.2, tracked in a `deferred` issue).
 **And** a check script fails when an image reference in `compose.yaml` does not match `images.yaml`.
 
 ### Story 1.4: Start and stop scripts
