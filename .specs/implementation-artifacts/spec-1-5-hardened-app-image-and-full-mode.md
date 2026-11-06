@@ -90,25 +90,25 @@ Layers run: blind-hunter, edge-case-hunter, verification-gap (iteration 1).
 
 | # | Finding | Verdict | Route | Evidence |
 |---|---------|---------|-------|----------|
-| 1 | Build-stage images (`node:24-dev`, `maven:3.9-jdk25-dev`) set to `scan: deferred` with dozens of CVSS 7+ findings; weakens the gate; header contradicts (BH, EC) | high | intent_gap | Implementer report: both fail the blocking rule, most without a fix, so exceptions cannot cover them; spec assumed they pass. Human decision needed. |
-| 2 | `scan app-image` untested (VG, BH) | medium | patch | no test names the target; a no-op would still print PASS |
-| 3 | `LS_APP_PORT` in check-urls untested (VG, BH) | low | patch | all tests use 8080 |
-| 4 | No cache policy for index.html / service worker (EC, BH) | medium | patch | custom `/**` handler; stale PWA after redeploy |
-| 5 | Missing Dockerfile silently skipped by check-images (EC) | medium | patch | `-f` guard |
-| 6 | Crash-looping app waits full timeout (EC, BH) | medium | patch | poll never checks container state |
-| 7 | Tailscale hint ignores BackendState (EC) | low | patch | spec says "logged in"; direct fix |
-| 8 | images.yaml header contradicts entries (EC, BH) | medium | patch | header says deferred = not running yet |
-| 9 | Plain shellcheck not clean, only `-S warning` (EC) | medium | patch | spec Verification expects no output |
-| 10 | Docs: "only reports state" stale with --full; phone cannot reach Keycloak (BH) | low | patch | direct doc fix |
-| 11 | Exceptions expire 2026-12-04, `scan app-image` then fails (EC, BH) | medium | defer | covered by #56 renewal; noted in security report |
-| 12 | App container hardening: read_only, cap_drop, no-new-privileges, JVM flags (BH) | medium | defer | not in spec; new deferred issue |
+| 1 | Build-stage images (`node:24-dev`, `maven:3.9-jdk25-dev`) set to `scan: deferred` with dozens of CVSS 7+ findings; weakens the gate; header contradicts (BH, EC) | high | intent_gap, resolved | Human chose non-dev/Alpine images and no deferral (see Implementation Notes). Implementer report: both fail the blocking rule, most without a fix, so exceptions cannot cover them; spec assumed they pass. Human decision needed. |
+| 2 | `scan app-image` untested (VG, BH) | medium | patch, fixed | no test names the target; a no-op would still print PASS |
+| 3 | `LS_APP_PORT` in check-urls untested (VG, BH) | low | patch, fixed | all tests use 8080 |
+| 4 | No cache policy for index.html / service worker (EC, BH) | medium | patch, fixed | custom `/**` handler; stale PWA after redeploy |
+| 5 | Missing Dockerfile silently skipped by check-images (EC) | medium | patch, fixed | `-f` guard |
+| 6 | Crash-looping app waits full timeout (EC, BH) | medium | patch, fixed | poll never checks container state |
+| 7 | Tailscale hint ignores BackendState (EC) | low | patch, fixed | spec says "logged in"; direct fix |
+| 8 | images.yaml header contradicts entries (EC, BH) | medium | patch, fixed | header says deferred = not running yet |
+| 9 | Plain shellcheck not clean, only `-S warning` (EC) | medium | patch, fixed | spec Verification expects no output |
+| 10 | Docs: "only reports state" stale with --full; phone cannot reach Keycloak (BH) | low | patch, fixed | direct doc fix |
+| 11 | Exceptions expire 2026-12-04, `scan app-image` then fails (EC, BH) | medium | defer | covered by #56 and #68 renewal; noted in security report |
+| 12 | App container hardening: read_only, cap_drop, no-new-privileges, JVM flags (BH) | medium | defer | not in spec; deferred issue #70 |
 | 13 | `/API/x` case-sensitive; dotted last segment 404; Accept header; later prefixes (EC, BH) | false | rejected | spec rule is "no file extension", paths are case-sensitive in Spring; prefixes are added when those endpoints exist |
 | 14 | Jar glob / -plain jar; mvn vs mvnw (EC, BH) | low | rejected | repackage makes one jar; spec mandates the DHI Maven stage; unlikely |
 | 15 | Dockerfile parsing: stage case, continuations, ARG, unused images (EC, BH) | low | rejected | not used in this Dockerfile; orphan check is #61 |
 | 16 | curl absent, pretty JSON, wrong LS_TAILSCALE_HOST, docker-missing message, stale image, -h exit code, tailscale off on down (EC, BH) | low | rejected | unlikely in everyday use; each fix adds branches |
 | 17 | check-urls "running" on any answer; no compose healthcheck for app (BH, EC) | low | rejected | spec: "running when it answers"; JRE image has no tool for a healthcheck |
 | 18 | SpaFallbackTests thin; report_unhealthy app skip untested; jar-contains-PWA only manual (BH, VG) | low | rejected | manual image run covered the real jar; diagnostics-only path |
-| 19 | Spec bookkeeping, "Review pass not run" (BH, VG) | medium | patch | completed in the finish step |
+| 19 | Spec bookkeeping, "Review pass not run" (BH, VG) | medium | patch, fixed | completed in the finish step |
 
 ## Verification
 

@@ -73,4 +73,5 @@ Three independent reviewers ran (blind, edge cases, verification gaps); every fi
 - #68: exception for CVE-2026-56109 (alsa-lib, JDK build image, no fix), expires and target 2026-12-04.
 - #70: compose hardening for the app container (read_only, cap_drop, no-new-privileges, JVM flags), target 2027-01-05.
 - #69: `scan app-image` is manual, not in CI or the default scan (target 2027-01-05).
+- #71: flaky `dev-scripts` test "--full app container exited" (seen once, not reproduced), target 2027-01-05.
 - Keycloak CVE exceptions remain tracked in #56.

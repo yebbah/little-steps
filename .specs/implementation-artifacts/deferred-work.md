@@ -33,3 +33,4 @@
 - #68  2026-12-04  Exception CVE-2026-56109 (alsa-lib) in the JDK build-stage image  (origin #30, Story 1.5)
 - #69  2027-01-05  scan app-image is manual, not in CI or the default scan  (origin #30, Story 1.5)
 - #70  2027-01-05  Compose hardening for the app container (read_only, cap_drop, no-new-privileges, JVM flags)  (origin #30, Story 1.5)
+- #71  2027-01-05  Flaky dev-scripts test "--full app container exited"  (origin #30, Story 1.5)
