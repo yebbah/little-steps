@@ -1,0 +1,72 @@
+{
+  "realm": "littlesteps",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "bruteForceProtected": true,
+  "revokeRefreshToken": true,
+  "refreshTokenMaxReuse": 0,
+  "smtpServer": {
+    "host": "mailpit",
+    "port": "1025",
+    "from": "no-reply@littlesteps.example.test",
+    "fromDisplayName": "LittleSteps (local)",
+    "auth": "false",
+    "ssl": "false",
+    "starttls": "false"
+  },
+  "clients": [
+    {
+      "clientId": "littlesteps-pwa",
+      "name": "LittleSteps PWA",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:8080/*",
+        "https://${LS_TAILSCALE_HOST}/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:8080",
+        "https://${LS_TAILSCALE_HOST}"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*##http://localhost:8080/*##https://${LS_TAILSCALE_HOST}/*"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "caregiver.a@example.test",
+      "email": "caregiver.a@example.test",
+      "firstName": "Caregiver",
+      "lastName": "A",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "${LS_CAREGIVER_A_PASSWORD}", "temporary": false }
+      ]
+    },
+    {
+      "username": "caregiver.b@example.test",
+      "email": "caregiver.b@example.test",
+      "firstName": "Caregiver",
+      "lastName": "B",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "${LS_CAREGIVER_B_PASSWORD}", "temporary": false }
+      ]
+    }
+  ]
+}

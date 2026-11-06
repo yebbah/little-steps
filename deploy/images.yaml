@@ -1,0 +1,35 @@
+# Image manifest (AD-26). Every image the stack uses, pinned by digest.
+# Fields: name, source (dhi | other), tag, digest, and a reason for every `other`.
+# Keep `name:` before `digest:` in each entry: deploy/security-scan.sh images parses that order.
+# deploy/check-images.sh fails when compose.yaml and this file disagree.
+# `scan: deferred` skips the image in deploy/security-scan.sh (it still has to match compose via check-images.sh).
+# Use it only for images that do not run yet; each one needs an entry in
+# .specs/implementation-artifacts/deferred-work.md. Remove it when the image is enabled.
+# Digests are the multi-arch index digests, read 2026-11-06.
+images:
+  - name: dhi.io/postgres
+    source: dhi
+    tag: "18-alpine"
+    digest: sha256:fec65236f2c8f14780ce38ac01f524449c730155fc342bfb88bc51f4a22e090d
+  - name: dhi.io/keycloak
+    source: dhi
+    tag: "26.8.2"
+    digest: sha256:aeda9dd828bc6760a29f14365d5ef9b6cd56ac0c7b90ab9dd0384b8bbf341aa0
+  - name: axllent/mailpit
+    source: other
+    tag: "v1.33.0"
+    digest: sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
+    reason: Not in the DHI catalog (checked 2026-11-06). Local development only, never deployed.
+  # P2 (Epic 18): Presidio, used by the privacy pipeline.
+  - name: ghcr.io/data-privacy-stack/presidio-analyzer
+    source: other
+    tag: "2.2.366-distroless"
+    digest: sha256:84cb78c12a26d7ff4d2f5b980452dd9983c0a5c8c56ee410226bb6bb3f19f7d8
+    scan: deferred
+    reason: Not in the DHI catalog (checked 2026-11-06). Needed from Epic 18.
+  - name: ghcr.io/data-privacy-stack/presidio-anonymizer
+    source: other
+    tag: "2.2.366-distroless"
+    digest: sha256:cf356326f0c9ed1a90b85973976066ff897973d6d495e4f56aa4cba4f351996b
+    scan: deferred
+    reason: Not in the DHI catalog (checked 2026-11-06). Needed from Epic 18.

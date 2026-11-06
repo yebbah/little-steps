@@ -164,6 +164,26 @@ check "images manifest parsing" 0 "dhi.io/postgres@sha256:aaa" env LS_IMAGES_FIL
 printf 'images:\n  - name: dhi.io/postgres\n    tag: "18"\n  - name: quay.io/keycloak/keycloak\n    digest: sha256:bbb\n' > "$TMP/images-nodigest.yaml"
 check "an image entry without a digest is an error, never skipped" 1 "dhi.io/postgres has no digest" env LS_IMAGES_FILE="$TMP/images-nodigest.yaml" "$SCAN" images
 
+cat > "$TMP/images-deferred.yaml" <<'EOF'
+images:
+  - name: dhi.io/postgres
+    source: dhi
+    tag: "18"
+    digest: sha256:aaa
+  - name: ghcr.io/example/p2-service
+    source: other
+    tag: "1"
+    digest: sha256:ccc
+    reason: not running yet
+    scan: deferred
+EOF
+check "a scan: deferred image is skipped with a visible notice" 0 "p2-service is deferred" env LS_IMAGES_FILE="$TMP/images-deferred.yaml" "$SCAN" images
+out="$(LS_IMAGES_FILE="$TMP/images-deferred.yaml" "$SCAN" images 2>/dev/null)"
+if echo "$out" | grep -q "dhi.io/postgres@sha256:aaa"; then pass=$((pass + 1)); echo "ok   the non-deferred image is still listed"; else fail=$((fail + 1)); echo "FAIL the non-deferred image is still listed"; fi
+if ! echo "$out" | grep -q p2-service; then pass=$((pass + 1)); echo "ok   a deferred image is not in the scanned list"; else fail=$((fail + 1)); echo "FAIL a deferred image is not in the scanned list"; fi
+printf 'images:\n  - name: a/b\n    scan: deferred\n' > "$TMP/images-deferred-nodigest.yaml"
+check "a deferred image without a digest is still an error" 1 "a/b has no digest" env LS_IMAGES_FILE="$TMP/images-deferred-nodigest.yaml" "$SCAN" images
+
 # ---- live (real pinned tools) ----------------------------------------------------------------
 if env LS_ROOT="$TMP/empty-root" "$SCAN" scan images 2>&1 | grep -q "missing tool"; then
   fail=$((fail + 1)); echo "FAIL live cases need the tools. Run: deploy/security-scan.sh install-tools"

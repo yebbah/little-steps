@@ -7,6 +7,7 @@ LittleSteps is a modular-monolith web app: a Spring Boot backend and a React PWA
 | What | Where | Written |
 |---|---|---|
 | Contributing policies | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | branching, security gate, finishing a story or epic |
+| Deferred items process | [docs/deferred-items.md](docs/deferred-items.md) | issues, target dates, exceptions |
 | Changelog | [docs/changelogs/](docs/changelogs/) | one per story, when the story is implemented |
 | Security report | [docs/security-reports/](docs/security-reports/) | one per story, from the template |
 | Release note | [docs/release-notes/](docs/release-notes/) | one per completed epic (Story 1.9) |
@@ -37,8 +38,10 @@ Check the setup by building both projects (see Development).
 | Step | Status |
 |---|---|
 | Tools, hook, dependencies (above) | available |
-| One-command local stack (`dev-up.sh`, Docker Compose, Keycloak, PostgreSQL, Mailpit) | arrives with Stories 1.3 and 1.4; `dev-up.sh` will also enable the hook |
-| Docker Hardened Images login (`docker login dhi.io`) | arrives with Story 1.3 |
+| Local stack with Docker Compose (PostgreSQL, Keycloak, Mailpit): `cp deploy/local.env.example deploy/local.env`, then `docker compose --env-file deploy/local.env -f deploy/compose.yaml up -d --wait` (see `deploy/README.md`) | available |
+| One-command start and stop (`dev-up.sh`, `dev-down.sh`); `dev-up.sh` will also enable the hook | arrives with Story 1.4 |
+| Docker Hardened Images login (`docker login dhi.io`), needed to pull the DHI images | required now; `dev-up.sh` will check it (Story 1.4) |
+| Known issue: 16 Keycloak CVEs with no upstream fix are covered by written exceptions that expire 2026-12-04 | replace the Keycloak digest when DHI publishes a newer one; see `security/exceptions.yaml` |
 
 ## Development
 
@@ -81,7 +84,8 @@ deploy/security-scan.sh                   # run the scan by hand
 | Per story: changelog and security report committed with the story | in use |
 | Per story: push the branch, close the story's issue with a short comment | in use |
 | Per epic: release note in `docs/release-notes/` (summary, changes, integration, security, code quality, test results) | arrives with Story 1.9 (`deploy/release-notes.sh`) |
-| Per epic: pull request from the epic branch, squash-merged to `main`, closes the epic issue | in use |
+| Per story: pull request squash-merged to `main`, closes the story's issue | in use |
+| Per epic: closes the epic issue once every story is merged to `main` | in use |
 | Images and artifacts built and published by CI | arrives with Story 1.8 |
 
 A release note links the changelogs and security reports of its stories, lists every active security exception, and lists images that do not come from Docker Hardened Images.

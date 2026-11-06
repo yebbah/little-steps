@@ -7,6 +7,7 @@
 #   deploy/security-scan.sh evaluate FILE [TARGET]
 #                                          apply the blocking policy to one Grype JSON report
 #   deploy/security-scan.sh images         print the image references from deploy/images.yaml
+#                                          (entries marked `scan: deferred` are listed on stderr, not scanned)
 #   deploy/security-scan.sh scan TARGET    one target only (backend, frontend or images), for tests
 #
 # Blocking rule: a finding whose CVE is in CISA KEV, or whose CVSS is 7.0 or above, fails the
@@ -319,19 +320,25 @@ scan_frontend() {
 cmd_images() {
   awk '
     function val(s) { sub(/^[^:]*:[ \t]*/, "", s); gsub(/["\047]/, "", s); return s }
-    /^[ \t]*-?[ \t]*name:/ {
-      if (name != "") { print "image " name " has no digest" > "/dev/stderr"; bad = 1 }
-      name = val($0)
+    function flush() {
+      if (name == "") return
+      if (digest == "") { print "image " name " has no digest" > "/dev/stderr"; bad = 1 }
+      else if (deferred) print "security-scan: image " name " is deferred (scan: deferred in images.yaml), not scanned" > "/dev/stderr"
+      else print name "@" digest
+      name = ""; digest = ""; deferred = 0
     }
+    /^[ \t]*-?[ \t]*name:/ { flush(); name = val($0) }
     /^[ \t]*digest:/ {
       if (name == "") { print "digest " val($0) " has no name before it" > "/dev/stderr"; bad = 1 }
-      else print name "@" val($0)
-      name = ""
+      else if (digest != "") { print "image " name " has more than one digest" > "/dev/stderr"; bad = 1 }
+      else digest = val($0)
     }
-    END {
-      if (name != "") { print "image " name " has no digest" > "/dev/stderr"; bad = 1 }
-      exit bad
-    }' "${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}"
+    /^[ \t]*scan:/ {
+      s = val($0); sub(/[ \t]+#.*$/, "", s)
+      if (name == "") { print "scan marker has no name before it" > "/dev/stderr"; bad = 1 }
+      else if (s == "deferred") deferred = 1
+    }
+    END { flush(); exit bad }' "${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}"
 }
 
 scan_images() {
