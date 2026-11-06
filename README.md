@@ -80,7 +80,7 @@ The phone cannot reach Keycloak on `localhost:8180` (that address is the phone i
 **Build and test**
 
 ```bash
-(cd backend && ./mvnw verify)                          # compile, tests (incl. the PWA fallback), backend SBOM
+(cd backend && ./mvnw verify)                          # compile, tests (module boundaries, PWA fallback, real PostgreSQL via Testcontainers; needs Docker), backend SBOM
 (cd frontend && npm ci && npm run build)               # type-check and bundle
 (cd frontend && npm run lint)                          # oxlint
 deploy/tests/security-scan.test.sh                     # tests for the security scan itself
@@ -100,7 +100,9 @@ deploy/security-scan.sh                   # run the scan by hand
 deploy/security-scan.sh scan app-image    # scan the locally built app image (after dev-up.sh --full)
 ```
 
-**Day-to-day development.** Run the backend from the IDE (port 8080) and the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
+**Backend modules and database.** The backend is split into the modules of the architecture's dependency graph (AD-1): one package per module under `app.littlesteps`, each with `api`, `web`, `domain` and `persistence` sub-packages. `ModularityTests` fails the build when a module crosses its allowed dependencies, and writes the module diagrams to `backend/target/spring-modulith-docs/`. The `import` module's package is `importer`, because `import` is a Java keyword. Flyway reads `backend/src/main/resources/db/migration/<module>/` (one history, timestamped versions). Tests that need the application extend `IntegrationTest`, which starts PostgreSQL in Testcontainers from the image digest in `deploy/images.yaml`; no test uses H2. Tables without a Family are listed in [backend/GLOBAL_TABLES.md](backend/GLOBAL_TABLES.md).
+
+**Day-to-day development.** The backend reads all its configuration from the environment and has no datasource unless a profile supplies one. Run it from the IDE (port 8080) with `SPRING_PROFILES_ACTIVE=local` and the variables of `deploy/local.env` exported (`LS_POSTGRES_DB`, `LS_POSTGRES_USER`, `LS_POSTGRES_PASSWORD`, and `LS_POSTGRES_PORT` if it is not 5432), after `deploy/dev-up.sh`. The `prod` profile takes `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`. Run the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
 
 Reports are written to `build/security/`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day). CI repeats the scan (Story 1.8).
 
@@ -130,7 +132,7 @@ When a deployment step exists, it is documented here with its commands, its conf
 ## Layout
 
 ```text
-backend/            Spring Boot, Maven, root package app.littlesteps
+backend/            Spring Boot, Maven, root package app.littlesteps, one package per module (AD-1), Flyway migrations in db/migration/<module>/
 frontend/           React + Vite PWA
 content/            curated content YAML
 eval/guardrails/    AI guardrail evaluation cases

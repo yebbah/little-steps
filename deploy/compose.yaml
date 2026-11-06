@@ -104,6 +104,14 @@ services:
       dockerfile: deploy/Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: local
+      LS_DB_HOST: postgres
+      LS_POSTGRES_PORT: "5432"
+      LS_POSTGRES_DB: ${LS_POSTGRES_DB:?Copy deploy/local.env.example to deploy/local.env}
+      LS_POSTGRES_USER: ${LS_POSTGRES_USER:?Copy deploy/local.env.example to deploy/local.env}
+      LS_POSTGRES_PASSWORD: ${LS_POSTGRES_PASSWORD:?Copy deploy/local.env.example to deploy/local.env}
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "127.0.0.1:${LS_APP_PORT:-8080}:8080"
     restart: unless-stopped

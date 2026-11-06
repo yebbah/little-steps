@@ -16,3 +16,6 @@
 - #74  2026-12-06  Package or target scope for security exceptions  (origin #27, Story 1.2)
 - #75  2027-02-04  Decide whether Unknown-severity findings with no score block  (origin #27, Story 1.2)
 - #76  2027-01-05  report.json: secrets target, failed targets, real image counts  (origin #27, Story 1.2)
+- #83  2027-01-05  Test the startup resubmission and the local/prod profiles for real  (origin #31, Story 1.6)
+- #92  2027-01-05  Production profiles from env files and least-privilege database role  (origin #31, Story 1.6)
+- #84  2027-02-04  Executor and context propagation for async listeners; clear prod datasource error  (origin #31, Story 1.6)

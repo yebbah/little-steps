@@ -97,7 +97,7 @@ graph LR
 
 ### Backend: modules and ports
 
-One Spring Boot app, a modular monolith (Spring Modulith). Each module is a package under `app.littlesteps`. Solid arrows mean "may call the `api` package of"; the closed set of edges is AD-1 and is checked by `ApplicationModules.verify()`. Only the application shell exists today; the modules arrive with their epics.
+One Spring Boot app, a modular monolith (Spring Modulith). Each module is a package under `app.littlesteps`. Solid arrows mean "may call the `api` package of"; the closed set of edges is AD-1 and is checked by `ApplicationModules.verify()`. The module packages, their declared dependencies and the Flyway layout exist since Story 1.6 (empty `api`, `web`, `domain` and `persistence` packages); the code arrives with the epics.
 
 ```mermaid
 graph TD
