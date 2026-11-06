@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
-class HealthEndpointTests {
+class HealthEndpointTests extends IntegrationTest {
 
 	@Autowired
 	private RestTestClient client;

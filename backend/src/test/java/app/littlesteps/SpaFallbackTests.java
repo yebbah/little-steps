@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
-class SpaFallbackTests {
+class SpaFallbackTests extends IntegrationTest {
 
 	@Autowired
 	private RestTestClient client;
