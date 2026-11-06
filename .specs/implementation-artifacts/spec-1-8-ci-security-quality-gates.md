@@ -22,7 +22,7 @@ context:
 ## Boundaries & Constraints
 
 **Always:**
-- Jobs: Backend (`./mvnw verify`, JaCoCo, `guardrail-eval` excluded), Frontend (npm ci, lint, typecheck, Vitest coverage, build, OpenAPI drift check when `api:check` exists), Scripts (action pinning, shellcheck, `images.yaml` digest check, script tests), Security (`security-scan.sh` over history, backend, frontend, images; Docker build not pushed; `scan app-image`).
+- Jobs: Backend (`./mvnw verify`, JaCoCo, `guardrail-eval` excluded), Frontend (npm ci, lint, typecheck, Vitest coverage, build, OpenAPI drift check when `api:check` exists), Scripts (action pinning, shellcheck, `images.yaml` digest check, script tests), Security (`security-scan.sh secrets` over history, `scan backend`, `scan frontend`; image scans and the app image build stay manual, #95). The Backend job logs in to dhi.io for Testcontainers.
 - Every third-party action pinned to a full commit SHA with the version in a comment; `deploy/check-actions.sh` fails on anything else and refuses forms it cannot read.
 - Reports (surefire, JaCoCo, SBOM, coverage, security) uploaded as artifacts. Maven, npm and the Grype database cached; scan tools and the KEV feed are never cached.
 - The security gate rule is unchanged (KEV or CVSS 7.0+).
@@ -47,7 +47,7 @@ context:
 - [x] History scope for the secret scan, tests
 - [x] README, deploy README, CONTRIBUTING pointer, changelog, security report, deferred issues
 
-**Acceptance Criteria:** see issue #33. Verified locally: all commands the workflow runs, actionlint 1.7.7 clean. The workflow itself can only run on GitHub (needs the DHI secrets).
+**Acceptance Criteria:** see issue #33. Verified locally: all commands the workflow runs, actionlint 1.7.7 clean. The workflow itself can only run on GitHub (needs the DHI secrets for the Backend job).
 
 ## Review Triage Log
 
@@ -68,7 +68,7 @@ Layers run: blind-hunter, edge-case-hunter, verification-gap (iteration 1, three
 | 11 | Fork and Dependabot PRs fail the Security job; PR scan reads whole history (BH, EC, VG) | medium | defer #90 | single maintainer today; README documents the secrets |
 | 12 | `npm ci --ignore-scripts` (BH) | low | rejected | the lockfile is audited by the scan; read-only token; would risk the native build tools |
 | 13 | GRYPE_*/GITLEAKS_* env not in the override guard (BH) | low | rejected | runner env is controlled by the workflow file itself |
-| 14 | app-image result not in summary.txt/report.json (VG) | low | rejected | its report `app-image.grype.json` is uploaded and the step log names the result |
+| 14 | app-image result not in summary.txt/report.json (VG) | low | rejected | superseded: image scans removed from CI (#95) |
 | 15 | Grype cache path assumed (VG) | low | rejected | default Linux location; cache miss only costs time |
 | 16 | Security job cache key per run churns cache (EC) | low | rejected | restore-keys fallback; 10 GB limit not near |
 

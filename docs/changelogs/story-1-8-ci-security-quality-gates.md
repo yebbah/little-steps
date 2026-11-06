@@ -11,7 +11,7 @@
 
 ## Summary
 
-Every push and pull request is now checked by `.github/workflows/ci.yml` on free GitHub-hosted runners: backend build and tests with coverage, frontend lint, typecheck, tests and build, script and manifest checks, and the security scan over the repository, all images and the built app image. A skipped local hook no longer lets an unsafe or broken change through.
+Every push and pull request is now checked by `.github/workflows/ci.yml` on free GitHub-hosted runners: backend build and tests with coverage, frontend lint, typecheck, tests and build, script and manifest checks, and the security scan over the commit history and the backend and frontend dependencies. Image scans stay manual (#95). A skipped local hook no longer lets an unsafe or broken change through.
 
 ## Added
 
@@ -43,16 +43,16 @@ Verdict PASS WITH WARNINGS; see [the security report](../security-reports/story-
 
 | Area | What changes | README section |
 |---|---|---|
-| Setup | Add the repository secrets `DHI_USERNAME` and `DHI_TOKEN` once; otherwise the Security job fails at the login step | Continuous integration |
+| Setup | Add the repository secrets `DHI_USERNAME` and `DHI_TOKEN` once; otherwise the Backend job fails at the login step (the integration tests pull the PostgreSQL image) | Continuous integration |
 | Development | New commands: `npm run typecheck`, `npm run test:coverage`, `deploy/check-actions.sh`; shellcheck also covers `.githooks/*` | Development |
-| Release | CI builds the app image (not pushed) and uploads reports for the release note; publishing is still not available | Release |
+| Release | CI uploads scan and test reports for the release note; the app image build and image scans are manual; publishing is still not available | Release |
 | Deployment | No change (reviewed). Prerequisites, Setup, Layout and Versions reviewed; Layout updated | Deployment, Layout, Versions |
 
 ## After you pull
 
 1. `(cd frontend && npm ci)` for Vitest.
 2. Add the `DHI_USERNAME` and `DHI_TOKEN` repository secrets and, if wanted, require the four CI jobs under Settings, Branches.
-3. After merge: close #69 (app-image scan now in CI) and #73 (CI asserts no `LS_*` override is set); both are done by this story.
+3. After merge: keep #69 open (image scans are not in CI, see #95) and close #73 (CI asserts no `LS_*` override is set); both are done by this story.
 
 ## Tests
 
@@ -62,6 +62,7 @@ Verdict PASS WITH WARNINGS; see [the security report](../security-reports/story-
 
 ## Deferred and known issues
 
+- [#95](https://github.com/yebbah/little-steps/issues/95): run image scans in CI as a scheduled or release job
 - [#88](https://github.com/yebbah/little-steps/issues/88): make the OpenAPI drift check, ModularityTests and Testcontainers mandatory in CI once Stories 1.6 and 1.7 merge.
 - [#89](https://github.com/yebbah/little-steps/issues/89): coverage thresholds.
 - [#90](https://github.com/yebbah/little-steps/issues/90): fork and Dependabot PR policy, PR-scoped secret scan.

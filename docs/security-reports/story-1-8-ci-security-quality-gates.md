@@ -6,11 +6,11 @@
 | Branch | feature/epic-01-issue-33-ci-security-quality-gates |
 | Commit scanned | working tree on baseline f66e007e124a4111f828d576e6e9de02af250076 (not committed yet) |
 | Date | 2026-11-06 |
-| Verdict | PASS WITH WARNINGS (3 frontend warnings below 7.0; first CI run needs the DHI secrets) |
+| Verdict | PASS WITH WARNINGS (3 frontend warnings below 7.0; the first CI run needs the DHI secrets for the Backend job; image scans are manual, #95) |
 
 ## 1. Summary
 
-The story adds the CI workflow, an action-pinning check, a commit-history mode for the secret scan, JaCoCo and Vitest (a new dev-only frontend dependency set). The full scan passes (`RESULT: PASS`) and `scan app-image` passes. No new exception.
+The story adds the CI workflow, an action-pinning check, a commit-history mode for the secret scan, JaCoCo and Vitest (a new dev-only frontend dependency set). The full local scan passes (`RESULT: PASS`) and `scan app-image` passes locally. CI runs only the secret scan and the backend and frontend dependency scans; the first CI run also showed a new blocking CVE in the Keycloak and JDK images (zlib1g CVE-2026-76844, no fix), which the manual image scans will report (#95). No new exception.
 
 ## 2. Scan result
 
@@ -40,19 +40,19 @@ No change. The existing exceptions (Story 1.3 Keycloak/Debian base packages and 
 
 ## 4. Container images
 
-No image added or changed. CI logs in to `dhi.io` with the `DHI_USERNAME` and `DHI_TOKEN` repository secrets and builds the app image without pushing it. Images from outside Docker Hardened Images remain `axllent/mailpit` (local only) as in Story 1.3.
+No image added or changed. The Backend job logs in to `dhi.io` with the `DHI_USERNAME` and `DHI_TOKEN` repository secrets so Testcontainers can pull PostgreSQL. CI does not scan or build images (#95). Images from outside Docker Hardened Images remain `axllent/mailpit` (local only) as in Story 1.3.
 
 ## 5. Supply chain
 
 - Actions used (all `actions/*`, pinned to full SHAs with the version in a comment, enforced by `deploy/check-actions.sh`): checkout v7.0.1, setup-java v6.2.0, setup-node v7.1.0, cache v6.1.0, upload-artifact v7.0.2.
 - New dependencies: jacoco-maven-plugin 0.8.16 (build only), vitest 5.1.0 and @vitest/coverage-v8 5.1.0 (dev only, locked in package-lock.json).
 - Scan tools are fetched with verified checksums on every run and are not cached; the KEV feed is not cached; only the Grype database is cached.
-- Workflow token is `contents: read`; checkout does not persist credentials; no `pull_request_target`; secrets are used only in the dhi.io login step.
+- Workflow token is `contents: read`; checkout does not persist credentials; no `pull_request_target`; secrets are used only in the Backend job's dhi.io login step.
 - A guard step fails the Security job if any `LS_*` test hook other than `LS_SECRETS_SCOPE` is set (resolves #73).
 
 ## 6. Secrets and data handling
 
-Secret scan over the commit history: clean. CI adds two secrets (`DHI_USERNAME`, `DHI_TOKEN`), passed through an environment variable and `--password-stdin`, never echoed. Reports uploaded as artifacts (30 days) contain package names and CVE ids only, no child data. Fork pull requests do not receive the secrets, so the Security job fails closed for them.
+Secret scan over the commit history: clean. CI adds two secrets (`DHI_USERNAME`, `DHI_TOKEN`), passed through an environment variable and `--password-stdin`, never echoed. Reports uploaded as artifacts (30 days) contain package names and CVE ids only, no child data. Fork pull requests do not receive the secrets, so the Backend job fails closed for them.
 
 ## 7. Tests
 
@@ -79,4 +79,4 @@ Three separate reviewers (blind, edge case, verification gap). The high finding 
 
 ## 10. Sign-off
 
-Signed off by the maintainer on 2026-11-06. Condition: merge after the first green CI run on GitHub with the `DHI_USERNAME` and `DHI_TOKEN` secrets added.
+Signed off by the maintainer on 2026-11-06. Scope amended after sign-off: image scans removed from CI at the maintainer's request (#95). Condition: merge after the first green CI run on GitHub with the `DHI_USERNAME` and `DHI_TOKEN` secrets added.

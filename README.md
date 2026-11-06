@@ -132,15 +132,15 @@ Reports are written to `build/security/`. The first run downloads the vulnerabil
 | Job | Runs |
 |---|---|
 | Backend | `./mvnw verify`: all tests, JaCoCo coverage, SBOM. Tests tagged `guardrail-eval` are excluded by default (wired up in Epic 13) |
-| Frontend | `npm ci`, lint, typecheck, Vitest with coverage, build, then the OpenAPI type drift check (`api:check`, arrives with Story 1.7) |
+| Frontend | `npm ci`, lint, typecheck, Vitest with coverage, build, then the OpenAPI type drift check (`api:check`) |
 | Scripts | `deploy/check-actions.sh` (every action pinned to a commit SHA, version in a comment), `shellcheck` on `deploy/*.sh`, `deploy/tests/*.sh` and `.githooks/*`, `deploy/check-images.sh`, and the tests of the check scripts |
-| Security | `deploy/security-scan.sh` over the commit history, backend, frontend and every image in `images.yaml`, a Docker build of the app image (not pushed) and `deploy/security-scan.sh scan app-image`; same KEV or CVSS 7.0+ rule as the hook |
+| Security | `deploy/security-scan.sh secrets` (commit history), `scan backend` and `scan frontend`; same KEV or CVSS 7.0+ rule as the hook. Image scans (`scan images`, `scan app-image`) are not in CI: run them by hand before a release (tracked in #95) |
 
-- **Secrets to add once** (Settings, Secrets and variables, Actions): `DHI_USERNAME` and `DHI_TOKEN`, a Docker Hardened Images account, used for `docker login dhi.io`. Without them the Security job fails at that step and says so. Pull requests from forks never receive secrets.
+- **Secrets to add once** (Settings, Secrets and variables, Actions): `DHI_USERNAME` and `DHI_TOKEN`, a Docker Hardened Images account, used for `docker login dhi.io` in the Backend job, because the integration tests pull the PostgreSQL image. Without them the Backend job fails at that step and says so. Pull requests from forks never receive secrets.
 - **Build artifacts** (30 days): `backend-reports` (surefire, JaCoCo, SBOM), `frontend-reports` (coverage) and `security-reports` (summary, report.json, Grype reports); they feed the epic release note.
 - **Caches**: Maven and npm (by the setup actions) and the Grype vulnerability database. The pinned scan tools and the KEV feed are fetched and verified every run, never cached.
 - **Adding or updating an action**: pin it to the full commit SHA of the release (`gh api repos/<owner>/<repo>/commits/<tag> -q .sha`) and put the version in a comment after it. `deploy/check-actions.sh` fails on a tag or branch.
-- **Run the same checks locally**: the commands under "Development" above; the Security job is `deploy/security-scan.sh` and `deploy/security-scan.sh scan app-image`.
+- **Run the same checks locally**: the commands under "Development" above; the Security job is `deploy/security-scan.sh secrets`, `scan backend` and `scan frontend`; add `deploy/security-scan.sh scan images` and `scan app-image` for the image scans CI does not run.
 - **Branch protection** (require the four CI jobs before merge) is a repository setting, not code: set it under Settings, Branches.
 
 ## Release
@@ -151,7 +151,7 @@ How a story or epic is finished is in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.m
 |---|---|
 | Per story: changelog and security report, pull request squash-merged to `main` | in use |
 | Per epic: release note in `docs/release-notes/` | arrives with Story 1.9 (`deploy/release-notes.sh`) |
-| App image built (not pushed) and reports uploaded as build artifacts by CI | in use (see "Continuous integration") |
+| Scan reports uploaded as build artifacts by CI (app image build and image scans are manual, #95) | in use (see "Continuous integration") |
 | Publishing images or artifacts | not available yet; CI never pushes an image |
 
 ## Deployment

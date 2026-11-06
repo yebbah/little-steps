@@ -39,6 +39,18 @@ jobs:
           cache: maven
           cache-dependency-path: backend/pom.xml
 
+      # The integration tests start PostgreSQL in Testcontainers from the dhi.io image in images.yaml.
+      - name: "Backend: log in to dhi.io (needs the DHI_USERNAME and DHI_TOKEN secrets)"
+        env:
+          DHI_USERNAME: ${{ secrets.DHI_USERNAME }}
+          DHI_TOKEN: ${{ secrets.DHI_TOKEN }}
+        run: |
+          if [ -z "$DHI_USERNAME" ] || [ -z "$DHI_TOKEN" ]; then
+            echo "::error title=dhi.io login::the DHI_USERNAME and DHI_TOKEN repository secrets are not available (a pull request from a fork never gets them). Add them under Settings, Secrets and variables, Actions."
+            exit 1
+          fi
+          printf '%s' "$DHI_TOKEN" | docker login dhi.io --username "$DHI_USERNAME" --password-stdin
+
       # Runs every unit and integration test (ModularityTests, Testcontainers tests once they exist),
       # JaCoCo coverage and the SBOM. The guardrail-eval tag is excluded in backend/pom.xml (Epic 13).
       - name: "Backend: ./mvnw verify"
@@ -141,7 +153,7 @@ jobs:
           deploy/tests/check-urls.test.sh
 
   security:
-    name: Security scan (secrets, dependencies, images, app image)
+    name: Security scan (secrets, backend and frontend dependencies)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -185,27 +197,16 @@ jobs:
       - name: "Security: install the pinned scan tools (checksums verified)"
         run: deploy/security-scan.sh install-tools
 
-      # The DHI base images and the manifest images are pulled from dhi.io.
-      - name: "Security: log in to dhi.io (needs the DHI_USERNAME and DHI_TOKEN secrets)"
-        env:
-          DHI_USERNAME: ${{ secrets.DHI_USERNAME }}
-          DHI_TOKEN: ${{ secrets.DHI_TOKEN }}
-        run: |
-          if [ -z "$DHI_USERNAME" ] || [ -z "$DHI_TOKEN" ]; then
-            echo "::error title=dhi.io login::the DHI_USERNAME and DHI_TOKEN repository secrets are not available (a pull request from a fork never gets them). Add them under Settings, Secrets and variables, Actions."
-            exit 1
-          fi
-          printf '%s' "$DHI_TOKEN" | docker login dhi.io --username "$DHI_USERNAME" --password-stdin
+      # Image scans are not run in CI: they need a dhi.io login and a
+      # Docker build, and base-image CVEs change daily. They are run by hand before a release (#95).
+      - name: "Security: scan commit history for secrets"
+        run: deploy/security-scan.sh secrets
 
-      - name: "Security: scan secrets, backend, frontend and images (deploy/security-scan.sh)"
-        run: deploy/security-scan.sh
+      - name: "Security: scan backend dependencies"
+        run: deploy/security-scan.sh scan backend
 
-      # Built for scanning only: nothing is pushed anywhere.
-      - name: "Build: app image (deploy/Dockerfile, not pushed)"
-        run: docker build --file deploy/Dockerfile --tag littlesteps-app .
-
-      - name: "Security: scan the built app image"
-        run: deploy/security-scan.sh scan app-image
+      - name: "Security: scan frontend dependencies"
+        run: deploy/security-scan.sh scan frontend
 
       - name: Show the scan summary
         if: always()
