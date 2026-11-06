@@ -16,11 +16,11 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
   - The full test suite passes.
   - The epic's release note is written in `docs/release-notes/` (AD-27).
 - **GitHub tracking:**
-  - Each epic has a parent issue (Epic N is issue #N+1).
-  - Each story gets a sub-issue, labelled `story` and `P1` or `P2`, when its epic is approved. Epic 1 is #26–#34, Epic 2 is #35–#42, and Epic 3 is #44–#53.
+  - Each epic has a parent issue (Epic N is issue #N+1, except Epic 24; see [Issues](../../../docs/CONTRIBUTING.md#issues)).
+  - Each story gets a sub-issue, labelled `story` and `P1` or `P2`, when its epic is approved. Epic 1 is #26–#34, Epic 2 is #35–#42 plus #104–#106 (Stories 2.9 to 2.11), and Epic 3 is #44–#53.
   - A story's issue is closed, with a summary comment, when the story is confirmed.
   - The epic's PR closes the epic issue.
-- **Order:** epics 1–17 are P1, and the core loop works online at the end of epic 9. Epics 18–23 are P2, and start only after P1 works end to end.
+- **Order:** epics 1–17 are P1, and the core loop works online at the end of epic 9. Epics 18–24 are P2, and start only after P1 works end to end.
 
 ## Epic List
 
@@ -49,6 +49,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 | 21 | Guided mode (P2) | planned | [#22](https://github.com/yebbah/little-steps/issues/22) |
 | 22 | Inventory and tagged notes (P2) | planned | [#23](https://github.com/yebbah/little-steps/issues/23) |
 | 23 | Progress trends and AI descriptions (P2) | planned | [#24](https://github.com/yebbah/little-steps/issues/24) |
+| 24 | Assistive-technology passes (P2) | planned | [#107](https://github.com/yebbah/little-steps/issues/107) |
 
 ### Epic 1: Local environment and project skeleton
 A developer can start and stop the whole product on a Mac with one command each. A skeleton app builds, boots and passes CI. Every commit is security-scanned, images are hardened, and the release-note tooling exists.
@@ -58,7 +59,7 @@ A developer can start and stop the whole product on a Mac with one command each.
 ### Epic 2: App shell and design foundations
 The app has its visual identity, navigation shell, status region and shared components, ready for every feature screen.
 **FRs covered:** none directly (UX-DR tokens, shell and shared components)
-**Done when:** a component gallery renders in light and dark, at phone and laptop widths, and passes the contrast and accessibility checks.
+**Done when:** a component gallery (local and test builds only) renders in light and dark, at phone and laptop widths, and passes the contrast and accessibility checks.
 
 ### Epic 3: Sign-in, Family and consent
 A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family. Also adds Family tenancy, the device outbox, the audit table, and a maintainer console for pilot invites.
@@ -164,6 +165,11 @@ Caregivers keep word, gesture and script lists and tagged notes.
 Caregivers see trends and cited descriptions on the progress view.
 **FRs covered:** FR-16 (P2)
 **Done when:** trends show at 5 or more Observations, and descriptions cite Observations.
+
+### Epic 24: Assistive-technology passes (P2)
+Caregivers who use screen readers are covered by recorded manual passes on the real devices and tools.
+**FRs covered:** none directly (NFR-14; UX-DR119 manual passes)
+**Done when:** VoiceOver (iOS and macOS), TalkBack and NVDA passes over the component gallery and the app shell are recorded in `docs/a11y-passes.md`, and every finding is fixed or tracked.
 
 ## FR Coverage Map
 

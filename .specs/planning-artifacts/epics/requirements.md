@@ -179,7 +179,7 @@ From the architecture spine (AD-n). Items marked **[Epic 1]** are foundation wor
 - **[Epic 1] Client data layer (AD-5, AD-15, AD-23):**
   - One Dexie database holding the outbox, drafts and the offline snapshot. The outbox tracks the enqueuing `sub`, coalesces commands, retries FIFO, pauses on 401 for in-place re-sign-in, and parks other errors with Retry.
   - Drafts autosave, and Dexie is wiped on sign-out, user change, membership end or purge.
-  - TanStack Query for server reads. The service worker precaches the app shell only. Radix primitives use plain CSS modules on DESIGN.md token CSS variables, and the frontend uses npm.
+  - TanStack Query for server reads. The service worker precaches the app shell only. Radix primitives use plain CSS modules on DESIGN.md token CSS variables, and the frontend uses npm. Routing uses React Router. The component gallery is registered only in dev and test modes. Accessibility tests use Playwright with axe-core in their own CI job.
 - **[Epic 1] Security gate (AD-25):** `deploy/security-scan.sh` run by the `.githooks/pre-commit` hook, and in CI for secrets and dependencies.
   - gitleaks on staged changes
   - CycloneDX SBOMs scanned by Grype
