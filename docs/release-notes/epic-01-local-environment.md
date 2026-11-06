@@ -13,7 +13,7 @@ The repository is public: no personal data, no absolute local paths, no secret v
 |---|---|
 | Epic | 01, Local environment and project skeleton |
 | Generated | 2026-11-06 |
-| Commit | cc62640 |
+| Commit | ee1cb2a |
 | Compared with | the start of the repository (first epic) |
 
 Status: done
@@ -40,7 +40,7 @@ One entry per story, with its changelog and security report.
 
 Commits since the start of the repository (first epic):
 
-- `cc62640` feat: release notes for each epic (#34)
+- `ee1cb2a` feat: release notes for each epic (#34) (#97)
 - `8b663a1` feat: CI with security and quality gates (#33) (#96)
 - `d30615f` feat: API contract, errors and safe logging (#32) (#94)
 - `4acffc6` feat: backend module skeleton and persistence baseline (#31) (#93)

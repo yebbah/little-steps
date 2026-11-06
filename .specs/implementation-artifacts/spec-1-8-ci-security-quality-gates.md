@@ -2,7 +2,7 @@
 title: 'Story 1.8: Continuous integration with security and quality gates'
 type: 'feature'
 created: '2026-11-06'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'f66e007e124a4111f828d576e6e9de02af250076'
 route: 'dispatch'
 review_loop_iteration: 0

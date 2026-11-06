@@ -2,7 +2,7 @@
 title: 'Story 1.6: Backend module skeleton and persistence baseline'
 type: 'feature'
 created: '2026-11-06'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'f66e007'
 route: 'dispatch'
 review_loop_iteration: 0
