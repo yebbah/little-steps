@@ -317,6 +317,7 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
   - Keycloak (realm imported from `deploy/keycloak/`), PostgreSQL, Mailpit (local only) and Presidio (P2) run from one `deploy/compose.yaml`, with an env-file per environment. Ollama runs natively on the host.
   - `deploy/dev-up.sh` and `deploy/dev-down.sh` are the only supported way to start and stop the local stack. They are idempotent bash scripts.
     - `dev-up.sh` checks prerequisites (Docker, Java, Node, Ollama and the configured model), creates `local.env` from the example if it is missing, starts the compose services, and waits for their health checks. `--full` also builds and runs the app image.
+    - `deploy/check-urls.sh` requests every local URL listed in the README (Keycloak, Mailpit, the database port) with `curl` and `nc`, sends no credentials, and exits non-zero if a required one fails. The app URL is informational until the app exists.
     - `dev-down.sh` stops everything and keeps data. `--wipe` also removes the volumes and the local storage folder.
   - Adapters are selected by Spring profile (`local`, `test`, `prod`) plus environment variables. There are no environment checks in code. Secrets come only from the environment.
 

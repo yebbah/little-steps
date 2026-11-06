@@ -72,6 +72,7 @@ Setting up the local environment is in v1 scope (spec CAP-19, architecture AD-22
   - It first checks the prerequisites (Docker, Java, Node, Ollama and the configured model) and says how to fix anything missing.
   - It is safe to run twice.
   - `--full` also builds and runs the app container image.
+- `deploy/check-urls.sh` requests every local URL (Keycloak, Mailpit, the database port) and prints PASS or FAIL for each.
 - `deploy/dev-down.sh` stops everything and keeps the data. `--wipe` resets the volumes and local files.
 - One `deploy/Dockerfile` builds the app image (the PWA plus Spring Boot). The same image is used when shipping.
 - For day-to-day work, Spring Boot and the Vite dev server run outside Docker, for debugging and hot reload. The AI model runtime runs natively on the Mac.

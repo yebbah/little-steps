@@ -111,6 +111,7 @@ Reference list for all epics. Each epic file cites the IDs it covers, and its re
   - New Strategies and Restrictions take effect in the next Plan and in later suggestions.
 - **FR-19 [P1, built first] (SPEC CAP-19):** A developer brings the whole product up on a Mac with `deploy/dev-up.sh` and tears it down with `deploy/dev-down.sh`.
   - `dev-up.sh` checks prerequisites (Docker, Java, Node, Ollama and the configured model) with fix steps, creates `local.env` from the example, starts PostgreSQL, Keycloak (realm imported) and Mailpit, and waits for health. It is idempotent.
+  - `deploy/check-urls.sh` requests every local URL (Keycloak, Mailpit, the database port) and prints PASS or FAIL for each.
   - `--full` builds and runs the app image from `deploy/Dockerfile`, and a phone reaches it over Tailscale HTTPS.
   - `dev-down.sh` keeps data, and `--wipe` resets volumes and local files.
   - The README covers first-time setup.

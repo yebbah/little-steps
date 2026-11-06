@@ -155,7 +155,11 @@ So that starting, stopping and resetting are one command each.
 **When** `deploy/dev-down.sh --wipe` runs
 **Then** it asks for typed confirmation, then removes the containers, the volumes and the local storage folder. `--yes` skips the prompt.
 
-**And** both scripts are bash, pass `shellcheck`, and work from any current directory.
+**Given** the stack is up
+**When** `deploy/check-urls.sh` runs
+**Then** it requests every URL in the README "Local URLs to test" table (Keycloak admin console, realm metadata, account console, Mailpit inbox and API, the PostgreSQL port) with ports from `local.env`, and prints PASS or FAIL for each. The app on port 8080 is informational until Story 1.5. It exits non-zero if a required URL fails, and sends no credentials.
+
+**And** all three scripts are bash, pass `shellcheck`, and work from any current directory.
 **And** the README documents first-time setup using only these scripts, plus the optional Tailscale step.
 
 ### Story 1.5: Hardened app image and full mode
