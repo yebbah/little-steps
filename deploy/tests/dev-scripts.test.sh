@@ -132,16 +132,16 @@ check "no node: listed" 1 "missing: Node" bash -c "cd '$TMP' && env PATH='$NONOD
 
 # ---- dev-up: Ollama ---------------------------------------------------------------------------
 R="$(new_repo ai-optional)"; : > "$STUB_LOG"
-check "AI optional, model missing: warning and continues" 0 "warning: Ollama model llama3.2 is not pulled.*Service state" up "$R" STUB_OLLAMA_MODEL=
+check "AI optional, model missing: warning and continues" 0 "warning: Ollama model qwen3:8b is not pulled.*Service state" up "$R" STUB_OLLAMA_MODEL=
 assert "AI optional: stack started" grep -q "up -d --wait" "$STUB_LOG"
 
 R="$(new_repo ai-required)"; : > "$STUB_LOG"
-check "AI required, model missing: error with ollama pull, exit 1" 1 "error: Ollama model llama3.2 is not pulled.*fix: ollama pull llama3.2" up "$R" LS_AI_REQUIRED=true
+check "AI required, model missing: error with ollama pull, exit 1" 1 "error: Ollama model qwen3:8b is not pulled.*fix: ollama pull qwen3:8b" up "$R" LS_AI_REQUIRED=true
 assert "AI required, model missing: no containers started" bash -c "! grep -q ' up ' '$STUB_LOG'"
 assert "AI required, model missing: local.env not created" test ! -f "$R/deploy/local.env"
 
 R="$(new_repo ai-present)"; : > "$STUB_LOG"
-check "AI required, model present: continues" 0 "Service state" up "$R" LS_AI_REQUIRED=true STUB_OLLAMA_MODEL=llama3.2:latest
+check "AI required, model present: continues" 0 "Service state" up "$R" LS_AI_REQUIRED=true STUB_OLLAMA_MODEL=qwen3:8b:latest
 
 R="$(new_repo ai-noollama)"; : > "$STUB_LOG"
 NOOLLAMA="$TMP/noollama-stubs"; mkdir -p "$NOOLLAMA"; cp "$STUBS/docker" "$STUBS/java" "$STUBS/node" "$NOOLLAMA/"
@@ -158,12 +158,12 @@ check "up fails and ps is empty: generic fallback, no timeout claim" 1 "compose 
 
 # ---- env parsing and Ollama matching ----
 R="$(new_repo similar)"; : > "$STUB_LOG"
-check "similar model name (llama3x2) does not count as llama3.2" 1 "error: Ollama model llama3.2 is not pulled" up "$R" LS_AI_REQUIRED=true STUB_OLLAMA_MODEL=llama3x2
+check "similar model name (qwen3x8b) does not count as qwen3:8b" 1 "error: Ollama model qwen3:8b is not pulled" up "$R" LS_AI_REQUIRED=true STUB_OLLAMA_MODEL=qwen3x8b
 R="$(new_repo upper)"; : > "$STUB_LOG"
-check "LS_AI_REQUIRED=True is treated as true" 1 "error: Ollama model llama3.2 is not pulled" up "$R" LS_AI_REQUIRED=True
+check "LS_AI_REQUIRED=True is treated as true" 1 "error: Ollama model qwen3:8b is not pulled" up "$R" LS_AI_REQUIRED=True
 R="$(new_repo crlf)"; mkdir -p "$R/deploy"; : > "$STUB_LOG"
-{ cat "$R/deploy/local.env.example"; printf 'LS_AI_REQUIRED="true" # strict\r\nOLLAMA_MODEL=llama3.2 # model\r\n'; } > "$R/deploy/local.env"
-check "quotes, CR and inline comment in local.env are read correctly" 1 "error: Ollama model llama3.2 is not pulled" up "$R"
+{ cat "$R/deploy/local.env.example"; printf 'LS_AI_REQUIRED="true" # strict\r\nOLLAMA_MODEL=qwen3:8b # model\r\n'; } > "$R/deploy/local.env"
+check "quotes, CR and inline comment in local.env are read correctly" 1 "error: Ollama model qwen3:8b is not pulled" up "$R"
 
 # ---- dev-down -----------------------------------------------------------------------------------
 R="$(new_repo down)"; mkdir -p "$R/data"; echo x > "$R/data/file"; : > "$STUB_LOG"
