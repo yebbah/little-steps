@@ -7,6 +7,8 @@ export default defineConfig({
   test: {
     // Vitest: unit tests live next to the code. The coverage report is uploaded by CI.
     include: ['src/**/*.test.{ts,tsx}'],
+    // jest-dom matchers and cleanup for component tests. Files opt into jsdom with `// @vitest-environment jsdom`.
+    setupFiles: ['./src/test/setup.ts'],
     // The JUnit file feeds the epic release note (deploy/release-notes.sh).
     reporters: ['default', 'junit'],
     outputFile: { junit: 'test-results/junit.xml' },
