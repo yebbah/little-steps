@@ -17,7 +17,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
   - The epic's release note is written in `docs/release-notes/` (AD-27).
 - **GitHub tracking:**
   - Each epic has a parent issue (Epic N is issue #N+1).
-  - Each story gets a sub-issue, labelled `story` and `P1` or `P2`, when its epic is approved. Epic 1 is #26–#34 and Epic 2 is #35–#42.
+  - Each story gets a sub-issue, labelled `story` and `P1` or `P2`, when its epic is approved. Epic 1 is #26–#34, Epic 2 is #35–#42, and Epic 3 is #44–#53.
   - A story's issue is closed, with a summary comment, when the story is confirmed.
   - The epic's PR closes the epic issue.
 - **Order:** epics 1–17 are P1, and the core loop works online at the end of epic 9. Epics 18–23 are P2, and start only after P1 works end to end.
