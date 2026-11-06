@@ -2,7 +2,7 @@
 title: 'Story 2.1: Design tokens, theme and type'
 type: 'feature'
 created: '2026-11-06'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 context:
   - '{project-root}/.specs/planning-artifacts/epics/epic-02-app-shell.md'

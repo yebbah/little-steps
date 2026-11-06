@@ -70,4 +70,4 @@ Reviewed in the [triage log](../../.specs/implementation-artifacts/spec-2-1-desi
 
 ## 10. Sign-off
 
-Pending human validation.
+Validated by the maintainer on 2026-11-06.

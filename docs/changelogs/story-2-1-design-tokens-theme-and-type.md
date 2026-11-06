@@ -63,5 +63,5 @@ Also updated: Continuous integration table (lint rule tests step), `frontend/REA
 
 ## Deferred and known issues
 
-- #111: image-layer focus ring contrast and DESIGN.md ratio cross-check (Epic 18).
+- #111: image-layer focus ring contrast and DESIGN.md ratio cross-check (Epic 18). The Story 2.1 AC was amended on 2026-11-06 to scope the contrast test to token-backed pairings, so this is not spec drift.
 - #112: root-font and 17px body check in WebKit (Story 2.7).
