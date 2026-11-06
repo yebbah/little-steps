@@ -2,7 +2,7 @@
 title: 'Story 2.6: Message catalog and tone check'
 type: 'feature'
 created: '2026-11-06'
-status: 'in-review'
+status: 'done'
 baseline_commit: '9cf9f738f8d604b54154e07961d3165c41983010'
 route: 'dispatch'
 review_loop_iteration: 0

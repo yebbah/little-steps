@@ -86,8 +86,8 @@ The phone cannot reach Keycloak on `localhost:8180` (that address is the phone i
 ```bash
 (cd backend && ./mvnw verify)                          # compile, tests (module boundaries, PWA fallback, problem responses, safe logging, OpenAPI drift, real PostgreSQL via Testcontainers; needs Docker), JaCoCo coverage, backend SBOM
 (cd frontend && npm ci && npm run build)               # type-check and bundle
-(cd frontend && npm run lint && npm run typecheck)     # oxlint (including the rule against string literals in JSX), tsc
-(cd frontend && npm run lint:test)                     # tests for that lint rule
+(cd frontend && npm run lint && npm run typecheck)     # oxlint (including the rule against string literals in JSX), stylelint (no box-shadow other than none, no outline removed without a replacement), tsc
+(cd frontend && npm run lint:test)                     # tests for those lint rules
 (cd frontend && npm run api:check)                     # fails when src/api/schema.d.ts is out of date
 (cd frontend && npm run test:coverage)                 # Vitest with coverage (frontend/coverage/)
 (cd frontend && npm run test:e2e:install && npm run test:e2e)  # Playwright and axe against a test-mode build with the gallery on (first run downloads Chromium); see frontend/e2e/README.md
@@ -121,6 +121,8 @@ deploy/security-scan.sh scan app-image    # scan the locally built app image (af
 
 The frontend has no hand-written API types and no inline UI text: sentences go in `frontend/src/i18n/messages.ts` under stable keys, and a tone check (`frontend/src/i18n/tone.ts`, run by `npm test` and so by the Frontend CI job) fails on banned phrases. The banned UI patterns are in [docs/ui-review-checklist.md](docs/ui-review-checklist.md).
 
+**Design tokens, theme and the gallery.** Colours, type, spacing and radii are CSS custom properties in `frontend/src/styles/tokens.css`, taken from the UX `DESIGN.md` (a test compares every value). Components use the `--color-*` layer, which follows the device's light or dark setting, or the stored Light / Dark choice that `index.html` applies before first paint. The component gallery is at `/dev/gallery` when `VITE_ENABLE_GALLERY=true`, which `frontend/.env.development` and `.env.test` set; a production build ignores the flag and contains no gallery (a build test checks it).
+
 **Day-to-day development.** The backend reads all its configuration from the environment and has no datasource unless a profile supplies one. Run it from the IDE (port 8080) with `SPRING_PROFILES_ACTIVE=local` and the variables of `deploy/local.env` exported (`LS_POSTGRES_DB`, `LS_POSTGRES_USER`, `LS_POSTGRES_PASSWORD`, and `LS_POSTGRES_PORT` if it is not 5432), after `deploy/dev-up.sh`. The `prod` profile takes `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`. Run the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
 
 Reports are written to `build/security/`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day). CI repeats the scan (see "Continuous integration").
@@ -134,7 +136,7 @@ Reports are written to `build/security/`. The first run downloads the vulnerabil
 | Job | Runs |
 |---|---|
 | Backend | `./mvnw verify`: all tests, JaCoCo coverage, SBOM. Tests tagged `guardrail-eval` are excluded by default (wired up in Epic 13) |
-| Frontend | `npm ci`, lint, typecheck, Vitest with coverage, build, then the OpenAPI type drift check (`api:check`) |
+| Frontend | `npm ci`, lint (oxlint and stylelint), lint rule tests, typecheck, Vitest with coverage, build, then the OpenAPI type drift check (`api:check`) |
 | Scripts | `deploy/check-actions.sh` (every action pinned to a commit SHA, version in a comment), `shellcheck` on `deploy/*.sh`, `deploy/tests/*.sh` and `.githooks/*`, `deploy/check-images.sh`, and the tests of the check scripts |
 | Security | `deploy/security-scan.sh secrets` (commit history), `scan backend` and `scan frontend`; same KEV or CVSS 7.0+ rule as the hook. Image scans (`scan images`, `scan app-image`) are not in CI: run them by hand before a release (tracked in #95) |
 

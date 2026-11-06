@@ -1,0 +1,90 @@
+/* Base styles: the root, the page, the type classes and the focus indicator (Story 2.1).
+   Tokens come from tokens.css. */
+
+/* The root is never set in px, so browser and OS text size are honoured (UX-DR9). */
+html {
+  font-size: 100%;
+}
+
+/* iOS and iPadOS only: Dynamic Type sets the base (17px at the default setting). The
+   -webkit-touch-callout guard keeps macOS Safari, whose system body is about 13px, on the 100% root. */
+@supports (font: -apple-system-body) and (-webkit-touch-callout: none) {
+  html {
+    font: -apple-system-body;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-floor);
+  color: var(--color-ink);
+  font-family: var(--font-stack);
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-body-line);
+}
+
+/* Type scale (UX-DR8): one class per token, all in rem. */
+.type-display {
+  font-size: var(--type-display-size);
+  font-weight: var(--type-display-weight);
+  line-height: var(--type-display-line);
+  letter-spacing: var(--type-display-tracking);
+}
+
+.type-title {
+  font-size: var(--type-title-size);
+  font-weight: var(--type-title-weight);
+  line-height: var(--type-title-line);
+  letter-spacing: var(--type-title-tracking);
+}
+
+.type-heading {
+  font-size: var(--type-heading-size);
+  font-weight: var(--type-heading-weight);
+  line-height: var(--type-heading-line);
+}
+
+.type-section-label {
+  font-size: var(--type-section-label-size);
+  font-weight: var(--type-section-label-weight);
+  line-height: var(--type-section-label-line);
+  letter-spacing: var(--type-section-label-tracking);
+  text-transform: uppercase;
+}
+
+.type-body {
+  font-size: var(--type-body-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-body-line);
+}
+
+.type-body-sm {
+  font-size: var(--type-body-sm-size);
+  font-weight: var(--type-body-sm-weight);
+  line-height: var(--type-body-sm-line);
+}
+
+.type-cue {
+  font-size: var(--type-cue-size);
+  font-weight: var(--type-cue-weight);
+  line-height: var(--type-cue-line);
+}
+
+.type-label {
+  font-size: var(--type-label-size);
+  font-weight: var(--type-label-weight);
+  line-height: var(--type-label-line);
+}
+
+.type-meta {
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-meta-weight);
+  line-height: var(--type-meta-line);
+}
+
+/* Focus indicator (UX-DR14): a real 2px outline with a 2px offset, so it survives forced-colors mode. */
+:focus-visible {
+  outline: var(--space-focus-width) solid var(--color-focus-ring);
+  outline-offset: var(--space-focus-offset);
+}

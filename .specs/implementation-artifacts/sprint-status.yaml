@@ -47,13 +47,13 @@ development_status:
   1-9-release-notes-for-each-epic: done
   epic-1-retrospective: done
 
-  epic-2: backlog
-  2-1-design-tokens-theme-and-type: backlog
+  epic-2: in-progress
+  2-1-design-tokens-theme-and-type: done
   2-2-domain-tints-and-icons: backlog
   2-3-app-shell-navigation-and-focus-management: backlog
   2-4-core-controls: backlog
   2-5-surfaces-feedback-and-labels: backlog
-  2-6-message-catalog-and-tone-check: backlog
+  2-6-message-catalog-and-tone-check: done
   2-10-catalog-copy-for-status-lines-banners-and-empty-states: backlog
   2-11-catalog-copy-for-errors-confirmations-and-security-notices: backlog
   2-7-responsive-reflow-and-accessibility-test-harness: backlog

@@ -5,6 +5,14 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LittleSteps</title>
+    <!-- Applies the stored Light / Dark choice before first paint, so there is no flash of the wrong
+         theme. Same storage key as src/styles/theme.ts (a test keeps them equal). -->
+    <script>
+      try {
+        var theme = localStorage.getItem('littlesteps.theme')
+        if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme)
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

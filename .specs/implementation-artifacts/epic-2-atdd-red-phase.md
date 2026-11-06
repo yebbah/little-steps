@@ -17,7 +17,7 @@ inputDocuments:
   - frontend/playwright.config.ts
 acceptanceCriteria:
   - { id: 'AC-1', idSource: generated, text: '2.1 Gallery route registered only when VITE_ENABLE_GALLERY=true; production bundle contains no gallery; build test fails otherwise (R-01)' }
-  - { id: 'AC-2', idSource: generated, text: '2.1 Contrast test checks every DESIGN.md token pairing in light and dark against 4.5:1 text and 3:1 control edges (R-02)' }
+  - { id: 'AC-2', idSource: generated, text: '2.1 Contrast test checks every token-backed DESIGN.md pairing in light and dark against 4.5:1 text and 3:1 control edges (R-02)' }
   - { id: 'AC-3', idSource: generated, text: '2.3 Route change sets document.title "<Screen>: <subject> · LittleSteps", moves focus to h1, one role=status region outside routed content, message on next frame, Back restores scroll and focus (R-03)' }
   - { id: 'AC-4', idSource: generated, text: '2.5 Sheet/Dialog: role=dialog aria-modal aria-labelledby, focus to heading on open, trapped, returns to invoker, page inert, Esc/scrim/Close, one modal level (R-04)' }
 ---

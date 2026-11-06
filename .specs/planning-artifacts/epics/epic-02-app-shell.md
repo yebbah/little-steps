@@ -61,7 +61,7 @@ So that it feels warm and works on any device and setting.
 **And** Playroom is the app's only visual theme. Light and dark are modes of it, not separate themes, and the only theme control is the Light / Dark / System choice (UX-DR2).
 **And** a minimal component gallery exists at `/dev/gallery`. It shows the colour tokens, the type scale and the spacing and radius tokens, with a Light / Dark toggle.
 **And** the gallery route is registered only when `VITE_ENABLE_GALLERY=true`, which is set for dev and test modes and never for the production build. A build test fails if the production bundle contains the gallery.
-**And** an automated contrast test checks every token pairing listed in DESIGN.md in both modes against WCAG AA (4.5:1 for text, 3:1 for control edges), and fails on any miss (UX-DR6).
+**And** an automated contrast test checks every token-backed pairing listed in DESIGN.md (both colours are design tokens) in both modes against WCAG AA (4.5:1 for text, 3:1 for control edges), and fails on any miss (UX-DR6). Pairings over image content, such as the focus ring on the image layer, are out of scope here because the backing colour is not a token; they are tracked in #111 (Epic 18).
 
 ### Story 2.2: Domain tints and icons
 
