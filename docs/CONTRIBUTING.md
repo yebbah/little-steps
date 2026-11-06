@@ -42,7 +42,7 @@ Example: `feature/epic-01-issue-28-hardened-local-infrastructure`.
 
 - Every commit must pass `deploy/security-scan.sh` (pre-commit hook in `.githooks/` and CI). The blocking rule (CISA KEV, CVSS 7.0 or more) and the exceptions are in [security/README.md](../security/README.md).
 - Never use `--no-verify`; CI repeats the scan, so a skipped hook still fails.
-- Use Grype for scanning, not Trivy. Pin GitHub Actions to commit SHAs.
+- Use Grype for scanning, not Trivy. Pin GitHub Actions to full commit SHAs with the version in a comment; `deploy/check-actions.sh` fails CI on a tag or branch.
 - Container images come from Docker Hardened Images (`dhi.io`) when the catalog has them. An image from elsewhere is listed as a warning in the epic's release note.
 - Background: AD-25, AD-26 and AD-27 in the architecture spine, NFR-20 to NFR-22, and the epic Definition of done.
 

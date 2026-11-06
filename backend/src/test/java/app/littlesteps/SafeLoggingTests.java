@@ -75,7 +75,8 @@ class SafeLoggingTests extends IntegrationTest {
 			.getResponseHeaders().getFirst("X-Request-Id");
 		ObjectMapper mapper = JsonMapper.builder().build();
 
-		var lines = output.getAll().lines().filter(line -> !line.isBlank()).map(mapper::readTree).toList();
+		// JVM and test-library warnings (for example Mockito self-attaching on newer JDKs) are not log lines.
+		var lines = output.getAll().lines().filter(line -> line.startsWith("{")).map(mapper::readTree).toList();
 
 		assertThat(lines).isNotEmpty().allSatisfy(node -> {
 			assertThat(node.has("@timestamp")).isTrue();

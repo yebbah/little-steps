@@ -4,7 +4,8 @@
 #
 #   deploy/security-scan.sh                run every check (default)
 #   deploy/security-scan.sh install-tools  download the pinned tools, verify checksums
-#   deploy/security-scan.sh secrets        gitleaks on staged changes only
+#   deploy/security-scan.sh secrets        gitleaks on staged changes only (LS_SECRETS_SCOPE=history: the commit
+#                                          history, set by CI where nothing is staged)
 #   deploy/security-scan.sh evaluate FILE [TARGET]
 #                                          apply the blocking policy to one Grype JSON report
 #   deploy/security-scan.sh images         print the image references from deploy/images.yaml
@@ -262,11 +263,23 @@ cmd_secrets() {
   require_tools
   cd "$ROOT"
   git rev-parse --git-dir >/dev/null 2>&1 || die "not a git repository: $ROOT"
-  if env -u GITLEAKS_CONFIG -u GITLEAKS_CONFIG_TOML "$(tool_bin gitleaks "$GITLEAKS_VERSION")" git --pre-commit --staged \
-       --config "$SCRIPT_DIR/gitleaks.toml" --redact --no-banner --log-level warn "$ROOT"; then
-    echo "[PASS] secrets: staged changes clean"
+  local gitleaks scope="staged changes"
+  gitleaks="$(tool_bin gitleaks "$GITLEAKS_VERSION")"
+  local args=(git --config "$SCRIPT_DIR/gitleaks.toml" --redact --no-banner --log-level warn)
+  # CI sets LS_SECRETS_SCOPE=history: nothing is staged there, so scan the commits instead.
+  case "${LS_SECRETS_SCOPE:-staged}" in
+    history)
+      scope="commit history"
+      # A shallow clone would silently scan less than the whole history.
+      [ "$(git rev-parse --is-shallow-repository)" = false ] \
+        || die "LS_SECRETS_SCOPE=history needs the full history (checkout with fetch-depth: 0)" ;;
+    staged) args+=(--pre-commit --staged) ;;
+    *) die "LS_SECRETS_SCOPE must be staged or history, not '${LS_SECRETS_SCOPE}'" ;;
+  esac
+  if env -u GITLEAKS_CONFIG -u GITLEAKS_CONFIG_TOML "$gitleaks" "${args[@]}" "$ROOT"; then
+    echo "[PASS] secrets: $scope clean"
   else
-    echo "[FAIL] secrets: gitleaks found a secret in the staged changes (values redacted above)"
+    echo "[FAIL] secrets: gitleaks found a secret in the $scope (values redacted above)"
     return 1
   fi
 }

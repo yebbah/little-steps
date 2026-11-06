@@ -8,6 +8,7 @@ Newest first. Add a line here with every new changelog.
 |---|---|---|
 | 1.6 | Backend module skeleton and persistence baseline | [story-1-6-backend-module-skeleton-and-persistence-baseline.md](story-1-6-backend-module-skeleton-and-persistence-baseline.md) |
 | 1.7 | API contract, errors and safe logging | [story-1-7-api-contract-errors-and-safe-logging.md](story-1-7-api-contract-errors-and-safe-logging.md) |
+| 1.8 | Continuous integration with security and quality gates | [story-1-8-ci-security-quality-gates.md](story-1-8-ci-security-quality-gates.md) |
 | 1.5 | Hardened app image and full mode | [story-1-5-hardened-app-image-and-full-mode.md](story-1-5-hardened-app-image-and-full-mode.md) |
 | 1.4 | Start and stop scripts | [story-1-4-start-and-stop-scripts.md](story-1-4-start-and-stop-scripts.md) |
 | 1.3 | Hardened local infrastructure with Docker Compose | [story-1-3-hardened-local-infrastructure.md](story-1-3-hardened-local-infrastructure.md) |

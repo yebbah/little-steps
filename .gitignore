@@ -34,3 +34,6 @@ Thumbs.db
 
 # Pinned security tools (installed by deploy/security-scan.sh install-tools)
 .tools/
+
+# Frontend test coverage output
+frontend/coverage/
