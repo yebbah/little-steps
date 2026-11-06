@@ -30,3 +30,9 @@ npm run lint:test  # tests for the lint rules
 npm test        # Vitest (unit and component, Testing Library with jsdom)
 npm run test:e2e   # Playwright and axe; see e2e/README.md
 ```
+
+## Source layout
+
+- `src/ui/`: shared controls (`Button`, `TextField`, `ChoiceChips`, `Stepper`, `DisclosureRow`), one CSS module each, tests beside them. Import from `src/ui/index.ts`.
+- `src/gallery/`: the dev-only gallery at `/dev/gallery`; its sample text lives in `strings.ts`, not in the product catalog.
+- `src/i18n/`: the message catalog and tone check. `src/styles/`: tokens, base styles and theme.

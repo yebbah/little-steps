@@ -1,0 +1,60 @@
+.button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--space-button-height);
+  padding: var(--space-2) var(--space-5);
+  border: var(--space-outline-width) solid transparent;
+  border-radius: var(--radius-full);
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.primary {
+  border-color: var(--color-action);
+  background: var(--color-action);
+  color: var(--color-action-foreground);
+}
+
+.secondary {
+  border-color: var(--color-action);
+  background: var(--color-card);
+  color: var(--color-action);
+}
+
+.quiet {
+  min-height: var(--space-target-min);
+  background: transparent;
+  color: var(--color-ink-soft);
+}
+
+.danger {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-danger-foreground);
+}
+
+/* The momentary touch fill; it never means "chosen". */
+.button:active:not([aria-disabled='true']) {
+  background: var(--color-pressed);
+}
+
+.primary:active:not([aria-disabled='true']),
+.danger:active:not([aria-disabled='true']) {
+  background: var(--color-block);
+}
+
+/* Same shape as the live button, only the label and fill change. Still focusable. */
+.button[aria-disabled='true'] {
+  border-color: var(--color-outline);
+  background: var(--color-pressed);
+  color: var(--color-ink-disabled);
+  cursor: default;
+}
+
+.quiet[aria-disabled='true'] {
+  border-color: transparent;
+  background: transparent;
+}

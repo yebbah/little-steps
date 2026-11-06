@@ -1,0 +1,67 @@
+.group {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.group legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The native input stays in the tab order and the accessibility tree; it only draws nothing itself. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.text {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-target-min);
+  padding: var(--space-2) var(--space-4);
+  border: var(--space-outline-width) solid var(--color-outline-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-card);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.input:active + .text {
+  background: var(--color-pressed);
+}
+
+.input:checked + .text {
+  border-color: var(--color-action);
+  background: var(--color-selected);
+  font-weight: 800;
+}
+
+.input:checked + .text::before {
+  content: '✓';
+  margin-inline-end: var(--space-2);
+}
+
+/* The shared focus indicator, drawn on the visible chip because the input itself is transparent. */
+.input:focus-visible + .text {
+  outline: var(--space-focus-width) solid var(--color-focus-ring);
+  outline-offset: var(--space-focus-offset);
+}

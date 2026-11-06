@@ -62,4 +62,40 @@ test('[P1] the gallery shows Domain tags on their tints and the icon tiles at th
   const tiles = screen.getByRole('region', { name: 'Icons' }).querySelectorAll('[data-size]')
   expect(new Set([...tiles].map((t) => t.getAttribute('data-size')))).toEqual(new Set(['76', '56', '36']))
   expect(tiles).toHaveLength((NAV_ICON_NAMES.length + SAMPLE_ICON_NAMES.length) * 3)
+test('the controls section shows every control in each state inside the 360, 768 and 1280 frames', () => {
+  render(<Gallery />)
+  expect(screen.getByRole('heading', { level: 2, name: 'Core controls' })).toBeInTheDocument()
+
+  for (const width of [360, 768, 1280]) {
+    const frame = screen.getByTestId(`frame-${width}`)
+    expect(frame).toHaveStyle({ width: `${width}px` })
+    const inside = within(frame)
+
+    // Buttons: four variants at rest and disabled, disabled ones aria-disabled and not native disabled.
+    expect(inside.getAllByRole('button', { name: /^(Primary|Secondary|Quiet|Danger)/ })).toHaveLength(8)
+    const disabled = inside.getAllByRole('button', { name: /disabled$/ })
+    expect(disabled).toHaveLength(4)
+    for (const button of disabled) {
+      expect(button).toHaveAttribute('aria-disabled', 'true')
+      expect(button).not.toBeDisabled()
+    }
+    expect(inside.getByRole('button', { name: 'Focus ring' })).toBeInTheDocument()
+
+    // Text fields: rest, filled and error.
+    expect(inside.getByLabelText('Note')).toHaveValue('')
+    expect(inside.getByLabelText('Filled note')).toHaveValue('Waved back at the window')
+    expect(inside.getByLabelText('Note with an error')).toHaveAttribute('aria-invalid', 'true')
+
+    // Chips: one selected radio, one selected checkbox.
+    expect(inside.getByRole('radio', { name: 'At home' })).toBeChecked()
+    expect(inside.getByRole('checkbox', { name: 'A tip' })).toBeChecked()
+
+    // Steppers: single at the minimum, paired with an error.
+    expect(inside.getAllByRole('spinbutton', { name: 'Minutes' })[0]).toHaveAttribute('aria-valuetext', '0, minimum')
+    expect(inside.getByText("Can't be more than 5 tried")).toBeInTheDocument()
+
+    // Disclosure rows: collapsed and expanded.
+    expect(inside.getByRole('button', { name: 'If it gets hard' })).toHaveAttribute('aria-expanded', 'false')
+    expect(inside.getByRole('button', { name: 'Model · Reading · One-to-one' })).toHaveAttribute('aria-expanded', 'true')
+  }
 })

@@ -125,6 +125,8 @@ The frontend has no hand-written API types and no inline UI text: sentences go i
 
 **Domain tints and icons.** `frontend/src/domain/` maps a free-text Domain to one of seven tint families (`domainTint`) and shows it with its own label (`DomainTag`). `frontend/src/icons/` holds the object line icons and `IconTile` (76, 56 and 36px). Both are listed in the gallery.
 
+**Core controls.** `frontend/src/ui/` holds `Button`, `TextField`, `ChoiceChips`, `Stepper` (single and paired) and `DisclosureRow`, built only on tokens. Disabled controls use `aria-disabled`, never native `disabled`, so they keep focus. The gallery shows each control in its states inside fixed 360, 768 and 1280px frames; the Playwright spec `frontend/e2e/tests/controls.spec.ts` checks focus rings (also under `forced-colors`), tap targets and axe.
+
 **Day-to-day development.** The backend reads all its configuration from the environment and has no datasource unless a profile supplies one. Run it from the IDE (port 8080) with `SPRING_PROFILES_ACTIVE=local` and the variables of `deploy/local.env` exported (`LS_POSTGRES_DB`, `LS_POSTGRES_USER`, `LS_POSTGRES_PASSWORD`, and `LS_POSTGRES_PORT` if it is not 5432), after `deploy/dev-up.sh`. The `prod` profile takes `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`. Run the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
 
 Reports are written to `build/security/`. The first run downloads the vulnerability database and the CISA KEV feed (cached for a day). CI repeats the scan (see "Continuous integration").
