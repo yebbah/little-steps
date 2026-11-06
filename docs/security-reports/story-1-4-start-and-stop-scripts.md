@@ -4,7 +4,7 @@
 |---|---|
 | Story | 1.4, issue #29 |
 | Branch | story-1-4-start-and-stop-scripts |
-| Commit scanned | not yet committed (baseline 590a637a4441ca6454c93cbd07bcec4c0ad1a912); the pre-commit hook scans the staged tree at commit |
+| Commit scanned | d9bfa15 (baseline 590a637a4441ca6454c93cbd07bcec4c0ad1a912); scanned by the pre-commit hook at commit |
 | Date | 2026-11-06 |
 | Verdict | PASS WITH WARNINGS (unchanged warnings; the 16 Keycloak exceptions from Story 1.3 remain) |
 

@@ -5,7 +5,7 @@
 | Story | 1.4, issue #29 |
 | Epic | 1, Local environment and project skeleton |
 | Branch | feature/epic-01-issue-29-start-and-stop-scripts |
-| Commits | not yet committed (baseline 590a637) |
+| Commits | d9bfa15 (baseline 590a637) |
 | Date | 2026-11-06 |
 | Security report | [story-1-4-start-and-stop-scripts.md](../security-reports/story-1-4-start-and-stop-scripts.md) |
 
