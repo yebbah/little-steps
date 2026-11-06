@@ -1,0 +1,12 @@
+# Written exceptions for vulnerabilities that have NO fixed version yet (AD-25).
+# An exception never covers a finding that has a fix: upgrade instead.
+# Every entry needs all four fields. `expires` is YYYY-MM-DD, not in the past and at most
+# 30 days from today. An expired or malformed entry fails the whole scan.
+# Every active exception is listed in the epic's release note.
+#
+# exceptions:
+#   - cve: CVE-2099-0001
+#     reason: No fixed version published by the maintainer.
+#     mitigation: The vulnerable code path is not reachable (feature disabled).
+#     expires: 2099-01-30
+exceptions: []

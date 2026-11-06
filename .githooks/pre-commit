@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Runs the security scan before every commit (AD-25). Never bypass it with --no-verify.
+set -euo pipefail
+exec "$(git rev-parse --show-toplevel)/deploy/security-scan.sh" run

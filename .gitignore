@@ -1,0 +1,36 @@
+# Local configuration and secrets
+local.env
+.env
+*.env
+!*.env.example
+
+# Backend build output
+backend/target/
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+
+# Generated reports (including build/security/)
+/build/
+
+# Local storage folder
+/data/
+
+# Party-mode session memory (never published)
+.specs/party-mode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+
+# Pinned security tools (installed by deploy/security-scan.sh install-tools)
+.tools/
