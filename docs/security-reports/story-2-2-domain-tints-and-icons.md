@@ -67,4 +67,4 @@ None touched security. The [triage log](../../.specs/implementation-artifacts/sp
 
 ## 10. Sign-off
 
-Awaiting validation by the maintainer.
+Validated by the maintainer on 2026-11-06.
