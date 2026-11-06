@@ -49,7 +49,7 @@ Before a story's last commit:
 1. Run an independent review pass with three separate reviewers: blind (diff only), edge cases, and verification gaps. Triage every finding with evidence, fix the real ones, and record the triage in the story's spec or review log. A self-review does not replace this.
 2. Write the changelog: `docs/changelogs/story-<N>-<M>-<slug>.md` from `docs/changelogs/TEMPLATE.md`, plus a row in the index in that folder. Changelogs are per story, not per epic.
 3. Write the security report: `docs/security-reports/story-<N>-<M>-<slug>.md` from `docs/security-reports/TEMPLATE.md`. Fill every section, with numbers from `build/security/summary.txt` and `report.json`. Security reports are per story, not per epic.
-4. Update the README Setup, Development, Release and Deployment sections if the story changed them. Mark steps that do not exist yet as "arrives with Story X"; never document what does not exist.
+4. Review and update `README.md` in every story, whether or not the story seems to touch it: check Prerequisites, Setup, Development, Release, Deployment, Layout and Versions against the code and the story's changes, and fix anything stale. Record each section touched, or "reviewed, no change", in the changelog's Operations impact table. Mark steps that do not exist yet as "arrives with Story X"; never document what does not exist.
 5. Log every deferred item as a GitHub issue (see "Deferred items" below) before pushing.
 6. Push the branch and close the story's issue with a short comment (commit, result, links to the deferred issues).
 

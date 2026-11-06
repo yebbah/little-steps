@@ -13,7 +13,7 @@ LittleSteps is a modular-monolith web app: a Spring Boot backend and a React PWA
 | Release note | [docs/release-notes/](docs/release-notes/) | one per completed epic (Story 1.9) |
 | Product and design specs | `.specs/` and `.ideas/` | planning and implementation specs |
 
-This README is kept current: a story that changes how the project is set up, developed, released or deployed updates the matching section below, and says so in its changelog.
+This README is reviewed and updated in every story, and the changelog records what was touched (or "reviewed, no change").
 
 ## Prerequisites
 
@@ -21,7 +21,8 @@ This README is kept current: a story that changes how the project is set up, dev
 - **Node 24** (pinned by `frontend/.nvmrc` and `engines` in `frontend/package.json`)
 - **Maven**: no install needed, use the wrapper (`backend/mvnw`)
 - **jq**: `brew install jq` (used by the security scan)
-- **Docker Desktop**: needed from Story 1.3 (local infrastructure)
+- **Docker Desktop**: runs the local stack (PostgreSQL, Keycloak, Mailpit)
+- **A Docker Hardened Images account**: `docker login dhi.io` is needed to pull the PostgreSQL and Keycloak images
 
 ## Setup
 
@@ -38,10 +39,10 @@ Check the setup by building both projects (see Development).
 | Step | Status |
 |---|---|
 | Tools, hook, dependencies (above) | available |
-| Local stack with Docker Compose (PostgreSQL, Keycloak, Mailpit): `cp deploy/local.env.example deploy/local.env`, then `docker compose --env-file deploy/local.env -f deploy/compose.yaml up -d --wait` (see `deploy/README.md`) | available |
+| Local stack with Docker Compose (PostgreSQL 18, Keycloak on port 8180, Mailpit): `cp deploy/local.env.example deploy/local.env`, change the placeholder values, then `docker compose --env-file deploy/local.env -f deploy/compose.yaml up -d --wait` (see `deploy/README.md`, including how to reset the realm) | available |
 | One-command start and stop (`dev-up.sh`, `dev-down.sh`); `dev-up.sh` will also enable the hook | arrives with Story 1.4 |
 | Docker Hardened Images login (`docker login dhi.io`), needed to pull the DHI images | required now; `dev-up.sh` will check it (Story 1.4) |
-| Known issue: 16 Keycloak CVEs with no upstream fix are covered by written exceptions that expire 2026-12-04 | replace the Keycloak digest when DHI publishes a newer one; see `security/exceptions.yaml` |
+| Known issue: 16 Keycloak 26.8.2 CVEs with no upstream fix are covered by written exceptions that expire 2026-12-04 (tracked in issue #56) | replace the Keycloak digest in `deploy/images.yaml` and `deploy/compose.yaml` when DHI publishes a newer one; see `security/exceptions.yaml` |
 
 ## Development
 
@@ -52,6 +53,8 @@ Check the setup by building both projects (see Development).
 (cd frontend && npm ci && npm run build)               # type-check and bundle
 (cd frontend && npm run lint)                          # oxlint
 deploy/tests/security-scan.test.sh                     # tests for the security scan itself
+deploy/check-images.sh                                 # compose.yaml and images.yaml must agree
+deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh   # tests for the image check and the Keycloak realm
 ```
 
 If a command fails with a Java error, `JAVA_HOME` is not a JDK 25. The build stops with "Java 25 is required".
@@ -66,16 +69,20 @@ deploy/security-scan.sh                   # run the scan by hand
 
 **Branches and commits**
 
-- Work on a branch from an up-to-date `main`, named `feature/epic-<NN>-issue-<N>-<slug>` (Epic N is issue N+1).
+- Work on a branch from an up-to-date `main`, one per level: `feature/epic-<NN>-<slug>`, `feature/epic-<NN>-issue-<N>-<slug>` or `feature/epic-<NN>-issue-<N>-sub-<M>-<slug>`. Each is merged back to `main` by PR.
 - Commit messages are conventional (`feat:`, `fix:`, `docs:`, `chore:`) and reference the story issue.
 - Pull requests are squash-merged. Never force-push a shared branch.
 - Do not put personal data, secret values or absolute local paths in any file: the repository is public.
 
 **Finishing a story.** Before a story's last commit:
 
-1. Write its changelog in `docs/changelogs/` from the template, and add it to the index there.
-2. Write its security report in `docs/security-reports/` from the template.
-3. Update the Setup, Development, Release and Deployment sections of this README if the story changed any of them.
+1. Run the independent three-reviewer pass (blind, edge cases, verification gaps) and triage the findings.
+2. Write its changelog in `docs/changelogs/` from the template, and add it to the index there.
+3. Write its security report in `docs/security-reports/` from the template.
+4. Review this README and update every section the story made stale (Prerequisites, Setup, Development, Release, Deployment, Layout, Versions), even if that is none; say so in the changelog.
+5. Log every deferred item as a `deferred` GitHub issue (see `docs/deferred-items.md`).
+
+Do these before asking anyone to validate the story. Then push and close the story's issue.
 
 ## Release
 
@@ -107,10 +114,15 @@ backend/            Spring Boot, Maven, root package app.littlesteps
 frontend/           React + Vite PWA
 content/            curated content YAML
 eval/guardrails/    AI guardrail evaluation cases
-deploy/             security scan and tests; later Dockerfile, compose, image manifest, scripts
+deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, tests; later Dockerfile and start/stop scripts
 security/           vulnerability scan exceptions
 .githooks/          git hooks (pre-commit runs the security scan)
-docs/               changelogs, security reports, release notes
+.github/            issue templates (deferred items); CI arrives with Story 1.8
+.specs/, .ideas/    product and design specs, input brief and project context
+.tools/             pinned scanners installed by the security scan (git-ignored)
+build/              generated output, such as security reports (git-ignored)
+docs/               contributing policies, changelogs, security reports, release notes, deferred items process
+AGENTS.md           instructions for AI coding agents (CLAUDE.md points to it)
 ```
 
 ## Versions
