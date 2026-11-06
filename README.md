@@ -22,27 +22,45 @@ This README is reviewed and updated in every story, and the changelog records wh
 - **Maven**: no install needed, use the wrapper (`backend/mvnw`)
 - **jq**: `brew install jq` (used by the security scan)
 - **Docker Desktop**: runs the local stack (PostgreSQL, Keycloak, Mailpit)
-- **A Docker Hardened Images account**: `docker login dhi.io` is needed to pull the PostgreSQL and Keycloak images
+- **A Docker Hardened Images account**: `docker login dhi.io` is needed to pull the PostgreSQL and Keycloak images; `dev-up.sh` checks it
 
 ## Setup
 
-Run once after cloning:
+First-time setup, after cloning and installing the prerequisites above:
 
 ```bash
 deploy/security-scan.sh install-tools     # pinned, checksum-verified Grype, Syft and gitleaks, into .tools/
-git config core.hooksPath .githooks       # enable the pre-commit security scan
+docker login dhi.io                       # Docker Hardened Images account
 (cd frontend && npm ci)                   # frontend dependencies
+deploy/dev-up.sh                          # checks prerequisites, enables the git hook, starts the stack
 ```
 
-Check the setup by building both projects (see Development).
+`deploy/dev-up.sh` works from any directory. It checks every prerequisite first and prints one fix step for anything missing, before changing anything. Then it sets `git config core.hooksPath .githooks` (the pre-commit security scan), checks Ollama, creates `deploy/local.env` from the example if it is missing (change the placeholder values when you like), starts PostgreSQL, Keycloak and Mailpit and waits until they are healthy. Running it again while the stack is up only reports the state.
+
+```bash
+deploy/dev-down.sh                        # stop the containers; volumes and the local data/ folder are kept
+deploy/dev-down.sh --wipe                 # reset: asks you to type "wipe", then removes containers, volumes and data/
+deploy/dev-down.sh --wipe --yes           # same without the prompt
+```
 
 | Step | Status |
 |---|---|
-| Tools, hook, dependencies (above) | available |
-| Local stack with Docker Compose (PostgreSQL 18, Keycloak on port 8180, Mailpit): `cp deploy/local.env.example deploy/local.env`, change the placeholder values, then `docker compose --env-file deploy/local.env -f deploy/compose.yaml up -d --wait` (see `deploy/README.md`, including how to reset the realm) | available |
-| One-command start and stop (`dev-up.sh`, `dev-down.sh`); `dev-up.sh` will also enable the hook | arrives with Story 1.4 |
-| Docker Hardened Images login (`docker login dhi.io`), needed to pull the DHI images | required now; `dev-up.sh` will check it (Story 1.4) |
+| Start, stop and reset (`dev-up.sh`, `dev-down.sh`; details and the realm reset in `deploy/README.md`) | available |
+| Ollama (optional): while `LS_AI_REQUIRED=false` in `deploy/local.env` (the default) a missing Ollama or `OLLAMA_MODEL` is only a warning; when it is `true`, run `ollama pull <model>` first | available |
+| Optional, phone access over Tailscale: install Tailscale and log in, then set `LS_TAILSCALE_HOST` in `deploy/local.env` to your machine's `<machine>.<tailnet>.ts.net` name (it feeds the realm redirect URI; reset the realm with `dev-down.sh --wipe` if the stack already ran). The `tailscale serve` command and the app itself arrive with Story 1.5 | optional |
 | Known issue: 16 Keycloak 26.8.2 CVEs with no upstream fix are covered by written exceptions that expire 2026-12-04 (tracked in issue #56) | replace the Keycloak digest in `deploy/images.yaml` and `deploy/compose.yaml` when DHI publishes a newer one; see `security/exceptions.yaml` |
+
+**Local URLs to test** (ports come from `deploy/local.env`; defaults shown). `dev-up.sh` prints the same list.
+
+| What | URL | Expect |
+|---|---|---|
+| Keycloak admin console | http://localhost:8180/admin | login page; admin user and password from `local.env` |
+| Keycloak realm metadata | http://localhost:8180/realms/littlesteps/.well-known/openid-configuration | JSON with issuer `.../realms/littlesteps` |
+| Keycloak account console (test user login) | http://localhost:8180/realms/littlesteps/account | login for a fictional realm user |
+| Mailpit inbox | http://localhost:8025 | empty inbox UI |
+| Mailpit API | http://localhost:8025/api/v1/info | JSON with version |
+| PostgreSQL (not HTTP) | `psql -h localhost -p 5432 -U littlesteps littlesteps` | connects (password from `local.env`) |
+| App (arrives with Story 1.5) | http://localhost:8080 | connection refused until then |
 
 ## Development
 
@@ -55,6 +73,8 @@ Check the setup by building both projects (see Development).
 deploy/tests/security-scan.test.sh                     # tests for the security scan itself
 deploy/check-images.sh                                 # compose.yaml and images.yaml must agree
 deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh   # tests for the image check and the Keycloak realm
+deploy/tests/dev-scripts.test.sh                       # tests for dev-up.sh and dev-down.sh (stubs, no real Docker)
+shellcheck deploy/*.sh deploy/tests/*.sh               # brew install shellcheck
 ```
 
 If a command fails with a Java error, `JAVA_HOME` is not a JDK 25. The build stops with "Java 25 is required".
@@ -84,7 +104,7 @@ How a story or epic is finished is in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.m
 Not available yet. What is planned:
 
 - **Local, full mode** (Story 1.5): one app image in which Spring Boot serves the built PWA at the same origin as `/api`, running as a non-root user on a Docker Hardened Images Java runtime.
-- **Local, development mode** (Stories 1.3 and 1.4): infrastructure in Docker Compose, the backend run from the IDE, and the Vite dev server proxying `/api`.
+- **Local, development mode**: infrastructure in Docker Compose, started with `deploy/dev-up.sh` (available); the backend run from the IDE and the Vite dev server proxying `/api` arrive with Story 1.5.
 - **Production hosting**: decided at launch. Every component is a standard container or protocol, so it can move to inexpensive hosting without code changes. All configuration and secrets come from the environment, through the Spring profiles `local`, `test` and `prod`.
 
 When a deployment step exists, it is documented here with its commands, its configuration and how to roll back.
@@ -96,13 +116,14 @@ backend/            Spring Boot, Maven, root package app.littlesteps
 frontend/           React + Vite PWA
 content/            curated content YAML
 eval/guardrails/    AI guardrail evaluation cases
-deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, tests; later Dockerfile and start/stop scripts
+deploy/             security scan, Docker Compose stack, image manifest (images.yaml), Keycloak realm, `dev-up.sh` and `dev-down.sh`, tests; Dockerfile arrives with Story 1.5
 security/           vulnerability scan exceptions
 .githooks/          git hooks (pre-commit runs the security scan)
 .github/            issue templates (deferred items); CI arrives with Story 1.8
 .specs/, .ideas/    product and design specs, input brief and project context
 .tools/             pinned scanners installed by the security scan (git-ignored)
 build/              generated output, such as security reports (git-ignored)
+data/               local storage folder, removed by `dev-down.sh --wipe` (git-ignored)
 docs/               contributing policies, changelogs, security reports, release notes, deferred items process
 AGENTS.md           instructions for AI coding agents (CLAUDE.md points to it)
 ```
