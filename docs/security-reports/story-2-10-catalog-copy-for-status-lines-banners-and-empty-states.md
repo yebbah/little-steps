@@ -71,4 +71,4 @@ None with security impact. Triage: see the Review Triage Log in [the story spec]
 
 ## 10. Sign-off
 
-Pending validation by the maintainer.
+Validated by the maintainer on 2026-11-06.
