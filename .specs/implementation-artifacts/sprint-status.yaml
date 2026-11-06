@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-06-2026 12:00
-last_updated: 11-06-2026 22:00
+last_updated: 11-06-2026 23:00
 project: little-steps
 project_key: NOKEY
 tracking_system: file-system
@@ -55,7 +55,7 @@ development_status:
   2-5-surfaces-feedback-and-labels: backlog
   2-6-message-catalog-and-tone-check: done
   2-10-catalog-copy-for-status-lines-banners-and-empty-states: done
-  2-11-catalog-copy-for-errors-confirmations-and-security-notices: backlog
+  2-11-catalog-copy-for-errors-confirmations-and-security-notices: done
   2-7-responsive-reflow-and-accessibility-test-harness: backlog
   2-8-pwa-shell-and-install-offer: backlog
   2-9-settings-shell-and-theme-choice: backlog
