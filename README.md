@@ -80,9 +80,11 @@ The phone cannot reach Keycloak on `localhost:8180` (that address is the phone i
 **Build and test**
 
 ```bash
-(cd backend && ./mvnw verify)                          # compile, tests (module boundaries, PWA fallback, real PostgreSQL via Testcontainers; needs Docker), backend SBOM
+(cd backend && ./mvnw verify)                          # compile, tests (module boundaries, PWA fallback, problem responses, safe logging, OpenAPI drift, real PostgreSQL via Testcontainers; needs Docker), backend SBOM
 (cd frontend && npm ci && npm run build)               # type-check and bundle
-(cd frontend && npm run lint)                          # oxlint
+(cd frontend && npm run lint)                          # oxlint, including the rule against string literals in JSX
+(cd frontend && npm run lint:test)                     # tests for that lint rule
+(cd frontend && npm run api:check)                     # fails when src/api/schema.d.ts is out of date
 deploy/tests/security-scan.test.sh                     # tests for the security scan itself
 deploy/check-images.sh                                 # compose.yaml and images.yaml must agree
 deploy/tests/check-images.test.sh && deploy/tests/realm.test.sh   # tests for the image check and the Keycloak realm
@@ -101,6 +103,15 @@ deploy/security-scan.sh scan app-image    # scan the locally built app image (af
 ```
 
 **Backend modules and database.** The backend is split into the modules of the architecture's dependency graph (AD-1): one package per module under `app.littlesteps`, each with `api`, `web`, `domain` and `persistence` sub-packages. `ModularityTests` fails the build when a module crosses its allowed dependencies, and writes the module diagrams to `backend/target/spring-modulith-docs/`. The `import` module's package is `importer`, because `import` is a Java keyword. Flyway reads `backend/src/main/resources/db/migration/<module>/` (one history, timestamped versions). Tests that need the application extend `IntegrationTest`, which starts PostgreSQL in Testcontainers from the image digest in `deploy/images.yaml`; no test uses H2. Tables without a Family are listed in [backend/GLOBAL_TABLES.md](backend/GLOBAL_TABLES.md).
+
+**API contract, errors and logs.** The REST API lives under `/api/v1`. Every failed request is an RFC 9457 `application/problem+json` response whose `type` comes from `shared/web/ProblemTypes` and which carries a `requestId` (also sent as the `X-Request-Id` header; a safe incoming value is kept). Logs are JSON on stdout with the request ID, and hold IDs, enums, durations and counts only: wrap Caregiver and AI free text in `CaregiverText` or `AiText` (their `toString()` is `[redacted]`). `backend/openapi.json` is the committed contract; the backend build fails when the generated one differs. After changing an endpoint:
+
+```bash
+(cd backend && ./mvnw test -Dopenapi.update=true)      # refresh backend/openapi.json (not allowed in CI)
+(cd frontend && npm run api:types)                     # regenerate frontend/src/api/schema.d.ts (needs network the first time)
+```
+
+The frontend has no hand-written API types and no inline UI text: sentences go in `frontend/src/i18n/messages.ts`.
 
 **Day-to-day development.** The backend reads all its configuration from the environment and has no datasource unless a profile supplies one. Run it from the IDE (port 8080) with `SPRING_PROFILES_ACTIVE=local` and the variables of `deploy/local.env` exported (`LS_POSTGRES_DB`, `LS_POSTGRES_USER`, `LS_POSTGRES_PASSWORD`, and `LS_POSTGRES_PORT` if it is not 5432), after `deploy/dev-up.sh`. The `prod` profile takes `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`. Run the Vite dev server with `(cd frontend && npm run dev)`. Vite proxies `/api` and `/actuator` to `http://localhost:8080`, and hot reload works on both sides. Use `dev-up.sh --full` to check the product as it ships.
 
@@ -132,7 +143,7 @@ When a deployment step exists, it is documented here with its commands, its conf
 ## Layout
 
 ```text
-backend/            Spring Boot, Maven, root package app.littlesteps, one package per module (AD-1), Flyway migrations in db/migration/<module>/
+backend/            Spring Boot, Maven, root package app.littlesteps, one package per module (AD-1), Flyway migrations in db/migration/<module>/ (backend/openapi.json is the generated API contract)
 frontend/           React + Vite PWA
 content/            curated content YAML
 eval/guardrails/    AI guardrail evaluation cases
