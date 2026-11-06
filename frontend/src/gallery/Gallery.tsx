@@ -135,6 +135,8 @@ export function Gallery() {
             ))}
           </ul>
         ))}
+      </section>
+
       <section className={styles.section} aria-labelledby="gallery-controls">
         <h2 id="gallery-controls" className="type-heading">
           {g('controls')}

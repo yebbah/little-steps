@@ -62,6 +62,8 @@ test('[P1] the gallery shows Domain tags on their tints and the icon tiles at th
   const tiles = screen.getByRole('region', { name: 'Icons' }).querySelectorAll('[data-size]')
   expect(new Set([...tiles].map((t) => t.getAttribute('data-size')))).toEqual(new Set(['76', '56', '36']))
   expect(tiles).toHaveLength((NAV_ICON_NAMES.length + SAMPLE_ICON_NAMES.length) * 3)
+})
+
 test('the controls section shows every control in each state inside the 360, 768 and 1280 frames', () => {
   render(<Gallery />)
   expect(screen.getByRole('heading', { level: 2, name: 'Core controls' })).toBeInTheDocument()
