@@ -15,6 +15,11 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
   - The security scan is clean: no KEV, High or Critical findings.
   - The full test suite passes.
   - The epic's release note is written in `docs/release-notes/` (AD-27).
+- **GitHub tracking:**
+  - Each epic has a parent issue (Epic N is issue #N+1).
+  - Each story gets a sub-issue, labelled `story` and `P1` or `P2`, when its epic is approved. Epic 1 is #26–#34, Epic 2 is #35–#42, and Epic 3 is #44–#53.
+  - A story's issue is closed, with a summary comment, when the story is confirmed.
+  - The epic's PR closes the epic issue.
 - **Order:** epics 1–17 are P1, and the core loop works online at the end of epic 9. Epics 18–23 are P2, and start only after P1 works end to end.
 
 ## Epic List
@@ -23,7 +28,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 | --- | --- | --- | --- |
 | 1 | [Local environment and project skeleton](epic-01-local-environment.md) | approved | [#2](https://github.com/yebbah/little-steps/issues/2) |
 | 2 | [App shell and design foundations](epic-02-app-shell.md) | approved | [#3](https://github.com/yebbah/little-steps/issues/3) |
-| 3 | Sign-in, Family and consent | planned | [#4](https://github.com/yebbah/little-steps/issues/4) |
+| 3 | [Sign-in, Family and consent](epic-03-sign-in-family-consent.md) | approved | [#4](https://github.com/yebbah/little-steps/issues/4) |
 | 4 | Child Profile and Care Team | planned | [#5](https://github.com/yebbah/little-steps/issues/5) |
 | 5 | Goals and Goal Periods | planned | [#6](https://github.com/yebbah/little-steps/issues/6) |
 | 6 | Strategies and Restrictions | planned | [#7](https://github.com/yebbah/little-steps/issues/7) |
@@ -56,8 +61,8 @@ The app has its visual identity, navigation shell, status region and shared comp
 **Done when:** a component gallery renders in light and dark, at phone and laptop widths, and passes the contrast and accessibility checks.
 
 ### Epic 3: Sign-in, Family and consent
-A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family.
-**FRs covered:** FR-1
+A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family. Also adds Family tenancy, the device outbox, the audit table, and a maintainer console for pilot invites.
+**FRs covered:** FR-1; NFR-4, NFR-5 (recording)
 **Done when:** invite → sign-up → consent → Family → co-caregiver joins, leaves or is removed, and the others are notified.
 
 ### Epic 4: Child Profile and Care Team
