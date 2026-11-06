@@ -1,0 +1,37 @@
+.frames {
+  display: grid;
+  gap: var(--space-5);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+/* A fixed width, set inline from FRAME_WIDTHS, so the controls are seen at each real layout width. */
+.frame {
+  box-sizing: border-box;
+  max-width: none;
+  padding: var(--space-4);
+  border: var(--space-outline-width) solid var(--color-outline);
+  border-radius: var(--radius-lg);
+  background: var(--color-floor);
+}
+
+.showcase {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.showcase h4 {
+  margin: var(--space-3) 0 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* A static sample of the shared focus indicator: the same tokens as base.css, shown without a Tab press. */
+.focusSample {
+  outline: var(--space-focus-width) solid var(--color-focus-ring);
+  outline-offset: var(--space-focus-offset);
+}

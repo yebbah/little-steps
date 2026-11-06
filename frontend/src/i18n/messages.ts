@@ -10,6 +10,10 @@ export const messages = {
   // Standard labels (UX-DR136): the wording is fixed by the spec.
   'label.aiSuggested': 'AI-suggested · check with your therapist if unsure.',
   'label.proposedByYou': 'Proposed by you · not yet discussed with the care team.',
+  // Stepper (Story 2.4). {n} is replaced by the caller-side number.
+  'stepper.minimum': '{n}, minimum',
+  'stepper.maximum': '{n}, maximum',
+  'stepper.exceedsTried': "Can't be more than {n} tried",
 } as const satisfies Record<string, string>
 
 export type MessageKey = keyof typeof messages

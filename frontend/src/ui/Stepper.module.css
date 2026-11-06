@@ -1,0 +1,95 @@
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.stepper > label {
+  flex: 1 1 8rem;
+}
+
+.control {
+  display: inline-flex;
+  align-items: stretch;
+  border: var(--space-outline-width) solid var(--color-outline-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+}
+
+.button {
+  box-sizing: border-box;
+  min-width: var(--space-target-min);
+  min-height: var(--space-target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-action);
+  font-family: inherit;
+  font-size: var(--type-heading-size);
+  font-weight: var(--type-heading-weight);
+  cursor: pointer;
+}
+
+.minus::before {
+  content: '−';
+}
+
+.plus::before {
+  content: '+';
+}
+
+.button:active:not([aria-disabled='true']) {
+  background: var(--color-pressed);
+}
+
+.button[aria-disabled='true'] {
+  color: var(--color-ink-disabled);
+  cursor: default;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 4.5rem;
+  min-height: var(--space-target-min);
+  padding: var(--space-2);
+  border: 0;
+  border-inline: var(--space-outline-width) solid var(--color-outline-strong);
+  background: transparent;
+  color: var(--color-ink);
+  font-family: inherit;
+  text-align: center;
+  appearance: textfield;
+}
+
+.input::-webkit-inner-spin-button,
+.input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.error::before {
+  content: '! ';
+  font-weight: var(--type-label-weight);
+}
+
+.paired {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.paired legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+}
