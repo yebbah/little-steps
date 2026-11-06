@@ -47,8 +47,8 @@ development_status:
   1-9-release-notes-for-each-epic: done
   epic-1-retrospective: done
 
-  epic-2: backlog
-  2-1-design-tokens-theme-and-type: backlog
+  epic-2: in-progress
+  2-1-design-tokens-theme-and-type: done
   2-2-domain-tints-and-icons: backlog
   2-3-app-shell-navigation-and-focus-management: backlog
   2-4-core-controls: backlog

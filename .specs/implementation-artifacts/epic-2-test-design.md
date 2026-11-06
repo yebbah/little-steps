@@ -58,7 +58,7 @@ inputDocuments:
 | Risk ID | Category | Description | P | I | Score | Mitigation | Owner | Timeline |
 | ------- | -------- | ----------- | - | - | ----- | ---------- | ----- | -------- |
 | R-01 | SEC | Gallery route or code ships in the production bundle (2.1: registered only when `VITE_ENABLE_GALLERY=true`, never in production; Done-when: a test checks this) | 2 | 3 | 6 | Build test inspects the production bundle for route and gallery code; runs on a production build | Dev | Story 2.1 |
-| R-02 | BUS | A token pairing misses WCAG AA in light or dark (2.1, UX-DR6) | 2 | 3 | 6 | Contrast unit test over every DESIGN.md pairing, both modes, 4.5:1 text and 3:1 edges | Dev | Story 2.1 |
+| R-02 | BUS | A token pairing misses WCAG AA in light or dark (2.1, UX-DR6) | 2 | 3 | 6 | Contrast unit test over every token-backed DESIGN.md pairing (image-layer pairings: #111), both modes, 4.5:1 text and 3:1 edges | Dev | Story 2.1 |
 | R-03 | TECH | Title, focus and announcement wrong on route change (2.3, UX-DR112/116/117) | 3 | 2 | 6 | Route-change tests: title, h1 focus, one `role=status`, announce on next frame, Back with scroll and focus | Dev | Story 2.3 |
 | R-04 | TECH | Modal focus trap, return, inert page or one-level rule fails (2.5, UX-DR28/113) | 2 | 3 | 6 | Component tests plus Playwright keyboard pass on gallery Sheet and Dialog | Dev | Story 2.5 |
 | R-08 | TECH | Service worker caches API responses or loses drafts on update (2.8, AD-23) | 2 | 3 | 6 | Build test on the precache manifest (no API); update-hook test; offline and update smoke | Dev | Story 2.8 |
@@ -136,7 +136,7 @@ Levels: Unit, Component (Vitest, Testing Library, jsdom), Build/CI, E2E (Playwri
 | Requirement | Test Level | Risk Link | Test Count | Owner | Notes |
 | ----------- | ---------- | --------- | ---------- | ----- | ----- |
 | 2.1 Production bundle has no gallery; test mode does | Build/CI | R-01 | 3 | DEV | Only a built bundle can show this |
-| 2.1 Every token pairing passes AA, light and dark | Unit | R-02 | 4 | DEV | Pure computation over the pairing table |
+| 2.1 Every token-backed pairing passes AA, light and dark | Unit | R-02 | 4 | DEV | Pure computation over the pairing table |
 | 2.3 Route change: title, h1 focus, single status region, ordering | Component + E2E | R-03 | 6 | DEV | Component for logic; E2E for real focus and Back |
 | 2.5 Sheet/Dialog: trap, return, Esc, scrim, single level, inert | Component + E2E | R-04 | 6 | DEV | Real focus behaviour needs a browser |
 | 2.7 axe: no serious/critical on gallery frames and shell, both modes | E2E | R-13 | 2 | DEV | One run per mode over all targets |

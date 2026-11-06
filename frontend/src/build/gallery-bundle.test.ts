@@ -2,7 +2,6 @@ import { build, type Rollup } from 'vite'
 import { expect, test } from 'vitest'
 
 // R-01 (Story 2.1): the component gallery exists only in local and test builds.
-// RED PHASE: the gallery route does not exist yet. Remove `.skip` when Story 2.1 registers /dev/gallery.
 
 const GALLERY_ROUTE = '/dev/gallery'
 
@@ -23,7 +22,7 @@ async function bundleText(mode: string, enableGallery: boolean): Promise<string>
   }
 }
 
-test.skip('[P0] AC-1 the gallery route is in the test-mode bundle and absent from the production bundle', async () => {
+test('[P0] AC-1 the gallery route is in the test-mode bundle and absent from the production bundle', async () => {
   // When both bundles are built, the same way CI builds them
   const testBundle = await bundleText('test', true)
   const productionBundle = await bundleText('production', false)
@@ -32,4 +31,20 @@ test.skip('[P0] AC-1 the gallery route is in the test-mode bundle and absent fro
   expect(testBundle).toContain(GALLERY_ROUTE)
   expect(productionBundle).not.toContain(GALLERY_ROUTE)
   expect(productionBundle).not.toMatch(/gallery/i)
+}, 120_000)
+
+test('[P0] AC-1 a production build ignores VITE_ENABLE_GALLERY=true set in the environment', async () => {
+  // Given a person (or a CI job) sets the flag by mistake
+  const bundle = await bundleText('production', true)
+
+  // Then the production bundle still has no gallery
+  expect(bundle).not.toContain(GALLERY_ROUTE)
+  expect(bundle).not.toMatch(/gallery/i)
+}, 120_000)
+
+test('[P0] AC-1 a build in any mode other than development and test ignores the flag (staging)', async () => {
+  const bundle = await bundleText('staging', true)
+
+  expect(bundle).not.toContain(GALLERY_ROUTE)
+  expect(bundle).not.toMatch(/gallery/i)
 }, 120_000)

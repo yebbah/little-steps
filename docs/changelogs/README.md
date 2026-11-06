@@ -15,3 +15,4 @@ Newest first. Add a line here with every new changelog.
 | 1.3 | Hardened local infrastructure with Docker Compose | [story-1-3-hardened-local-infrastructure.md](story-1-3-hardened-local-infrastructure.md) |
 | 1.2 | Security scan before every commit | [story-1-2-security-scan-before-every-commit.md](story-1-2-security-scan-before-every-commit.md) |
 | 1.1 | Scaffold the repository | [story-1-1-scaffold-the-repository.md](story-1-1-scaffold-the-repository.md) |
+| 2.1 | Design tokens, theme and type | [story-2-1-design-tokens-theme-and-type.md](story-2-1-design-tokens-theme-and-type.md) |

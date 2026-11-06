@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "declaration-property-value-allowed-list": {
+      "/^(-webkit-)?box-shadow$/i": ["none"]
+    },
+    "declaration-property-value-disallowed-list": {
+      "outline": ["/(^|\\s)(none|hidden)(\\s|$)/i", "/(^|\\s)0(\\.0+)?[a-z%]*(\\s|$)/i"],
+      "outline-style": ["/^(none|hidden)$/i"],
+      "outline-width": ["/^0(\\.0+)?[a-z%]*$/i"]
+    }
+  }
+}
