@@ -3,6 +3,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, expect, test } from 'vitest'
 import tokensCss from '../styles/tokens.css?raw'
+import { NAV_ICON_NAMES, SAMPLE_ICON_NAMES } from '../icons/names.ts'
 import { Gallery } from './Gallery.tsx'
 
 afterEach(() => document.documentElement.removeAttribute('data-theme'))
@@ -42,4 +43,23 @@ test('the toggle starts on the applied choice and can return to System', async (
   await userEvent.click(screen.getByRole('button', { name: 'System' }))
   expect(document.documentElement.hasAttribute('data-theme')).toBe(false)
   localStorage.clear()
+})
+
+test('[P1] the gallery shows Domain tags on their tints and the icon tiles at three sizes', () => {
+  render(<Gallery />)
+
+  const tags = within(screen.getByRole('region', { name: 'Domain tints' })).getAllByRole('listitem')
+  expect(tags.map((t) => t.firstElementChild?.getAttribute('data-tint'))).toEqual([
+    'joint-attention',
+    'communication',
+    'motor-imitation',
+    'play',
+    'regulation',
+    'sensory',
+    'other',
+  ])
+
+  const tiles = screen.getByRole('region', { name: 'Icons' }).querySelectorAll('[data-size]')
+  expect(new Set([...tiles].map((t) => t.getAttribute('data-size')))).toEqual(new Set(['76', '56', '36']))
+  expect(tiles).toHaveLength((NAV_ICON_NAMES.length + SAMPLE_ICON_NAMES.length) * 3)
 })
