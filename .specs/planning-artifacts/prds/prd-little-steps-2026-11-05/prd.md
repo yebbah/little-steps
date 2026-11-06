@@ -435,6 +435,9 @@ After an appointment, a Caregiver can record Appointment Feedback and attach it 
 - **Language:** v1 ships in English for English-speaking markets. User-facing text is kept separate from code, so translation stays possible later.
 - **Cost:** low running cost per Family, suitable for a small pilot, with a ceiling set in §10.2. Local development and testing cost nothing beyond the Mac.
 - **Observability:** structured logs and traces, plus evaluation metrics for AI output. Logs never contain child content or identifiers.
+- **Supply-chain security (NFR-20):** every commit passes a vulnerability scan. Any finding in the CISA KEV catalog, or rated High or Critical (CVSS 7.0 or above), blocks until it is fixed. Staged changes are also scanned for secrets.
+- **Hardened images (NFR-21):** container images come from Docker Hardened Images where available, pinned by digest. Any other source is flagged in the release note.
+- **Release notes (NFR-22):** every completed epic ships a release note covering integration, changes, new features, security, code quality and test results.
 
 ## 7. Non-Goals
 - Not a therapist portal or clinic management tool.

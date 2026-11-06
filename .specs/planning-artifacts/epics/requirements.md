@@ -157,7 +157,7 @@ Reference list for all epics. Each epic file cites the IDs it covers, and its re
 - **NFR-18 (Retention):** Uploaded originals are deleted 12 months after upload unless the Caregiver deletes them sooner.
 - **NFR-19 (Metrics):** The pilot can measure SM-1 to SM-8 (PRD §9), including the monthly "easier / same / harder" check-in and the therapist-usefulness flag in Appointment Feedback.
 
-- **NFR-20 (Vulnerability gate):** A security scan runs before every commit and again in CI.
+- **NFR-20 (Vulnerability gate):** A security scan runs before every commit. CI repeats the secret and dependency scans; image scans run by hand before a release.
   - Any finding in the CISA KEV catalog, or with CVSS High or Critical (7.0 or above), blocks the commit or build until it is fixed.
   - Staged changes are also scanned for secrets.
 - **NFR-21 (Hardened images):** Container images come from Docker Hardened Images where the catalog has them, and are pinned by digest.
@@ -180,10 +180,10 @@ From the architecture spine (AD-n). Items marked **[Epic 1]** are foundation wor
   - One Dexie database holding the outbox, drafts and the offline snapshot. The outbox tracks the enqueuing `sub`, coalesces commands, retries FIFO, pauses on 401 for in-place re-sign-in, and parks other errors with Retry.
   - Drafts autosave, and Dexie is wiped on sign-out, user change, membership end or purge.
   - TanStack Query for server reads. The service worker precaches the app shell only. Radix primitives use plain CSS modules on DESIGN.md token CSS variables, and the frontend uses npm.
-- **[Epic 1] Security gate (AD-25):** `deploy/security-scan.sh` run by the `.githooks/pre-commit` hook and in CI.
+- **[Epic 1] Security gate (AD-25):** `deploy/security-scan.sh` run by the `.githooks/pre-commit` hook, and in CI for secrets and dependencies.
   - gitleaks on staged changes
   - CycloneDX SBOMs scanned by Grype
-  - an image scan
+  - an image scan (every commit; not in CI, run by hand before a release)
   - Blocks on KEV or CVSS 7.0 and above. Exceptions only when no fix exists, logged in `security/exceptions.yaml`, 30 days at most.
   - Actions pinned to SHAs, and scanners pinned and checksum-verified.
 - **[Epic 1] Hardened images (AD-26):** a `deploy/images.yaml` manifest, DHI for PostgreSQL, Keycloak and the Node and JRE stages, official-publisher images for Mailpit and Presidio flagged as `other` (Presidio also `scan: deferred` while it is not enabled), everything digest-pinned and CI-checked, and a `dhi.io` login check in `dev-up.sh`.

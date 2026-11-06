@@ -99,8 +99,8 @@ P1 is the first pilot slice. It must work end to end before P2 work starts.
 - **Accessibility:** WCAG 2.1 AA, large touch targets and system text sizing.
 - **Language:** English only in v1, with all user-facing text kept separate from code.
 - **Observability:** Structured logs, traces and AI evaluation metrics. Logs never contain child content or identifiers.
-- **Supply-chain security:** Every commit and build passes a vulnerability scan. Any finding in the CISA KEV catalog, or rated High or Critical, blocks until it is fixed. Container images come from Docker Hardened Images where available, and any other source is flagged in the release note.
-- **Release notes:** An epic is closed only with a release note covering integration, changes, new features, security, code quality and test results (new tests plus non-regression).
+- **Supply-chain security (NFR-20, NFR-21):** Every commit passes a vulnerability scan (secrets, dependencies and images), and CI repeats the secret and dependency scans. Image scans and the app image build are run by hand before a release. Any finding in the CISA KEV catalog, or rated High or Critical, blocks until it is fixed. Container images come from Docker Hardened Images where available, and any other source is flagged in the release note.
+- **Release notes (NFR-22):** An epic is closed only with a release note covering integration, changes, new features, security, code quality and test results (new tests plus non-regression).
 - **Architecture:** The architecture spine's AD-1 to AD-27 are binding. A contradiction is surfaced, never resolved locally.
 
 ## Non-goals

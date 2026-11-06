@@ -1,7 +1,7 @@
 ---
 epic: 1
 title: Local environment and project skeleton
-status: approved
+status: done
 phase: P1
 ---
 
@@ -250,8 +250,8 @@ So that nothing unsafe or broken reaches review, even if a local hook was skippe
 - the OpenAPI type drift check
 - `shellcheck` on `deploy/*.sh` and `.githooks/*`
 - the `images.yaml` digest check
-- a Docker build of the app image (not pushed)
-- `deploy/security-scan.sh` over the repository and all images, failing on the same KEV or CVSS 7.0+ rule
+- `deploy/security-scan.sh` for secrets and backend and frontend dependencies, failing on the same KEV or CVSS 7.0+ rule
+- image scans and the app image build are not in CI (base-image CVEs change daily); they are run by hand before a release and recorded in the release note
 
 **And** every third-party action is pinned to a full commit SHA, with the version in a comment. A check fails on any action referenced by tag.
 **And** the workflow uses only free GitHub-hosted runners and caches Maven, npm and the vulnerability database.

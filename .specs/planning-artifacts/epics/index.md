@@ -8,7 +8,7 @@ review: one epic at a time; an epic's requirements and stories are confirmed tog
 
 LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tested and closed before the next one starts.
 
-- **Requirements:** [requirements.md](requirements.md) lists FR-1 to FR-19, NFR-1 to NFR-19, the architecture requirements (AD-n) and UX-DR1 to UX-DR137.
+- **Requirements:** [requirements.md](requirements.md) lists FR-1 to FR-19, NFR-1 to NFR-22, the architecture requirements (AD-n) and UX-DR1 to UX-DR137.
 - **Epic files:** each `epic-NN-*.md` holds the epic's goal, its "Done when" test, the requirements it covers, and its stories with acceptance criteria.
 - **Definition of done (every epic):**
   - All stories meet their acceptance criteria.
@@ -26,7 +26,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 
 | # | Epic | Status | Issue |
 | --- | --- | --- | --- |
-| 1 | [Local environment and project skeleton](epic-01-local-environment.md) | approved | [#2](https://github.com/yebbah/little-steps/issues/2) |
+| 1 | [Local environment and project skeleton](epic-01-local-environment.md) | done | [#2](https://github.com/yebbah/little-steps/issues/2) |
 | 2 | [App shell and design foundations](epic-02-app-shell.md) | approved | [#3](https://github.com/yebbah/little-steps/issues/3) |
 | 3 | [Sign-in, Family and consent](epic-03-sign-in-family-consent.md) | approved | [#4](https://github.com/yebbah/little-steps/issues/4) |
 | 4 | Child Profile and Care Team | planned | [#5](https://github.com/yebbah/little-steps/issues/5) |
