@@ -1,10 +1,6 @@
 # Deferred items
 
-How work that is parked instead of fixed is tracked. The rules are in [CONTRIBUTING.md](CONTRIBUTING.md#deferred-items); this page explains the process and the places involved.
-
-## The rule in one line
-
-Every deferred item is **one GitHub issue** labelled `deferred`, linked to the issue of the story where it arose, with a **target date** and a **remediation suggestion**. The issue is the only place to read the status of an item.
+How work that is parked instead of fixed is tracked. The rule (one `deferred` issue per item, with an origin, a target date and a remediation) is in [CONTRIBUTING.md](CONTRIBUTING.md#deferred-items); this page is the process and the places involved. The issue is the only place to read the status of an item.
 
 ## What counts as deferred
 
@@ -48,7 +44,7 @@ An exception always has a matching `deferred` issue. When several exceptions sha
 - The issue's target date equals the `expires` date of its exceptions.
 - The header comment in `security/exceptions.yaml` names the issue, so the file and the tracker can be followed in both directions.
 - Renewing an exception means extending `expires` (30 days at most) **and** the issue's target date, with the reason written in the issue. Closing the issue means deleting the entries.
-- Exceptions never cover a finding that has a fix: upgrade instead.
+The rules for an exception itself (no fix upstream, reason, mitigation, 30-day expiry) are in [security/README.md](../security/README.md).
 
 ## Example
 
