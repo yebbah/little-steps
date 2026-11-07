@@ -2,7 +2,7 @@
 title: 'Story 2.9: Settings shell and theme choice'
 type: 'feature'
 created: '2026-11-07'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'b3ac470038ccf2cbc057c1fc169c5190fdc6f2f5'
 route: 'dispatch'
 review_loop_iteration: 0

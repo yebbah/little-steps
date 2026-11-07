@@ -5,7 +5,7 @@
 | Story | 2.7, issue #41 |
 | Epic | 2, App shell and design foundations |
 | Branch | feature/epic-02-issue-41-responsive-reflow-and-accessibility-test-harness |
-| Commits | see `git log` on the branch (one feature commit) |
+| Commits | `006cd49` (squash-merged) |
 | Date | 2026-11-07 |
 | Security report | [story-2-7-responsive-reflow-and-accessibility-test-harness.md](../security-reports/story-2-7-responsive-reflow-and-accessibility-test-harness.md) |
 

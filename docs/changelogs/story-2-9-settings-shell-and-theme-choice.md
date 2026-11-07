@@ -5,7 +5,7 @@
 | Story | 2.9, issue #104 |
 | Epic | 2, App shell and design foundations |
 | Branch | feature/epic-02-issue-104-settings-shell-and-theme-choice |
-| Commits | see `git log` on the branch (one feature commit) |
+| Commits | `5db7951` (squash-merged) |
 | Date | 2026-11-07 |
 | Security report | [story-2-9-settings-shell-and-theme-choice.md](../security-reports/story-2-9-settings-shell-and-theme-choice.md) |
 

@@ -2,7 +2,7 @@
 title: 'Story 2.7: Responsive reflow and accessibility test harness'
 type: 'feature'
 created: '2026-11-07'
-status: 'in-review'
+status: 'done'
 baseline_commit: '5db79516fd9f22d5029140dd8c7d0d975df6498d'
 route: 'dispatch'
 review_loop_iteration: 0

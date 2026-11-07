@@ -2,7 +2,7 @@
 title: 'Story 2.5: Surfaces, feedback and labels'
 type: 'feature'
 created: '2026-11-07'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'd08dbda72e5773c28e73c4764a05e5663cd442f3'
 route: 'dispatch'
 review_loop_iteration: 0

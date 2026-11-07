@@ -70,4 +70,4 @@ Reviewed in the [triage log](../../.specs/implementation-artifacts/spec-2-7-resp
 
 ## 10. Sign-off
 
-Written for the maintainer's validation; pending.
+Validated by the maintainer on 2026-11-07. Merged as `006cd49`.

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-06-2026 12:00
-last_updated: 11-07-2026 15:00
+last_updated: 11-07-2026 12:30
 project: little-steps
 project_key: NOKEY
 tracking_system: file-system
@@ -47,19 +47,19 @@ development_status:
   1-9-release-notes-for-each-epic: done
   epic-1-retrospective: done
 
-  epic-2: in-progress
+  epic-2: done
   2-1-design-tokens-theme-and-type: done
   2-2-domain-tints-and-icons: done
   2-3-app-shell-navigation-and-focus-management: done
   2-4-core-controls: done
-  2-5-surfaces-feedback-and-labels: review
+  2-5-surfaces-feedback-and-labels: done
   2-6-message-catalog-and-tone-check: done
   2-10-catalog-copy-for-status-lines-banners-and-empty-states: done
   2-11-catalog-copy-for-errors-confirmations-and-security-notices: done
-  2-7-responsive-reflow-and-accessibility-test-harness: review
-  2-8-pwa-shell-and-install-offer: review
-  2-9-settings-shell-and-theme-choice: review
-  epic-2-retrospective: optional
+  2-7-responsive-reflow-and-accessibility-test-harness: done
+  2-8-pwa-shell-and-install-offer: done
+  2-9-settings-shell-and-theme-choice: done
+  epic-2-retrospective: done
 
   epic-3: backlog
   3-1-sign-in-and-sign-out: backlog
@@ -113,19 +113,84 @@ action_items:
     ref: ".specs/implementation-artifacts/epic-1-retro-2026-11-06.md"
   - id: "epic-2-test-design-item-1-browser-matrix-and-coverage"
     epic: 2
-    action: "T1: confirm the CI browser matrix (Chromium on PRs, WebKit and Firefox nightly), the frontend coverage target (80% on new code proposed) and whether Epic 2 gets a performance budget"
+    action: "T1: confirm the CI browser matrix (Chromium on PRs, WebKit and Firefox
+      nightly), the frontend coverage target (80% on new code proposed) and whether
+      Epic 2 gets a performance budget"
     owner: ""
     status: open
     ref: ".specs/test-artifacts/epic-2-test-design.md"
   - id: "epic-2-test-design-item-2-red-phase-tests"
     epic: 2
-    action: "T2: un-skip the remaining red-phase tests with their stories (AC-3 with 2.3, AC-4 with 2.5) and widen the contrast pairings to all of DESIGN.md. AC-1 and AC-2 were un-skipped with Story 2.1"
+    action: "T2: un-skip the remaining red-phase tests with their stories (AC-3 with
+      2.3, AC-4 with 2.5) and widen the contrast pairings to all of DESIGN.md. AC-1
+      and AC-2 were un-skipped with Story 2.1"
     owner: ""
-    status: open
+    status: done
     ref: ".specs/test-artifacts/epic-2-atdd-red-phase.md"
   - id: "epic-2-test-design-item-3-uuid-override"
     epic: 2
-    action: "T3: drop the uuid override in frontend/package.json once playwright-utils ships exceljs with uuid 11 or later"
+    action: "T3: drop the uuid override in frontend/package.json once playwright-utils
+      ships exceljs with uuid 11 or later"
     owner: ""
     status: open
     ref: "frontend/README.md"
+  - id: "epic-2-retro-item-10-r1-confirm-t1-nightly-webkit-and-firefox"
+    epic: 2
+    action: "R1: confirm T1 (nightly WebKit and Firefox #134, no performance budget,
+      frontend coverage target)"
+    owner: "maintainer"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-11-r3-fix-124-and-129-spa-fallback-and-no-c"
+    epic: 2
+    action: "R3: fix #124 and #129 (SPA fallback and no-cache headers) before Story
+      3.1"
+    owner: "backend dev"
+    status: done
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-12-r4-replace-the-three-hand-rolled-externa"
+    epic: 2
+    action: "R4: replace the three hand-rolled external stores with one shared helper"
+    owner: "frontend dev"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-13-r5-move-shell-statuscontext-ts-so-surfac"
+    epic: 2
+    action: "R5: move shell/statusContext.ts so surfaces does not import from shell"
+    owner: "frontend dev"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-14-r6-make-playwright-refuse-a-stale-server"
+    epic: 2
+    action: "R6: make Playwright refuse a stale server (dedicated port or reuseExistingServer
+      false unless asked)"
+    owner: "frontend dev"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-15-r7-run-the-accessibility-job-on-linux-be"
+    epic: 2
+    action: "R7: run the accessibility job on Linux before pushing (Playwright container
+      script)"
+    owner: "frontend dev"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-16-r8-give-screen-return-targets-a-data-foc"
+    epic: 2
+    action: "R8: give screen return targets a data-focus-key and test Back restores
+      them"
+    owner: "frontend dev"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-17-r9-write-in-story-2-8-acceptance-how-fir"
+    epic: 2
+    action: "R9: write in Story 2.8 acceptance how first open is counted (spec reconciliation)"
+    owner: "maintainer"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
+  - id: "epic-2-retro-item-18-r10-allow-the-merge-command-in-agent-per"
+    epic: 2
+    action: "R10: allow the merge command in agent permission settings so unattended
+      runs do not stop at each PR"
+    owner: "maintainer"
+    status: open
+    ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
