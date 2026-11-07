@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, expect, test, vi } from 'vitest'
-import { applyTheme, isThemeChoice, readThemeChoice, setThemeChoice, THEME_STORAGE_KEY } from './theme.ts'
+import { applyTheme, appliedThemeChoice, isThemeChoice, readThemeChoice, setThemeChoice, THEME_STORAGE_KEY } from './theme.ts'
 
 afterEach(() => {
   localStorage.clear()
@@ -54,4 +54,30 @@ test('blocked storage still applies the choice for this visit', () => {
 
   expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
   expect(readThemeChoice()).toBe('system')
+})
+
+const BARS =
+  '<meta name="theme-color" content="#FAF7F2" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#17191F" media="(prefers-color-scheme: dark)">'
+const bars = () => [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')].map((m) => m.content)
+
+test('the browser bar colour follows an explicit choice: Dark and Light set both metas, System restores the originals', () => {
+  document.head.innerHTML = BARS
+  applyTheme('dark')
+  expect(bars()).toEqual(['#17191F', '#17191F'])
+  applyTheme('light')
+  expect(bars()).toEqual(['#FAF7F2', '#FAF7F2'])
+  applyTheme('system')
+  expect(bars()).toEqual(['#FAF7F2', '#17191F'])
+  document.head.innerHTML = ''
+})
+
+test('the theme the page is showing is read from the page, whatever storage says', () => {
+  expect(appliedThemeChoice()).toBe('system')
+  applyTheme('dark')
+  expect(appliedThemeChoice()).toBe('dark')
+})
+
+test('a page with no theme-colour metas is not an error', () => {
+  document.head.innerHTML = ''
+  expect(() => applyTheme('dark')).not.toThrow()
 })

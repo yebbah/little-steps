@@ -20,10 +20,32 @@ export function readThemeChoice(): ThemeChoice {
   }
 }
 
+/** The choice the page is showing now, read from the page itself (storage can be blocked or changed elsewhere). */
+export function appliedThemeChoice(root: HTMLElement = document.documentElement): ThemeChoice {
+  const applied = root.getAttribute('data-theme')
+  return applied === 'light' || applied === 'dark' ? applied : 'system'
+}
+
+// The two theme-colour metas in index.html follow the device setting by media query. An explicit choice
+// makes both show that choice's colour, so the browser bar matches the app; System restores them.
+function syncThemeColour(choice: ThemeChoice) {
+  const metas = [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')]
+  const light = metas.find((m) => (m.getAttribute('media') ?? '').includes('light'))
+  const dark = metas.find((m) => (m.getAttribute('media') ?? '').includes('dark'))
+  if (!light || !dark) return
+  light.dataset.original ??= light.content
+  dark.dataset.original ??= dark.content
+  const [lightColour, darkColour] = [light.dataset.original, dark.dataset.original]
+  const pick = choice === 'light' ? lightColour : choice === 'dark' ? darkColour : undefined
+  light.content = pick ?? lightColour
+  dark.content = pick ?? darkColour
+}
+
 /** Applies a choice to the page without storing it. 'system' removes the override. */
 export function applyTheme(choice: ThemeChoice, root: HTMLElement = document.documentElement): void {
   if (choice === 'system') root.removeAttribute('data-theme')
   else root.setAttribute('data-theme', choice)
+  syncThemeColour(choice)
 }
 
 /** Stores and applies a choice. A storage failure still applies the choice for this visit. */

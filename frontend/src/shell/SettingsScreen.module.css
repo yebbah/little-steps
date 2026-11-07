@@ -1,0 +1,14 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-target-min);
+  color: var(--color-action);
+  text-decoration: underline;
+}
+
+.section {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-5);
+  margin-top: var(--space-4);
+}
