@@ -2,6 +2,7 @@ import * as RadixDialog from '@radix-ui/react-dialog'
 import { useLayoutEffect, useRef, type PointerEvent, type ReactNode } from 'react'
 import { t } from '../i18n/messages.ts'
 import { Button } from '../ui/Button.tsx'
+import { ActionRow } from './ActionRow.tsx'
 import { focusMain } from './focusMain.ts'
 import { useModalLevel } from './modalLevel.ts'
 import styles from './Modal.module.css'
@@ -94,7 +95,7 @@ function Modal({ open, onOpenChange, title, description, children, footer, foote
               </Button>
             </RadixDialog.Close>
           </header>
-          <div className={styles.body}>
+          <div className={styles.body} data-part="body">
             {description ? (
               <RadixDialog.Description className="type-body">{description}</RadixDialog.Description>
             ) : null}
@@ -102,7 +103,7 @@ function Modal({ open, onOpenChange, title, description, children, footer, foote
           </div>
           {footer ? (
             <footer className={footerLayout === 'actions' ? styles.actions : styles.footer}>
-              {footerLayout === 'actions' ? <div className={styles.actionRow}>{footer}</div> : footer}
+              {footerLayout === 'actions' ? <ActionRow>{footer}</ActionRow> : footer}
             </footer>
           ) : null}
         </RadixDialog.Content>

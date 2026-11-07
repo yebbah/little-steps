@@ -14,6 +14,11 @@ html {
   }
 }
 
+/* Focus scrolling keeps clear of the pinned bottom nav; the shell publishes its measured height (UX-DR121). */
+html {
+  scroll-padding-bottom: var(--pinned-bottom-height, 0px);
+}
+
 body {
   margin: 0;
   background: var(--color-floor);

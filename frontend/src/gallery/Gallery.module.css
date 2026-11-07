@@ -1,4 +1,6 @@
 .page {
+  /* A long unbroken word (the display sample at 200% text) wraps instead of widening the page (UX-DR120). */
+  overflow-wrap: anywhere;
   max-width: var(--space-content-max);
   margin: 0 auto;
   padding: var(--space-margin-mobile);
@@ -6,6 +8,7 @@
 
 .toggle {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin: var(--space-4) 0;
 }
@@ -40,9 +43,20 @@
 
 .swatch {
   display: grid;
-  grid-template-columns: 5.5rem 5.5rem 1fr;
+  grid-template-columns: 5.5rem 5.5rem minmax(0, 1fr);
   gap: var(--space-3);
   align-items: center;
+}
+
+/* At 320px and 200% text two swatches and the name no longer fit on a line: the name goes under them. */
+@media (max-width: 480px) {
+  .swatch {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .name {
+    grid-column: 1 / -1;
+  }
 }
 
 .chip {

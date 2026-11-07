@@ -140,19 +140,14 @@
 
 /* Two buttons sit side by side only while there is room; otherwise they stack, the primary last (UX-DR121). */
 .actions {
-  container-type: inline-size;
   padding-bottom: var(--space-4);
 }
 
-.actionRow {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-@container (min-width: 23.5rem) {
-  .actionRow {
-    flex-direction: row;
-    justify-content: flex-end;
+/* Under 500px tall the footer unpins: the whole sheet scrolls, so nothing is pinned over short content (UX-DR121). */
+@media (max-height: 499.98px) {
+  .body {
+    flex: none;
+    min-height: 0;
+    overflow-y: visible;
   }
 }

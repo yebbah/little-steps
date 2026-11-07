@@ -68,3 +68,7 @@ Today's "Frontend" job runs lint, typecheck, Vitest and build. Story 2.7 adds a 
 ## Write-time check (local AI tooling)
 
 When Claude Code works in this project, a hook (`.claude/hooks/tea-enforce.cjs`, configured in `.tea/enforce-config.json`, both outside this repository) blocks writes to test files that use hard waits, `.only` and similar patterns. Rules come from the test-review criteria registry. To exempt a rule, add its id to `disabledRules` in that config and say why. It does not run in CI.
+
+## Accessibility and reflow (Story 2.7)
+
+`e2e/tests/a11y-reflow.spec.ts` is the harness behind the CI job "Frontend: accessibility": axe on every shell screen and the gallery in light and dark, reflow at 320px and 200% text, the reflow rules and the colour-alone checks. Results by screen are in [docs/a11y-passes.md](../../docs/a11y-passes.md).

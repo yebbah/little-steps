@@ -5,6 +5,7 @@ import { InstallOffer } from '../pwa/InstallOffer.tsx'
 import { StatusLineProvider } from '../surfaces/StatusLineProvider.tsx'
 import { NavItems } from './NavItems.tsx'
 import { StatusProvider } from './StatusProvider.tsx'
+import { usePinnedBottom } from './usePinnedBottom.ts'
 import { useRouteFocus } from './useRouteFocus.ts'
 import styles from './AppShell.module.css'
 
@@ -22,7 +23,9 @@ export function AppShell() {
 
 function ShellFrame() {
   const mainRef = useRef<HTMLElement>(null)
+  const navRef = useRef<HTMLElement>(null)
   useRouteFocus(mainRef, t)
+  usePinnedBottom(navRef)
 
   const skip = (event: MouseEvent) => {
     event.preventDefault()
@@ -34,7 +37,7 @@ function ShellFrame() {
       <a href="#main-content" className={styles.skip} onClick={skip}>
         {t('nav.skip')}
       </a>
-      <nav aria-label={t('nav.label')} className={styles.nav}>
+      <nav aria-label={t('nav.label')} className={styles.nav} ref={navRef}>
         <NavItems />
       </nav>
       <main id="main-content" tabIndex={-1} ref={mainRef} className={styles.main}>
