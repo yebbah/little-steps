@@ -1,0 +1,158 @@
+/* Overlays are separated from the page by the scrim, not a shadow (DESIGN.md Elevation). */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--color-scrim);
+}
+
+.content {
+  /* In dark mode a card on the scrimmed page needs a 1px strong edge, top and sides (DESIGN.md). */
+  --sheet-edge: transparent;
+
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 11;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 24px);
+  padding: 0 var(--space-5) env(safe-area-inset-bottom);
+  border: var(--space-outline-width) solid var(--sheet-edge);
+  border-bottom: 0;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--color-card);
+  color: var(--color-ink);
+  overflow-y: auto;
+  animation: sheet-in 200ms ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .content {
+    --sheet-edge: var(--color-outline-strong);
+  }
+}
+
+:global(:root[data-theme='dark']) .content {
+  --sheet-edge: var(--color-outline-strong);
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes sheet-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Tablet and laptop: centred, all corners rounded, at most 560px wide. */
+@media (min-width: 600px) {
+  .content {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(100% - var(--space-5) * 2);
+    max-width: 560px;
+    height: fit-content;
+    margin: auto;
+    padding-bottom: 0;
+    border-bottom: var(--space-outline-width) solid var(--sheet-edge);
+    border-radius: var(--radius-xl);
+    animation-name: sheet-fade;
+  }
+}
+
+/* No sliding and no fading (UX-DR122). */
+@media (prefers-reduced-motion: reduce) {
+  .content {
+    animation: none;
+  }
+}
+
+.grabber {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-3) 0 var(--space-2);
+  touch-action: none;
+}
+
+.grabberBar {
+  width: 40px;
+  height: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-outline-strong);
+}
+
+@media (min-width: 600px) {
+  .grabber {
+    display: none;
+  }
+
+  .header {
+    padding-top: var(--space-4);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  padding-block: var(--space-2);
+  overflow-wrap: anywhere;
+}
+
+.close {
+  flex: none;
+}
+
+.body {
+  display: grid;
+  gap: var(--space-3);
+  flex: 1 1 auto;
+  min-height: 6rem;
+  padding-block: var(--space-2) var(--space-4);
+  overflow-y: auto;
+}
+
+.footer {
+  padding-bottom: var(--space-4);
+}
+
+/* Two buttons sit side by side only while there is room; otherwise they stack, the primary last (UX-DR121). */
+.actions {
+  container-type: inline-size;
+  padding-bottom: var(--space-4);
+}
+
+.actionRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@container (min-width: 23.5rem) {
+  .actionRow {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

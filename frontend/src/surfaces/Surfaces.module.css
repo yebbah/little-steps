@@ -1,0 +1,33 @@
+/* Flat surfaces (UX-DR29): hierarchy from colour blocks and spacing, never a shadow. */
+.card {
+  box-sizing: border-box;
+  border: var(--space-outline-width) solid var(--color-outline);
+  border-radius: var(--radius-xl);
+  background: var(--color-card);
+  color: var(--color-ink);
+}
+
+.blockCard {
+  box-sizing: border-box;
+  padding: 14px;
+  border: var(--space-outline-width) solid var(--color-outline);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+  color: var(--color-ink);
+}
+
+.heroBand {
+  box-sizing: border-box;
+  padding: var(--space-4) 20px 22px;
+  border-radius: var(--radius-xl);
+  color: var(--color-ink);
+}
+
+.tipBlock {
+  box-sizing: border-box;
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-tip-surface);
+  color: var(--color-ink);
+}

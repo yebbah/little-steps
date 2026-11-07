@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { applyTheme, readThemeChoice, type ThemeChoice } from '../styles/theme.ts'
 import tokensCss from '../styles/tokens.css?raw'
 import { ControlsFrames } from './Controls.tsx'
+import { SurfacesShowcase } from './Surfaces.tsx'
 import styles from './Gallery.module.css'
 import { DomainTag } from '../domain/DomainTag.tsx'
 import { domainTint } from '../domain/domainTint.ts'
@@ -143,6 +144,14 @@ export function Gallery() {
         </h2>
         <p className="type-body-sm">{g('controlsHint')}</p>
         <ControlsFrames />
+      </section>
+
+      <section className={styles.section} aria-labelledby="gallery-surfaces">
+        <h2 id="gallery-surfaces" className="type-heading">
+          {g('surfaces')}
+        </h2>
+        <p className="type-body-sm">{g('surfacesHint')}</p>
+        <SurfacesShowcase />
       </section>
     </main>
   )
