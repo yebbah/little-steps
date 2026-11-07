@@ -231,3 +231,19 @@ test('an app seen running from the home screen is never offered again in a brows
   secondVisit()
   expect(ask({ from: 'settings' })).toBe(false)
 })
+
+test('a fullscreen or minimal-ui window (F11 in a plain tab) is not remembered as installed', () => {
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: !query.includes('(display-mode: standalone)') || query.includes(','), addEventListener() {}, removeEventListener() {} }))
+  loadPage()
+  expect(localStorage.getItem('littlesteps.install.installed')).toBeNull()
+})
+
+test('the browser offering install again clears the installed flag, so a removed app can be offered once more', () => {
+  localStorage.setItem('littlesteps.install.installed', 'true')
+  secondVisit()
+  localStorage.setItem('littlesteps.install.installed', 'true')
+  expect(ask({ from: 'settings' })).toBe(false)
+  window.dispatchEvent(promptEvent('accepted'))
+  expect(localStorage.getItem('littlesteps.install.installed')).toBeNull()
+  expect(ask({ from: 'settings' })).toBe(true)
+})

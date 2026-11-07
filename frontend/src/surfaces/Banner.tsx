@@ -1,6 +1,7 @@
 import { t, tf } from '../i18n/messages.ts'
 import { Button } from '../ui/Button.tsx'
 import { focusMain } from './focusMain.ts'
+import { isModalOpen } from './modalLevel.ts'
 import { firstWords } from './firstWords.ts'
 import styles from './Banner.module.css'
 
@@ -29,7 +30,8 @@ export function Banner({ message, action, onDismiss }: BannerProps) {
           {onDismiss ? (
             <Button variant="quiet" aria-label={tf('banner.dismiss', { firstWords: firstWords(message) })} onClick={() => {
                 onDismiss()
-                focusMain()
+                // Behind an open modal the page is inert and cannot take focus.
+                if (!isModalOpen()) focusMain()
               }}
             >
               <span aria-hidden="true">{GLYPH_CLOSE}</span>

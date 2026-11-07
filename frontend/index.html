@@ -11,10 +11,22 @@
     <!-- Applies the stored Light / Dark choice before first paint, so there is no flash of the wrong
          theme. Same storage key as src/styles/theme.ts (a test keeps them equal). -->
     <script>
-      try {
-        var theme = localStorage.getItem('littlesteps.theme')
-        if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme)
-      } catch (e) {}
+      (function () {
+        try {
+          var theme = localStorage.getItem('littlesteps.theme')
+          if (theme !== 'light' && theme !== 'dark') return
+          document.documentElement.setAttribute('data-theme', theme)
+          // The browser bar follows the choice too (src/styles/theme.ts does the same after load). The two
+          // colours are the floor tokens; a test keeps them equal to tokens.css.
+          try {
+            var bars = document.querySelectorAll('meta[name="theme-color"]')
+            for (var i = 0; i < bars.length; i++) {
+              if (!bars[i].getAttribute('data-original')) bars[i].setAttribute('data-original', bars[i].getAttribute('content'))
+              bars[i].setAttribute('content', theme === 'dark' ? '#17191F' : '#FAF7F2')
+            }
+          } catch (e) {}
+        } catch (e) {}
+      })()
     </script>
   </head>
   <body>

@@ -19,10 +19,13 @@ export type ChoiceChipsProps =
  */
 export function ChoiceChips(props: ChoiceChipsProps) {
   const name = useId()
-  const isSelected = (value: string) => (props.mode === 'single' ? props.value === value : props.value.includes(value))
+  const isSelected = (value: string) => (props.mode === 'single' ? props.value === value : (props.value ?? []).includes(value))
   const toggle = (value: string) => {
     if (props.mode === 'single') props.onChange(value)
-    else props.onChange(props.value.includes(value) ? props.value.filter((v) => v !== value) : [...props.value, value])
+    else {
+      const current = props.value ?? []
+      props.onChange(current.includes(value) ? current.filter((v) => v !== value) : [...current, value])
+    }
   }
   return (
     <fieldset className={[styles.group, props.className].filter(Boolean).join(' ')}>

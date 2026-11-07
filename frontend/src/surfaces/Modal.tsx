@@ -45,9 +45,11 @@ function Modal({ open, onOpenChange, title, description, children, footer, foote
   // had focus when the modal was asked to open. A layout effect runs before Radix moves focus into the modal.
   const invoker = useRef<HTMLElement | null>(null)
   useLayoutEffect(() => {
-    if (open && document.activeElement instanceof HTMLElement && document.activeElement !== document.body && !container?.contains(document.activeElement)) {
-      invoker.current = document.activeElement
-    }
+    if (!open) return
+    const active = document.activeElement
+    const usable = active instanceof HTMLElement && active !== document.body && !container?.contains(active)
+    // Nothing usable has focus: forget the previous invoker so focus never returns to a stale element.
+    invoker.current = usable ? active : null
   }, [open, container])
 
   const swipeStart = (event: PointerEvent) => {

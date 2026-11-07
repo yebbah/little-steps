@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { applyTheme, readThemeChoice, type ThemeChoice } from '../styles/theme.ts'
 import tokensCss from '../styles/tokens.css?raw'
 import { ControlsFrames } from './Controls.tsx'
@@ -24,6 +24,11 @@ const tileSizes: IconTileSize[] = [76, 56, 36]
 
 export function Gallery() {
   const [mode, setMode] = useState<ThemeChoice>(readThemeChoice)
+  // The toggle is for this visit only: leaving the gallery puts the stored choice back.
+  useEffect(() => {
+    const stored = readThemeChoice()
+    return () => applyTheme(stored)
+  }, [])
   // The toggle changes the page for this visit only; the stored choice belongs to Settings (Story 2.9).
   const choose = (choice: ThemeChoice) => {
     setMode(choice)

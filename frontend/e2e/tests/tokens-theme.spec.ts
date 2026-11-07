@@ -95,4 +95,9 @@ test.describe('component gallery at /dev/gallery', () => {
     await expect(toggle).toHaveCSS('outline-style', 'solid')
     await expect(toggle).toHaveCSS('outline-color', 'rgb(51, 69, 127)')
   })
+
+  test('[P1] the gallery also opens with a trailing slash', async ({ page }) => {
+    await page.goto('/dev/gallery/')
+    await expect(page.getByRole('heading', { level: 1, name: 'Component gallery' })).toBeVisible()
+  })
 })

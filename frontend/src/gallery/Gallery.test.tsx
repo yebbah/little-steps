@@ -6,7 +6,10 @@ import tokensCss from '../styles/tokens.css?raw'
 import { NAV_ICON_NAMES, SAMPLE_ICON_NAMES } from '../icons/names.ts'
 import { Gallery } from './Gallery.tsx'
 
-afterEach(() => document.documentElement.removeAttribute('data-theme'))
+afterEach(() => {
+  document.documentElement.removeAttribute('data-theme')
+  localStorage.clear()
+})
 
 test('the gallery lists every colour token, the type scale, spacing and radii', () => {
   render(<Gallery />)

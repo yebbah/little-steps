@@ -154,3 +154,15 @@ test('when the app is already on the home screen the row says so instead of doin
   expect(screen.queryByRole('dialog')).toBeNull()
   expect(screen.getByRole('status')).toHaveTextContent('LittleSteps is already on your home screen.')
 })
+
+test('when the offer cannot open for another reason the row says install is unavailable, not that the app is installed', async () => {
+  const user = userEvent.setup({ delay: null })
+  renderAt('/family/settings')
+  await user.click(screen.getByRole('radio', { name: 'Dark' }))
+  const { Sheet } = await import('../surfaces/Modal.tsx')
+  render(<Sheet open onOpenChange={() => {}} title="Another" />)
+  // The page behind an open modal takes no pointer input, so the press is made directly.
+  act(() => screen.getByRole('button', { name: 'Add to home screen', hidden: true }).click())
+  frame()
+  expect(screen.getByRole('status', { hidden: true })).toHaveTextContent('Install is not available right now')
+})

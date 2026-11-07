@@ -5,13 +5,13 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 fail=0
-dir="src/__stylelint_fixture__"
+# A temporary folder outside src/, so a lint or test run in parallel (or an interrupted run) never sees the fixture.
+dir="$(mktemp -d)"
 trap 'rm -rf "$dir"' EXIT
-mkdir -p "$dir"
 
 expect_css() { # name expected(pass|fail) source
   printf '%s\n' "$3" >"$dir/fixture.css"
-  out="$(npx stylelint "$dir/fixture.css" 2>&1)" && got=pass || got=fail
+  out="$(npx stylelint --config .stylelintrc.json "$dir/fixture.css" 2>&1)" && got=pass || got=fail
   # A failure must come from one of the two rules, not from a crash or a syntax error.
   if [ "$got" = fail ] && ! grep -qE 'declaration-property-value-(allowed|disallowed)-list' <<<"$out"; then got="fail-other"; fi
   if [ "$got" = "$2" ]; then echo "PASS  $1"; else echo "FAIL  $1 (expected $2, got $got)"; fail=1; fi

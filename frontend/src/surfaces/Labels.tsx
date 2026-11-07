@@ -9,7 +9,7 @@ const GLYPH_INFO = 'ⓘ'
  * role) or the catalog's default.
  */
 export function SourceBadge({ source, label, reviewStatus }: { source: 'careTeam' | 'parentProposed'; label?: string; reviewStatus?: string }) {
-  const text = label ?? t(source === 'careTeam' ? 'surface.sourceCareTeam' : 'surface.sourceProposed')
+  const text = label || t(source === 'careTeam' ? 'surface.sourceCareTeam' : 'surface.sourceProposed')
   return (
     <span className={`${styles.badge} ${source === 'careTeam' ? styles.careTeam : styles.parentProposed} type-meta`} data-source={source}>
       {text}

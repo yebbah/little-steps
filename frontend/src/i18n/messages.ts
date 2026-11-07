@@ -148,6 +148,7 @@ export const messages = {
   'settings.themeChanged': 'Theme set to {theme}.',
   'settings.addToHome': 'Add to home screen',
   'settings.alreadyInstalled': 'LittleSteps is already on your home screen.',
+  'settings.installUnavailable': 'Install is not available right now. Look for Add to Home Screen in your browser menu.',
 } as const satisfies Record<string, string>
 
 export type MessageKey = keyof typeof messages
@@ -155,7 +156,7 @@ export type MessageKey = keyof typeof messages
 /** Looks up a catalog entry. An unknown key shows the key itself, so a gap is visible, not blank. */
 export function t(key: MessageKey | (string & {})): string {
   if (key === '') return '[empty message key]'
-  return Object.hasOwn(messages, key) ? (messages as Record<string, string>)[key] : key
+  return Object.prototype.hasOwnProperty.call(messages, key) ? (messages as Record<string, string>)[key] : key
 }
 
 /**
@@ -164,6 +165,6 @@ export function t(key: MessageKey | (string & {})): string {
  */
 export function tf(key: MessageKey | (string & {}), values: Record<string, string | number> = {}): string {
   return t(key).replace(/\{(\w+)\}/g, (whole, name: string) =>
-    Object.hasOwn(values, name) ? String(values[name]) : whole,
+    Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : whole,
   )
 }

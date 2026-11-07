@@ -62,3 +62,20 @@ test.describe('app shell layout and Back', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Today' })).toBeFocused()
   })
 })
+
+test.describe('Back restores scroll (UX-DR112)', () => {
+  test('[P0] going Back returns to the scroll position the screen had', async ({ page }) => {
+    // A short, wide-text viewport makes the placeholder screen taller than the window.
+    await page.setViewportSize({ width: 360, height: 400 })
+    await page.goto('/today')
+    await page.addStyleTag({ content: 'html { font-size: 300% !important; }' })
+    await page.evaluate(() => window.scrollTo(0, 120))
+    const before = await page.evaluate(() => window.scrollY)
+    expect(before).toBeGreaterThan(50)
+    await page.getByRole('link', { name: 'Goals' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Goals' })).toBeFocused()
+    await page.goBack()
+    await expect(page.getByRole('heading', { level: 1, name: 'Today' })).toBeVisible()
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before - 10)
+  })
+})

@@ -15,7 +15,7 @@ export function SurfacesShowcase() {
 
   return (
     <div className={styles.showcase}>
-      <h4 className="type-label">{g('cards')}</h4>
+      <h3 className="type-label">{g('cards')}</h3>
       <Card>
         <HeroBand family="play">
           <span className="type-heading">{g('heroSample')}</span>
@@ -25,7 +25,7 @@ export function SurfacesShowcase() {
       <BlockCard>{g('blockSample')}</BlockCard>
       <TipBlock>{g('tipSample')}</TipBlock>
 
-      <h4 className="type-label">{g('labels')}</h4>
+      <h3 className="type-label">{g('labels')}</h3>
       <div className={styles.row}>
         <SourceBadge source="careTeam" />
         <SourceBadge source="parentProposed" reviewStatus="Proposed" />
@@ -33,11 +33,11 @@ export function SurfacesShowcase() {
         <CheckTag />
       </div>
 
-      <h4 className="type-label">{g('statusLines')}</h4>
+      <h3 className="type-label">{g('statusLines')}</h3>
       <StatusLineView text={g('statusSample')} />
       <StatusLineView text={g('statusUndoSample')} onUndo={() => {}} />
 
-      <h4 className="type-label">{g('banners')}</h4>
+      <h3 className="type-label">{g('banners')}</h3>
       <Notices
         notices={notices.map((notice) => ({
           ...notice,
@@ -46,7 +46,7 @@ export function SurfacesShowcase() {
         }))}
       />
 
-      <h4 className="type-label">{g('sheets')}</h4>
+      <h3 className="type-label">{g('sheets')}</h3>
       <div className={styles.row}>
         <Button variant="secondary" onClick={() => setSheet(true)}>
           {g('openSheet')}

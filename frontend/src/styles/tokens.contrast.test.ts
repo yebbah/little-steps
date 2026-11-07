@@ -40,6 +40,8 @@ const PAIRINGS: Pairing[] = [
   { text: 'action', surface: 'selected', min: TEXT },
   { text: 'ink', surface: 'selected', min: TEXT },
   { text: 'ink', surface: 'pressed', min: TEXT },
+  { text: 'ink-soft', surface: 'selected', min: TEXT },
+  { text: 'ink-soft', surface: 'pressed', min: TEXT },
   { text: 'ink', surface: 'tip-surface', min: TEXT },
   { text: 'ink', surface: 'attention-soft', min: TEXT },
   { text: 'ink-soft', surface: 'tip-surface', min: TEXT },
@@ -65,7 +67,7 @@ function readTokens(css: string): Map<string, string> {
 function luminance(hex: string): number {
   const channel = (i: number) => {
     const c = parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) / 255
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
   }
   return 0.2126 * channel(0) + 0.7152 * channel(1) + 0.0722 * channel(2)
 }
