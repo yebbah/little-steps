@@ -3,6 +3,12 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './styles/tokens.css'
 import './styles/base.css'
+import { startInstallTracking } from './pwa/install.ts'
+
+startInstallTracking()
+
+// The service worker is for production builds only; the dev server and test-mode builds (the gallery) run without one.
+if (import.meta.env.PROD && import.meta.env.MODE === 'production') void import('./pwa/register.ts').then(({ registerServiceWorker }) => registerServiceWorker()).catch(() => {})
 
 const root = createRoot(document.getElementById('root')!)
 

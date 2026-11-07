@@ -23,3 +23,4 @@ Newest first. Add a line here with every new changelog.
 | 2.1 | Design tokens, theme and type | [story-2-1-design-tokens-theme-and-type.md](story-2-1-design-tokens-theme-and-type.md) |
 | 2.2 | Domain tints and icons | [story-2-2-domain-tints-and-icons.md](story-2-2-domain-tints-and-icons.md) |
 | 2.5 | Surfaces, feedback and labels | [story-2-5-surfaces-feedback-and-labels.md](story-2-5-surfaces-feedback-and-labels.md) |
+| 2.8 | PWA shell and install offer | [story-2-8-pwa-shell-and-install-offer.md](story-2-8-pwa-shell-and-install-offer.md) |
