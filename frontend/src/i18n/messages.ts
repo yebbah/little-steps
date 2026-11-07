@@ -121,6 +121,12 @@ export const messages = {
   'screen.notFound.subject': 'Page not found',
   'screen.notFound.intro': 'The link may be old. Today is a good place to start.',
   'screen.notFound.back': 'Go to Today',
+
+  // Surfaces and labels (Story 2.5).
+  'surface.close': 'Close',
+  'surface.sourceCareTeam': 'Care Team',
+  'surface.sourceProposed': 'Proposed by you',
+  'surface.aiSuggested': 'AI-suggested',
 } as const satisfies Record<string, string>
 
 export type MessageKey = keyof typeof messages

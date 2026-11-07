@@ -1,0 +1,36 @@
+.badge {
+  box-sizing: border-box;
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  overflow-wrap: anywhere;
+}
+
+.careTeam {
+  background: var(--color-care-team-soft);
+  color: var(--color-care-team);
+}
+
+.parentProposed {
+  background: var(--color-parent-proposed-soft);
+  color: var(--color-parent-proposed);
+}
+
+.ai {
+  border: var(--space-outline-width) solid var(--color-outline);
+  background: var(--color-floor);
+  color: var(--color-ink-soft);
+}
+
+.check {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: var(--space-outline-width) solid var(--color-attention);
+  border-radius: var(--radius-sm);
+  background: var(--color-attention-soft);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}

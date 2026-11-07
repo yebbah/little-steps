@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { t } from '../i18n/messages.ts'
 import type { MessageKey } from '../i18n/messages.ts'
+import { StatusLine } from '../surfaces/StatusLine.tsx'
 import { FOCUS_KEY_ATTRIBUTE } from './useRouteFocus.ts'
 
 /** A placeholder destination: an h1 (the focus target on arrival) and one line of catalog copy. */
@@ -10,6 +11,7 @@ export function Screen({ titleKey, introKey }: { titleKey: MessageKey; introKey:
       <h1 tabIndex={-1} className="type-title">
         {t(titleKey)}
       </h1>
+      <StatusLine />
       <p className="type-body">{t(introKey)}</p>
     </>
   )

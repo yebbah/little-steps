@@ -101,3 +101,22 @@ test('the controls section shows every control in each state inside the 360, 768
     expect(inside.getByRole('button', { name: 'Model · Reading · One-to-one' })).toHaveAttribute('aria-expanded', 'true')
   }
 })
+
+test('[P1] the gallery shows every surface, label, status line and banner, and opens a sheet and a dialog', async () => {
+  render(<Gallery />)
+  const section = within(screen.getByRole('region', { name: 'Surfaces, feedback and labels' }))
+  expect(section.getByText('Care Team')).toBeInTheDocument()
+  expect(section.getByText('Proposed by you · Proposed')).toBeInTheDocument()
+  expect(section.getByText('AI-suggested')).toBeInTheDocument()
+  expect(section.getByText('Please check this')).toBeInTheDocument()
+  expect(section.getByText('Review saved.')).toBeInTheDocument()
+  expect(section.getByRole('button', { name: 'Undo' })).toBeInTheDocument()
+  const notices = within(section.getByRole('region', { name: 'Notices' })).getAllByRole('listitem')
+  expect(notices[0]).toHaveTextContent('Earlier practice is still open.')
+
+  await userEvent.click(section.getByRole('button', { name: 'Open sheet' }))
+  expect(screen.getByRole('dialog', { name: 'A few ideas to try' })).toBeInTheDocument()
+  await userEvent.keyboard('{Escape}')
+  await userEvent.click(section.getByRole('button', { name: 'Open dialog' }))
+  expect(screen.getByRole('dialog', { name: 'Share this summary' })).toBeInTheDocument()
+})

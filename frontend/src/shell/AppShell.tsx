@@ -1,6 +1,7 @@
 import { useRef, type MouseEvent } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { t } from '../i18n/messages.ts'
+import { StatusLineProvider } from '../surfaces/StatusLineProvider.tsx'
 import { NavItems } from './NavItems.tsx'
 import { StatusProvider } from './StatusProvider.tsx'
 import { useRouteFocus } from './useRouteFocus.ts'
@@ -11,7 +12,9 @@ export function AppShell() {
   const location = useLocation()
   return (
     <StatusProvider flushSignal={location.key}>
-      <ShellFrame />
+      <StatusLineProvider flushSignal={location.key}>
+        <ShellFrame />
+      </StatusLineProvider>
     </StatusProvider>
   )
 }
