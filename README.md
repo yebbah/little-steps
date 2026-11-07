@@ -13,6 +13,7 @@ LittleSteps is a modular-monolith web app: a Spring Boot backend and a React PWA
 | Workflow decision trees | [docs/workflow.md](docs/workflow.md) | spec first, story lifecycle, triage, security finding, CI, deferred items, epic finish, issue hierarchy |
 | Architecture diagrams | [docs/architecture.md](docs/architecture.md) | infrastructure (local and cloud) and components |
 | Deferred items process | [docs/deferred-items.md](docs/deferred-items.md) | issues, target dates, exceptions |
+| BMAD setup | [docs/bmad-setup.md](docs/bmad-setup.md) | install, local overrides, new-workspace steps |
 | Changelog | [docs/changelogs/](docs/changelogs/) | one per story, when the story is implemented |
 | Security report | [docs/security-reports/](docs/security-reports/) | one per story, from the template |
 | Release note | [docs/release-notes/](docs/release-notes/) | one per completed epic (Story 1.9) |
@@ -133,6 +134,8 @@ Reports are written to `build/security/`. The first run downloads the vulnerabil
 
 **Branches, commits and finishing a story.** The rules are in [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
+**BMAD setup.** How BMAD is installed and customized here (output folders, the rule that keeps BMAD outputs on the story branch, the Test Architect redirect), and the files to carry over to a new workspace, are in [docs/bmad-setup.md](docs/bmad-setup.md).
+
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every push and pull request, on free GitHub-hosted runners, in four parallel jobs. A failing step is named in the run, so the name says what failed.
@@ -188,7 +191,7 @@ security/           vulnerability scan exceptions
 .tools/             pinned scanners installed by the security scan (git-ignored)
 build/              generated output, such as security reports (git-ignored)
 data/               local storage folder, removed by `dev-down.sh --wipe` (git-ignored)
-docs/               contributing policies, changelogs, security reports, release notes, deferred items process, UI review checklist
+docs/               contributing policies, BMAD setup, changelogs, security reports, release notes, deferred items process, UI review checklist
 AGENTS.md           instructions for AI coding agents (CLAUDE.md points to it)
 ```
 
