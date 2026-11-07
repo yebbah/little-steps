@@ -69,7 +69,18 @@ async function reflowProblems(page: Page) {
       const noWrap = style.whiteSpace === 'nowrap' && element.scrollWidth > element.clientWidth + 1
       if (truncated || ellipsis || noWrap || clippedTall) clipped.push(`${element.tagName.toLowerCase()}: ${element.textContent.trim().slice(0, 40)}`)
     }
-    return { horizontalScroll: root.scrollWidth > root.clientWidth + 1, clipped }
+    // Name what sticks out, so a failure on another platform (fonts, classic scrollbars) says where.
+    const offenders: string[] = []
+    if (root.scrollWidth > root.clientWidth + 1) {
+      for (const element of document.querySelectorAll<HTMLElement>('body *')) {
+        const right = element.getBoundingClientRect().right
+        if (right > root.clientWidth + 0.5 && !element.closest('[data-testid^="frame-"]')) {
+          offenders.push(`${element.tagName.toLowerCase()}.${String(element.className).slice(0, 40)} right=${right.toFixed(1)} of ${root.clientWidth}`)
+        }
+      }
+      if (offenders.length === 0) offenders.push(`page is ${root.scrollWidth}px wide in a ${root.clientWidth}px window`)
+    }
+    return { horizontalScroll: root.scrollWidth > root.clientWidth + 1, clipped, offenders }
   }, CLIPPABLE)
 }
 
@@ -83,6 +94,7 @@ test.describe('reflow at 320 CSS px and 200% text (UX-DR120)', () => {
       const problems = await reflowProblems(page)
       expect(problems.clipped).toEqual([])
       // The gallery shows 360, 768 and 1280px frames that scroll inside their own container; the page itself must not.
+      expect(problems.offenders).toEqual([])
       expect(problems.horizontalScroll).toBe(false)
     })
   }
@@ -100,6 +112,7 @@ test.describe('reflow at 320 CSS px and 200% text (UX-DR120)', () => {
       await expect(page.getByRole('dialog')).toBeVisible()
       const problems = await reflowProblems(page)
       expect(problems.clipped).toEqual([])
+      expect(problems.offenders).toEqual([])
       expect(problems.horizontalScroll).toBe(false)
       // Everything in the dialog can be reached: its own scroller holds the content.
       const box = (await page.getByRole('dialog').boundingBox())!
