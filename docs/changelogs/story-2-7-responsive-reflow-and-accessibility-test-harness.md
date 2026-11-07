@@ -28,6 +28,7 @@ Every screen now reflows for large text, a short viewport and a screen reader, a
 
 - Deferred #125 (shell nav under text zoom, short viewports; the `viewport-fit` part came with Story 2.8) and #116 (the gallery focus test pressed Tab before the lazy gallery rendered).
 - Problems found in review (see the triage log in the story spec).
+- Found by the new CI job on its first run, not on a Mac: on the Linux runner, a long unbroken word (the gallery's display type sample at 200% text) widened the page by 2px. Long words now wrap in the gallery and in the shell content (`overflow-wrap: anywhere`), and the reflow test names any element that sticks out. Checked locally with four wide fonts.
 
 ## Removed or deprecated
 
