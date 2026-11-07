@@ -5,7 +5,7 @@
 | Story | 2.8, issue #42 |
 | Epic | 2, App shell and design foundations |
 | Branch | feature/epic-02-issue-42-pwa-shell-and-install-offer |
-| Commits | see `git log` on the branch (one feature commit) |
+| Commits | `b3ac470` (squash-merged) |
 | Date | 2026-11-07 |
 | Security report | [story-2-8-pwa-shell-and-install-offer.md](../security-reports/story-2-8-pwa-shell-and-install-offer.md) |
 

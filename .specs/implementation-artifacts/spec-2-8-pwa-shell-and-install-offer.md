@@ -2,7 +2,7 @@
 title: 'Story 2.8: PWA shell and install offer'
 type: 'feature'
 created: '2026-11-07'
-status: 'in-review'
+status: 'done'
 baseline_commit: '99d31abc25c5e7c2e5fac584209a39ab8a32f930'
 route: 'dispatch'
 review_loop_iteration: 0

@@ -5,7 +5,7 @@
 | Story | 2.5, issue #39 |
 | Epic | 2, App shell and design foundations |
 | Branch | feature/epic-02-issue-39-surfaces-feedback-and-labels |
-| Commits | see `git log` on the branch (one feature commit) |
+| Commits | `99d31ab` (squash-merged) |
 | Date | 2026-11-07 |
 | Security report | [story-2-5-surfaces-feedback-and-labels.md](../security-reports/story-2-5-surfaces-feedback-and-labels.md) |
 

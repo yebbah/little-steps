@@ -85,7 +85,7 @@ So that I can recognise an Activity's area at a glance without relying on colour
 - an unknown Domain → other
 
 **And** a `DomainTag` component always shows the Domain's text label with its tint. The tint is used only in the allowed places (UX-DR5).
-**And** an `IconTile` component renders line icons with a 2.4px stroke in white tiles at 76px, 56px and 36px. The icon set contains only objects: no people, faces, mascots, rings, streaks or badges (UX-DR13).
+**And** an `IconTile` component renders line icons with a 2.4px stroke in white tiles at 76px and 56px, and in a Domain-tinted square at 36px (the plan-row square, radius sm, as in DESIGN.md). The icon set contains only objects: no people, faces, mascots, rings, streaks or badges (UX-DR13).
 **And** the icons are custom SVGs kept in the repository, not an icon library. The set covers at least the five nav destinations (Today, Goals, Activities, Share, Family) and the gallery's samples, and a test fails if an icon is missing for a nav destination.
 
 ### Story 2.3: App shell, navigation and focus management

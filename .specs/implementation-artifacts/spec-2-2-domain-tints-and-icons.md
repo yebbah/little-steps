@@ -55,6 +55,8 @@ context:
 
 ## Spec Change Log
 
+- 2026-11-07, confirmed by the maintainer after the Epic 2 code review: the acceptance criterion and UX-DR13 said white tiles at 76px, 56px and 36px, while DESIGN.md (icon-tile, Plan strip) tints the 36px plan-row square with the Domain colour. The code already followed DESIGN.md. The epic file and `requirements.md` now say white tiles at 76px and 56px and a Domain-tinted square at 36px. No code change.
+
 ## Review Triage Log
 
 | # | Finding | Verdict | Route | Evidence |
