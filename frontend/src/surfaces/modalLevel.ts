@@ -14,6 +14,9 @@ const subscribe = (listener: () => void) => {
 }
 const getOwner = () => owner
 
+/** True while any modal is open. */
+export const isModalOpen = () => owner !== null
+
 /**
  * Claims the single modal slot while `open`, and makes the rest of the page inert for that time.
  * Returns the element the modal renders into and whether this modal may be shown. A modal that asks

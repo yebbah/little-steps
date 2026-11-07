@@ -127,6 +127,13 @@ export const messages = {
   'surface.sourceCareTeam': 'Care Team',
   'surface.sourceProposed': 'Proposed by you',
   'surface.aiSuggested': 'AI-suggested',
+
+  // Install offer (Story 2.8): no browser is named; the path is chosen by feature detection.
+  'pwa.title': 'Add LittleSteps to your home screen',
+  'pwa.body': 'It opens like an app, and everything still works in your browser.',
+  'pwa.instructions': 'Open your browser menu or the share button, then choose Add to Home Screen or Install.',
+  'pwa.add': 'Add to home screen',
+  'pwa.gotIt': 'Got it',
 } as const satisfies Record<string, string>
 
 export type MessageKey = keyof typeof messages

@@ -12,6 +12,7 @@
     "api:check": "bash scripts/api-types.sh --check",
     "lint:test": "bash scripts/lint-rules.test.sh && bash scripts/stylelint-rules.test.sh",
     "typecheck": "tsc -b",
+    "icons": "node scripts/generate-icons.mjs",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",

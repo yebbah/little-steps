@@ -1,6 +1,7 @@
 import { useRef, type MouseEvent } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { t } from '../i18n/messages.ts'
+import { InstallOffer } from '../pwa/InstallOffer.tsx'
 import { StatusLineProvider } from '../surfaces/StatusLineProvider.tsx'
 import { NavItems } from './NavItems.tsx'
 import { StatusProvider } from './StatusProvider.tsx'
@@ -41,6 +42,7 @@ function ShellFrame() {
           <Outlet />
         </div>
       </main>
+      <InstallOffer />
       <ScrollRestoration />
     </div>
   )

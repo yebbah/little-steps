@@ -1,9 +1,11 @@
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
+import { pwa } from './pwa.config.ts'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react()],
+  plugins: [react(), VitePWA(pwa)],
   // The component gallery exists only in local and test builds (Story 2.1). The flag comes from
   // .env.development and .env.test; a production build ignores it, whatever the environment says.
   define: mode !== 'development' && mode !== 'test' ? { 'import.meta.env.VITE_ENABLE_GALLERY': JSON.stringify('false') } : {},
