@@ -59,15 +59,11 @@ Component tests opt into jsdom with `// @vitest-environment jsdom` on the first 
 
 ## CI
 
-Today's "Frontend" job runs lint, typecheck, Vitest and build. Story 2.7 adds a separate job named "Frontend: accessibility" that runs `npm run test:e2e:install` then `npm run test:e2e` against the test-mode build, uploading `playwright-report/` and `test-results/`. Pull requests run Chromium only; the nightly run sets `E2E_ALL_BROWSERS=true`.
+The "Frontend" job runs lint, the lint rule tests, typecheck, Vitest and build. The separate job "Frontend: accessibility" runs `npm run test:e2e:install` then `npm run test:e2e` against the Vite test-mode server (the gallery on), and uploads `playwright-report/` and `test-results/`. Pull requests run Chromium only. A nightly WebKit and Firefox run (`E2E_ALL_BROWSERS=true`) is not scheduled yet: it is tracked in #134.
 
 ## Not set up
 
 - Contract (Pact) tests: the frontend calls its own backend in the same repo, so there is no separate provider boundary.
-
-## Write-time check (local AI tooling)
-
-When Claude Code works in this project, a hook (`.claude/hooks/tea-enforce.cjs`, configured in `.tea/enforce-config.json`, both outside this repository) blocks writes to test files that use hard waits, `.only` and similar patterns. Rules come from the test-review criteria registry. To exempt a rule, add its id to `disabledRules` in that config and say why. It does not run in CI.
 
 ## Accessibility and reflow (Story 2.7)
 

@@ -35,6 +35,18 @@ test.describe('settings', () => {
     await expect(page.locator('#root')).toBeEmpty()
   })
 
+  test('[P0] a stored Dark choice on a light device sets the browser bar colour on load', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' })
+    await page.addInitScript(() => localStorage.setItem('littlesteps.theme', 'dark'))
+    await page.goto('/family/settings')
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+    const bars = await page.locator('meta[name="theme-color"]').evaluateAll((metas) => metas.map((m) => m.getAttribute('content')))
+    expect(bars).toEqual(['#17191F', '#17191F'])
+    // Choosing System restores the two device-following colours.
+    await page.getByRole('radio', { name: 'System' }).click()
+    expect(await page.locator('meta[name="theme-color"]').evaluateAll((metas) => metas.map((m) => m.getAttribute('content')))).toEqual(['#FAF7F2', '#17191F'])
+  })
+
   test('[P1] choosing System removes the override', async ({ page }) => {
     await page.goto('/family/settings')
     await page.getByRole('radio', { name: 'Dark' }).click()

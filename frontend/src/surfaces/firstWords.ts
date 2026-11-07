@@ -5,5 +5,7 @@ const FIRST_WORDS = 4
 const MAX_CHARS = 40
 
 export function firstWords(text: string, count = FIRST_WORDS): string {
-  return text.trim().split(/\s+/).slice(0, count).join(' ').slice(0, MAX_CHARS)
+  const words = text.trim().split(/\s+/).slice(0, count).join(' ')
+  // By code point, so a character made of two UTF-16 units is never cut in half.
+  return [...words].slice(0, MAX_CHARS).join('')
 }

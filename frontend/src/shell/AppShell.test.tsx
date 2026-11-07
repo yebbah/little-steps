@@ -214,3 +214,9 @@ test('a message announced while a loader is pending waits until the new screen h
   frame()
   expect(screen.getByRole('status')).toHaveTextContent('Review saved.')
 })
+
+test('an unknown sub-path of a destination shows not-found and does not mark that destination current', () => {
+  renderAt('/goals/nothing-here')
+  expect(screen.getByRole('heading', { level: 1, name: "We can't find that page" })).toBeInTheDocument()
+  expect(within(screen.getByRole('navigation')).queryAllByRole('link').filter((l) => l.getAttribute('aria-current') === 'page')).toHaveLength(0)
+})

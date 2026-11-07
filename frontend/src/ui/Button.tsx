@@ -15,6 +15,8 @@ export function Button({ variant = 'primary', disabled = false, type = 'button',
     if (disabled) {
       // Also stops a submit button from submitting its form.
       event.preventDefault()
+      // A press on a disabled button does not reach an ancestor's click handler either.
+      event.stopPropagation()
       return
     }
     onClick?.(event)
@@ -23,7 +25,7 @@ export function Button({ variant = 'primary', disabled = false, type = 'button',
     <button
       {...rest}
       type={type}
-      aria-disabled={disabled || undefined}
+      aria-disabled={disabled || rest['aria-disabled']}
       className={[styles.button, styles[variant], 'type-label', className].filter(Boolean).join(' ')}
       onClick={handleClick}
     />

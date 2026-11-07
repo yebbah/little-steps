@@ -25,7 +25,7 @@ export function TextField({ label, error, id, className, ...rest }: TextFieldPro
         {...rest}
         id={inputId}
         className={`${styles.input} type-body`}
-        aria-invalid={error ? true : undefined}
+        aria-invalid={error ? true : rest['aria-invalid']}
         aria-describedby={describedBy}
       />
       {error ? (

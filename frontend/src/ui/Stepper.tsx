@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { t } from '../i18n/messages.ts'
 import styles from './Stepper.module.css'
 
@@ -19,12 +19,15 @@ export interface StepperProps {
 const fill = (key: 'stepper.minimum' | 'stepper.maximum', n: number) => t(key).replace('{n}', String(n))
 
 /** Turns what was typed into a value: empty stays empty, anything negative clamps to the minimum, non-digits drop. */
+/** No count in this app comes near this: it only stops an absurd typed number reaching the caller. */
+const MAX_ENTRY = 9999
+
 function parseEntry(raw: string, min: number): number | undefined {
   if (raw.trim().startsWith('-')) return min
   const whole = Number(raw)
-  if (raw.trim() !== '' && Number.isFinite(whole)) return Math.max(min, Math.trunc(whole))
+  if (raw.trim() !== '' && Number.isFinite(whole)) return Math.min(MAX_ENTRY, Math.max(min, Math.trunc(whole)))
   const digits = raw.replace(/\D/g, '')
-  return digits === '' ? undefined : Math.max(min, Number(digits))
+  return digits === '' ? undefined : Math.min(MAX_ENTRY, Math.max(min, Number(digits)))
 }
 
 /**
@@ -48,6 +51,15 @@ export function Stepper({ label, value, onChange, decrementLabel, incrementLabel
     onChange(next)
   }
 
+  // The caller changed the value itself (a form reset, a loaded record): a held entry no longer applies.
+  const lastValue = useRef(value)
+  useEffect(() => {
+    if (lastValue.current === value) return
+    lastValue.current = value
+    // oxlint-disable-next-line react/set-state-in-effect
+    setDraft(null)
+  }, [value])
+
   // The ceiling rose (for example Tried went up): a held entry that is now valid is committed.
   useEffect(() => {
     if (draft !== null && (max === undefined || draft <= max)) {
@@ -59,7 +71,7 @@ export function Stepper({ label, value, onChange, decrementLabel, incrementLabel
   }, [draft, max, onChange])
 
   const atMin = shown === undefined || shown <= min
-  const atMax = shown !== undefined && max !== undefined && shown >= max
+  const atMax = max !== undefined && (shown === undefined ? Math.max(min, 1) > max : shown >= max)
   let valueText: string | undefined
   if (shown !== undefined && shown <= min) valueText = fill('stepper.minimum', shown)
   else if (shown !== undefined && atMax && !over) valueText = fill('stepper.maximum', shown)

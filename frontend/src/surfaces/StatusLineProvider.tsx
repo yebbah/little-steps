@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { useStatus } from '../shell/statusContext.ts'
 import { StatusLineContext, StatusLineValueContext, type StatusLineApi, type StatusLineValue } from './statusLineContext.ts'
 
-/** Keys that move focus or change a modifier are not an action (they never clear the line). */
-const NON_ACTION_KEYS = new Set(['Tab', 'Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'CapsLock', 'NumLock', 'ScrollLock', 'Fn', 'Dead', 'Process', 'Unidentified'])
+/** Keys that only move focus, move through content (screen-reader navigation) or change a modifier are not an action. */
+const NON_ACTION_KEYS = new Set(['Tab', 'Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'CapsLock', 'NumLock', 'ScrollLock', 'Fn', 'Dead', 'Process', 'Unidentified', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'])
 
 /**
  * Holds the one visible status line. Announcing goes through `useStatus()`, so there is no live

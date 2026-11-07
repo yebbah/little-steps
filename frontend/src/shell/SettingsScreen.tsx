@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { t, tf, type MessageKey } from '../i18n/messages.ts'
-import { offerInstall } from '../pwa/install.ts'
+import { isInstalled, offerInstall } from '../pwa/install.ts'
 import { StatusLine } from '../surfaces/StatusLine.tsx'
 import { appliedThemeChoice, setThemeChoice, isThemeChoice, type ThemeChoice } from '../styles/theme.ts'
 import { Button, ChoiceChips } from '../ui/index.ts'
@@ -39,6 +39,12 @@ export function SettingsScreen() {
     announce(tf('settings.themeChanged', { theme: t(`settings.theme.${value}` as MessageKey) }))
   }
 
+  // The offer opens, or the Caregiver is told why it did not (never a dead row).
+  const installRow = () => {
+    if (offerInstall({ from: 'settings' })) return
+    announce(t(isInstalled() ? 'settings.alreadyInstalled' : 'settings.installUnavailable'))
+  }
+
   return (
     <>
       <h1 tabIndex={-1} className="type-title">
@@ -58,7 +64,7 @@ export function SettingsScreen() {
           value={theme}
           onChange={choose}
         />
-        <Button variant="secondary" onClick={() => offerInstall({ from: 'settings' }) || announce(t('settings.alreadyInstalled'))}>
+        <Button variant="secondary" onClick={installRow}>
           {t('settings.addToHome')}
         </Button>
       </div>

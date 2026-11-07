@@ -56,6 +56,16 @@ function isStandalone(): boolean {
   )
 }
 
+/** Only an installed app runs in the standalone display mode. Fullscreen and minimal-ui also happen in a plain tab (F11). */
+function isInstalledDisplay(): boolean {
+  return window.matchMedia?.('(display-mode: standalone)').matches === true || (navigator as { standalone?: boolean }).standalone === true
+}
+
+/** True when the app is on the home screen: running from it now, or seen running from it or installed earlier. */
+export function isInstalled(): boolean {
+  return installed || isStandalone() || read(INSTALLED_KEY) === 'true'
+}
+
 /**
  * Counts a visit once per browser session (a tab's reloads are the same visit). A damaged stored value
  * counts as no visits, so an offer from a feature waits rather than showing early.
@@ -82,10 +92,17 @@ function visits(): number {
 export function startInstallTracking(): () => void {
   countVisit()
   // Once seen running from the home screen, remember it: later visits in a browser tab are not offered it again.
-  if (isStandalone()) write(INSTALLED_KEY, 'true')
+  if (isInstalledDisplay()) write(INSTALLED_KEY, 'true')
   const onPrompt = (event: Event) => {
     event.preventDefault()
     deferredPrompt = event as BeforeInstallPromptEvent
+    // The browser is offering install, so the app is not installed (it was removed since it was last seen).
+    installed = false
+    try {
+      localStorage.removeItem(INSTALLED_KEY)
+    } catch {
+      // Blocked storage: nothing was remembered.
+    }
     // The event can arrive after the offer opened with instructions: switch to the browser's own prompt.
     if (state.open && state.mode === 'instructions') set({ open: true, mode: 'prompt' })
   }
@@ -113,7 +130,7 @@ export interface OfferOptions {
  * ignored on the very first visit, after "Not now", and when the app is already installed.
  */
 export function offerInstall({ from = 'feature' }: OfferOptions = {}): boolean {
-  if (installed || isStandalone() || read(INSTALLED_KEY) === 'true') return false
+  if (isInstalled()) return false
   // One modal level at a time: never open the offer behind another modal (it would be refused and read as "Not now").
   if (isModalOpen()) return false
   if (from === 'feature') {

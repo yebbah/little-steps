@@ -195,3 +195,12 @@ test('after Undo removes its button, focus moves to the main landmark', async ()
   await user.click(screen.getByRole('button', { name: 'Undo' }))
   expect(screen.getByRole('main')).toHaveFocus()
 })
+
+test('moving through the page with the arrow keys is not an action and keeps the line', async () => {
+  const { user } = setup()
+  await user.click(screen.getByRole('button', { name: SHOW }))
+  await user.keyboard('{ArrowDown}{ArrowDown}{Home}{End}')
+  expect(line()).toHaveTextContent(SAVED)
+  await user.keyboard('a')
+  expect(line()).toBeNull()
+})

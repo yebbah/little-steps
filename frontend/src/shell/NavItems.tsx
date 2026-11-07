@@ -9,7 +9,7 @@ export function NavItems() {
     <ul className={styles.navList}>
       {NAV_ICON_NAMES.map((name) => (
         <li key={name} className={styles.navItem}>
-          <NavLink to={`/${name}`} className={styles.navLink}>
+          <NavLink to={`/${name}`} end={name !== 'family'} className={styles.navLink}>
             <span className={styles.navIcon}>
               <Icon name={name} />
             </span>

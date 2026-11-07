@@ -63,3 +63,10 @@ test('the theme-colour metas and the icon fills are token values', () => {
   )
   for (const [, fill] of svg.matchAll(/fill="(#[0-9A-Fa-f]{6})"/g)) expect(allowed.has(fill.toUpperCase()), fill).toBe(true)
 })
+
+test('the inline theme script sets the browser bar to the floor tokens', () => {
+  const html = readFileSync(`${root}/index.html`, 'utf8')
+  const script = html.slice(html.indexOf('<script>'), html.indexOf('</script>'))
+  expect(script).toContain(`'${token('floor-dark')}'`)
+  expect(script).toContain(`'${token('floor')}'`)
+})
