@@ -13,7 +13,7 @@ The repository is public: no personal data, no absolute local paths, no secret v
 |---|---|
 | Epic | 02, App shell and design foundations |
 | Generated | 2026-11-07 |
-| Commit | 8706e12 |
+| Commit | 4c169fb |
 | Compared with | tag `epic-01` |
 
 Status: done
@@ -42,6 +42,7 @@ One entry per story, with its changelog and security report.
 
 Commits since tag `epic-01`:
 
+- `4c169fb` docs: Epic 2 acceptance, retrospective, release note and Story 2.2 spec reconciliation (#3) (#141)
 - `8706e12` fix: Epic 2 code review findings (#3) (#140)
 - `006cd49` feat: Story 2.7 responsive reflow and accessibility test harness (#41) (#135)
 - `5db7951` feat: Story 2.9 settings shell and theme choice (#104) (#133)
