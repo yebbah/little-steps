@@ -4,7 +4,7 @@
 |---|---|
 | Story | 2.3, issue #37 |
 | Branch | feature/epic-02-issue-37-app-shell-navigation-and-focus-management |
-| Commit scanned | 9e149d8 (scan run on the staged changes before the commit) |
+| Commit scanned | c710736 (scan run on the staged changes before the commit) |
 | Date | 2026-11-07 |
 | Verdict | PASS |
 

@@ -5,7 +5,7 @@
 | Story | 2.3, issue #37 |
 | Epic | 2, App shell |
 | Branch | feature/epic-02-issue-37-app-shell-navigation-and-focus-management |
-| Commits | 9e149d8 |
+| Commits | c710736 |
 | Date | 2026-11-07 |
 | Security report | [story-2-3-app-shell-navigation-and-focus-management.md](../security-reports/story-2-3-app-shell-navigation-and-focus-management.md) |
 
