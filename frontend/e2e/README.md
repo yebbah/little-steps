@@ -1,6 +1,6 @@
 # Frontend test framework
 
-Three layers, matching the Epic 2 test design (`.specs/implementation-artifacts/epic-2-test-design.md`):
+Three layers, matching the Epic 2 test design (`.specs/test-artifacts/epic-2-test-design.md`):
 
 | Layer | Tool | Where | Command |
 |-------|------|-------|---------|
