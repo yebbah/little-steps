@@ -5,7 +5,7 @@ lastSaved: '2026-11-06'
 storyId: '2.1, 2.3, 2.5'
 storyKey: 'epic-2-high-risk-r01-r04'
 storyFile: '.specs/planning-artifacts/epics/epic-02-app-shell.md'
-atddChecklistPath: '.specs/implementation-artifacts/epic-2-atdd-red-phase.md'
+atddChecklistPath: '.specs/test-artifacts/epic-2-atdd-red-phase.md'
 generatedTestFiles:
   - frontend/src/build/gallery-bundle.test.ts
   - frontend/src/styles/tokens.contrast.test.ts
@@ -13,7 +13,7 @@ generatedTestFiles:
   - frontend/e2e/tests/dialog.spec.ts
 inputDocuments:
   - .specs/planning-artifacts/epics/epic-02-app-shell.md
-  - .specs/implementation-artifacts/epic-2-test-design.md
+  - .specs/test-artifacts/epic-2-test-design.md
   - frontend/playwright.config.ts
 acceptanceCriteria:
   - { id: 'AC-1', idSource: generated, text: '2.1 Gallery route registered only when VITE_ENABLE_GALLERY=true; production bundle contains no gallery; build test fails otherwise (R-01)' }
