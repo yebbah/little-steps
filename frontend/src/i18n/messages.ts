@@ -98,6 +98,29 @@ export const messages = {
   'security.deletionRequested':
     '{caregiver} asked to delete all family data. It will be deleted on {date}. You can undo this in Settings → Privacy.',
   'security.deletionCancelled': 'Family deletion was cancelled.',
+  // App shell and navigation (Story 2.3).
+  'nav.label': 'Main',
+  'nav.skip': 'Skip to content',
+  'nav.today': 'Today',
+  'nav.goals': 'Goals',
+  'nav.activities': 'Activities',
+  'nav.share': 'Share',
+  'nav.family': 'Family',
+  'screen.titleFormat': '{screen}: {subject} · {product}',
+  'screen.today.subject': "Today's steps",
+  'screen.today.intro': 'Your day at a glance will appear here.',
+  'screen.goals.subject': 'Your goals',
+  'screen.goals.intro': 'Goals from your therapist and your own will appear here.',
+  'screen.activities.subject': 'Ideas to try',
+  'screen.activities.intro': 'Activities to practise will appear here.',
+  'screen.share.subject': 'Summaries',
+  'screen.share.intro': 'Summaries for your therapist will appear here.',
+  'screen.family.subject': 'Your family',
+  'screen.family.intro': 'The people in your family will appear here.',
+  'screen.notFound.title': "We can't find that page",
+  'screen.notFound.subject': 'Page not found',
+  'screen.notFound.intro': 'The link may be old. Today is a good place to start.',
+  'screen.notFound.back': 'Go to Today',
 } as const satisfies Record<string, string>
 
 export type MessageKey = keyof typeof messages

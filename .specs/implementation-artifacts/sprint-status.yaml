@@ -50,7 +50,7 @@ development_status:
   epic-2: in-progress
   2-1-design-tokens-theme-and-type: done
   2-2-domain-tints-and-icons: done
-  2-3-app-shell-navigation-and-focus-management: backlog
+  2-3-app-shell-navigation-and-focus-management: review
   2-4-core-controls: done
   2-5-surfaces-feedback-and-labels: backlog
   2-6-message-catalog-and-tone-check: done
