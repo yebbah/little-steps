@@ -112,6 +112,8 @@
 }
 
 .content {
+  /* A long word wraps instead of widening the page at large text sizes (UX-DR120). */
+  overflow-wrap: anywhere;
   box-sizing: border-box;
   max-width: var(--space-content-max);
   margin-inline: auto;

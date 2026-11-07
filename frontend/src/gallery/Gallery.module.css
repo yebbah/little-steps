@@ -1,4 +1,6 @@
 .page {
+  /* A long unbroken word (the display sample at 200% text) wraps instead of widening the page (UX-DR120). */
+  overflow-wrap: anywhere;
   max-width: var(--space-content-max);
   margin: 0 auto;
   padding: var(--space-margin-mobile);

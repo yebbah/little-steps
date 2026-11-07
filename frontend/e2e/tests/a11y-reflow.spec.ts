@@ -78,6 +78,12 @@ async function reflowProblems(page: Page) {
           offenders.push(`${element.tagName.toLowerCase()}.${String(element.className).slice(0, 40)} right=${right.toFixed(1)} of ${root.clientWidth}`)
         }
       }
+      // Text wider than its own box (an unbroken word) widens the page without its box sticking out.
+      for (const element of document.querySelectorAll<HTMLElement>('body *')) {
+        if (element.scrollWidth > element.clientWidth + 1 && element.clientWidth > 0 && !element.closest('[data-testid^="frame-"]') && getComputedStyle(element).overflowX === 'visible') {
+          offenders.push(`${element.tagName.toLowerCase()}.${String(element.className).slice(0, 40)} text ${element.scrollWidth}px in a ${element.clientWidth}px box: ${element.textContent?.trim().slice(0, 30)}`)
+        }
+      }
       if (offenders.length === 0) offenders.push(`page is ${root.scrollWidth}px wide in a ${root.clientWidth}px window`)
     }
     return { horizontalScroll: root.scrollWidth > root.clientWidth + 1, clipped, offenders }
