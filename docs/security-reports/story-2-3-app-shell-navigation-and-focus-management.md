@@ -70,4 +70,4 @@ None. The review's triage is in the spec's Review Triage Log.
 
 ## 10. Sign-off
 
-Pending the human's validation.
+Accepted by the human on 2026-11-07; merge.

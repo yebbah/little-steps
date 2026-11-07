@@ -2,7 +2,7 @@
 title: 'Story 2.3: App shell, navigation and focus management'
 type: 'feature'
 created: '2026-11-07'
-status: 'in-review'
+status: 'done'
 baseline_commit: '61fe1eb8729183d8fdde35835316a1401c8b3739'
 route: 'dispatch'
 review_loop_iteration: 0
