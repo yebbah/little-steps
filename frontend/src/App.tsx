@@ -1,12 +1,13 @@
-// The product name is not translated, so it is a constant rather than a catalog entry.
-const PRODUCT_NAME = 'LittleSteps'
+import { RouterProvider } from 'react-router'
+import { createAppRouter } from './shell/routes.tsx'
+
+// One router for the page. Creating it in render would build a second one under StrictMode, and each
+// browser router keeps its own history listener.
+let router: ReturnType<typeof createAppRouter> | undefined
 
 function App() {
-  return (
-    <main>
-      <h1>{PRODUCT_NAME}</h1>
-    </main>
-  )
+  router ??= createAppRouter()
+  return <RouterProvider router={router} />
 }
 
 export default App

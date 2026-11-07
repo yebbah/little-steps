@@ -6,6 +6,7 @@ Newest first. Add a line here with every new changelog.
 
 | Story | Title | Changelog |
 |---|---|---|
+| 2.3 | App shell, navigation and focus management | [story-2-3-app-shell-navigation-and-focus-management.md](story-2-3-app-shell-navigation-and-focus-management.md) |
 | 2.11 | Catalog copy for errors, confirmations and security notices | [story-2-11-catalog-copy-for-errors-confirmations-and-security-notices.md](story-2-11-catalog-copy-for-errors-confirmations-and-security-notices.md) |
 | 2.4 | Core controls | [story-2-4-core-controls.md](story-2-4-core-controls.md) |
 | 2.10 | Catalog copy for status lines, banners and empty states | [story-2-10-catalog-copy-for-status-lines-banners-and-empty-states.md](story-2-10-catalog-copy-for-status-lines-banners-and-empty-states.md) |

@@ -37,3 +37,5 @@
 - #112  2027-01-05  Root-font and 17px body check in WebKit  (origin #35)
 - #116  2027-01-05  Story 2.1 gallery focus test presses Tab before the lazy gallery renders  (origin #38, Story 2.4)
 - #119  2027-02-04  Catalog keys for two spine sentences no copy story owns  (origin #106, Story 2.11)
+- #124  2027-01-05  Serve index.html for client-side routes in the full-mode app image  (origin #37, Story 2.3)
+- #125  2027-01-05  Shell nav under text zoom, short viewports and home-indicator inset  (origin #37, Story 2.3)
