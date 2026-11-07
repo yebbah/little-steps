@@ -146,21 +146,22 @@ Reports are written to `build/security/`. The first run downloads the vulnerabil
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs on every push and pull request, on free GitHub-hosted runners, in four parallel jobs. A failing step is named in the run, so the name says what failed.
+`.github/workflows/ci.yml` runs on every push and pull request, on free GitHub-hosted runners, in five parallel jobs. A failing step is named in the run, so the name says what failed.
 
 | Job | Runs |
 |---|---|
 | Backend | `./mvnw verify`: all tests, JaCoCo coverage, SBOM. Tests tagged `guardrail-eval` are excluded by default (wired up in Epic 13) |
 | Frontend | `npm ci`, lint (oxlint and stylelint), lint rule tests, typecheck, Vitest with coverage, build, then the OpenAPI type drift check (`api:check`) |
+| Frontend: accessibility | Playwright against a test-mode build with the gallery on: axe (no serious or critical violation, light and dark, every shell screen and gallery frame), reflow at 320px and 200% text, the reflow rules, focus and the sheet and dialog rules. Chromium on pull requests; results are listed in [docs/a11y-passes.md](docs/a11y-passes.md) |
 | Scripts | `deploy/check-actions.sh` (every action pinned to a commit SHA, version in a comment), `shellcheck` on `deploy/*.sh`, `deploy/tests/*.sh` and `.githooks/*`, `deploy/check-images.sh`, and the tests of the check scripts |
 | Security | `deploy/security-scan.sh secrets` (commit history), `scan backend` and `scan frontend`; same KEV or CVSS 7.0+ rule as the hook. Image scans (`scan images`, `scan app-image`) are not in CI: run them by hand before a release (tracked in #95) |
 
 - **Secrets to add once** (Settings, Secrets and variables, Actions): `DHI_USERNAME` and `DHI_TOKEN`, a Docker Hardened Images account, used for `docker login dhi.io` in the Backend job, because the integration tests pull the PostgreSQL image. Without them the Backend job fails at that step and says so. Pull requests from forks never receive secrets.
-- **Build artifacts** (30 days): `backend-reports` (surefire, JaCoCo, SBOM), `frontend-reports` (coverage) and `security-reports` (summary, report.json, Grype reports); they feed the epic release note.
+- **Build artifacts** (30 days): `backend-reports` (surefire, JaCoCo, SBOM), `frontend-reports` (coverage), `accessibility-reports` (Playwright report and traces) and `security-reports` (summary, report.json, Grype reports); they feed the epic release note.
 - **Caches**: Maven and npm (by the setup actions) and the Grype vulnerability database. The pinned scan tools and the KEV feed are fetched and verified every run, never cached.
 - **Adding or updating an action**: pin it to the full commit SHA of the release (`gh api repos/<owner>/<repo>/commits/<tag> -q .sha`) and put the version in a comment after it. `deploy/check-actions.sh` fails on a tag or branch.
 - **Run the same checks locally**: the commands under "Development" above; the Security job is `deploy/security-scan.sh secrets`, `scan backend` and `scan frontend`; add `deploy/security-scan.sh scan images` and `scan app-image` for the image scans CI does not run.
-- **Branch protection** is a repository setting, not code. `main` requires a pull request and the four CI jobs (Backend, Frontend, Scripts, Security) before merge; the repository owner can still bypass it in an emergency. Change it under Settings, Branches.
+- **Branch protection** is a repository setting, not code. `main` requires a pull request and the CI jobs (Backend, Frontend, Frontend: accessibility, Scripts, Security) before merge (add "Frontend: accessibility" under Settings, Branches); the repository owner can still bypass it in an emergency. Change it under Settings, Branches.
 
 ## Release
 

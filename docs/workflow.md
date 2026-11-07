@@ -91,10 +91,12 @@ Rule: [Continuous integration](CONTRIBUTING.md#continuous-integration). Jobs and
 flowchart LR
   E["push or pull request"] --> J1["Backend<br/>mvnw verify, tests, JaCoCo, SBOM"]
   E --> J2["Frontend<br/>lint, typecheck, Vitest, build,<br/>OpenAPI drift check"]
+  E --> JA["Frontend: accessibility<br/>Playwright, axe, reflow"]
   E --> J3["Scripts<br/>action SHA pins, shellcheck,<br/>images.yaml digests"]
   E --> J4["Security<br/>secrets, backend and frontend<br/>dependency scan"]
-  J1 --> G{"All four green?"}
+  J1 --> G{"All five green?"}
   J2 --> G
+  JA --> G
   J3 --> G
   J4 --> G
   G -- "yes" --> OK["Mergeable"]

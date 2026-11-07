@@ -6,6 +6,7 @@
 
 .toggle {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin: var(--space-4) 0;
 }
@@ -40,9 +41,20 @@
 
 .swatch {
   display: grid;
-  grid-template-columns: 5.5rem 5.5rem 1fr;
+  grid-template-columns: 5.5rem 5.5rem minmax(0, 1fr);
   gap: var(--space-3);
   align-items: center;
+}
+
+/* At 320px and 200% text two swatches and the name no longer fit on a line: the name goes under them. */
+@media (max-width: 480px) {
+  .swatch {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .name {
+    grid-column: 1 / -1;
+  }
 }
 
 .chip {

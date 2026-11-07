@@ -43,3 +43,4 @@
 - #129  2027-01-06  Serve sw.js and index.html uncached; keep server routes out of the shell fallback  (origin #42)
 - #130  2027-01-06  Check for a new app version when the app is resumed  (origin #42)
 - #132  2027-01-06  Follow a theme change made in another tab  (origin #104)
+- #134  2027-01-06  Accessibility checks on the built bundle and in WebKit and Firefox nightly  (origin #41)

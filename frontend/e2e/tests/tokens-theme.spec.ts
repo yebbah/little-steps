@@ -85,6 +85,8 @@ test.describe('component gallery at /dev/gallery', () => {
 
   test('[P1] the focus ring is a real outline, 2px with a 2px offset', async ({ page }) => {
     await page.goto('/dev/gallery')
+    // The gallery is a lazy chunk: wait for it to render before pressing Tab (#116).
+    await expect(page.getByRole('heading', { level: 1, name: 'Component gallery' })).toBeVisible()
     await page.keyboard.press('Tab')
     const toggle = page.getByRole('button', { name: 'Light' })
     await expect(toggle).toBeFocused()
