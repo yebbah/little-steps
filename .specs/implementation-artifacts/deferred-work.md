@@ -42,3 +42,4 @@
 - #127  2027-01-06  Status line clearing with programmatic navigation  (origin #39)
 - #129  2027-01-06  Serve sw.js and index.html uncached; keep server routes out of the shell fallback  (origin #42)
 - #130  2027-01-06  Check for a new app version when the app is resumed  (origin #42)
+- #132  2027-01-06  Follow a theme change made in another tab  (origin #104)

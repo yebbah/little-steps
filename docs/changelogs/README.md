@@ -24,3 +24,4 @@ Newest first. Add a line here with every new changelog.
 | 2.2 | Domain tints and icons | [story-2-2-domain-tints-and-icons.md](story-2-2-domain-tints-and-icons.md) |
 | 2.5 | Surfaces, feedback and labels | [story-2-5-surfaces-feedback-and-labels.md](story-2-5-surfaces-feedback-and-labels.md) |
 | 2.8 | PWA shell and install offer | [story-2-8-pwa-shell-and-install-offer.md](story-2-8-pwa-shell-and-install-offer.md) |
+| 2.9 | Settings shell and theme choice | [story-2-9-settings-shell-and-theme-choice.md](story-2-9-settings-shell-and-theme-choice.md) |

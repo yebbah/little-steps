@@ -134,6 +134,20 @@ export const messages = {
   'pwa.instructions': 'Open your browser menu or the share button, then choose Add to Home Screen or Install.',
   'pwa.add': 'Add to home screen',
   'pwa.gotIt': 'Got it',
+
+  // Settings (Story 2.9). Reminders and Privacy arrive with Epics 16 and 17.
+  'screen.settings.title': 'Settings',
+  'screen.settings.subject': 'Looks and install',
+  'screen.settings.intro': 'Choose how LittleSteps looks on this device.',
+  'settings.open': 'Settings',
+  'settings.back': 'Back to Family',
+  'settings.theme': 'Theme',
+  'settings.theme.light': 'Light',
+  'settings.theme.dark': 'Dark',
+  'settings.theme.system': 'System',
+  'settings.themeChanged': 'Theme set to {theme}.',
+  'settings.addToHome': 'Add to home screen',
+  'settings.alreadyInstalled': 'LittleSteps is already on your home screen.',
 } as const satisfies Record<string, string>
 
 export type MessageKey = keyof typeof messages
