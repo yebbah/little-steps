@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-06-2026 12:00
-last_updated: 11-06-2026 23:00
+last_updated: 11-07-2026 09:00
 project: little-steps
 project_key: NOKEY
 tracking_system: file-system
@@ -119,7 +119,7 @@ action_items:
     ref: ".specs/implementation-artifacts/epic-2-test-design.md"
   - id: "epic-2-test-design-item-2-red-phase-tests"
     epic: 2
-    action: "T2: un-skip the red-phase tests with their stories (AC-1 and AC-2 with 2.1, AC-3 with 2.3, AC-4 with 2.5) and widen the contrast pairings to all of DESIGN.md"
+    action: "T2: un-skip the remaining red-phase tests with their stories (AC-3 with 2.3, AC-4 with 2.5) and widen the contrast pairings to all of DESIGN.md. AC-1 and AC-2 were un-skipped with Story 2.1"
     owner: ""
     status: open
     ref: ".specs/implementation-artifacts/epic-2-atdd-red-phase.md"
