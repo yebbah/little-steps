@@ -13,7 +13,7 @@ The app gets its "Playroom" visual identity, its navigation shell, a single stat
 - The component gallery (`/dev/gallery`) renders every Epic 2 component in light and dark, at 360px, 768px and 1280px. It exists only in local and test builds: a production build contains no gallery route or code, and a test checks this.
 - Automated accessibility checks pass: axe, contrast, reflow at 320px and at 200% text, and reduced motion.
 - The app installs as a PWA shell, and the five nav destinations open placeholder screens with correct focus and titles. Settings opens from Family and holds the theme choice.
-- One recorded run of the Playwright suite on WebKit and Firefox backs the browser support claim (NFR-10). A nightly run is added only if that run finds defects (AD-28, #134).
+- One recorded run of the Playwright suite on WebKit and Firefox backs the browser support claim (NFR-10). That run found a defect (#154, fixed), so a nightly run of the suite on Chromium, WebKit and Firefox is part of the epic's close (AD-28, #134). Frontend coverage is held at 80% or more by Vitest (AD-28).
 - The Definition of done in the index is met (clean scan, full test suite passing, release note).
 
 ## Requirements covered

@@ -296,6 +296,7 @@ So that anyone integrating or reviewing the epic sees what changed, how to adopt
 
 **And** narrative sections it can't fill are marked `TODO(author)`. A check fails if any `TODO(author)` remains, or if KEV or High/Critical counts are not 0, when the epic is marked done.
 **And** when an epic is closed, the commit is tagged `epic-NN`.
+**And** the check also fails a note with `Status: done` when one of the epic's story specs (`spec-<epic>-*.md`) has a `status` other than `done`. With `--strict` (the gate `tag` runs after the epic's last merge) it also fails when the note's `Commit` hash is not a commit on `main`. A draft note skips the story check. Positive and negative tests cover each case (#101).
 
 **Given** Epic 1 is complete
 **When** its release note is generated and finished
