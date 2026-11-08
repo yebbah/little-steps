@@ -28,4 +28,6 @@ A missing input is never shown as zero: the line becomes `TODO(author)` and the 
 
 `check` always fails when the KEV or High/Critical count (findings not covered by an exception) is not 0, when the scan result is not PASS, or when a section or the `Status:` line is missing. While `Status: draft`, remaining `TODO(author)` are allowed; at `Status: done` (or with `--strict`) any `TODO(author)` fails it.
 
+At `Status: done` (or with `--strict`) it also reads the epic's story specs, `.specs/implementation-artifacts/spec-<epic>-*.md`, and fails when one has a `status` other than `done` or when none exist. With `--strict`, which `tag` runs after the epic's last merge, it also fails when the `Commit` row is missing or its hash is not a commit on `main` (a pre-squash hash fails). The commit check is strict-only because the squash commit does not exist when the note is first marked done.
+
 Epic 1's note is [epic-01-local-environment.md](epic-01-local-environment.md).

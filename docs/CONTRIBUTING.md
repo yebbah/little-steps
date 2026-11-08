@@ -107,8 +107,8 @@ Write the release note in `docs/release-notes/` covering integration, changes, n
 
 1. Run the full scan, `./mvnw verify`, the frontend tests and `deploy/release-notes.sh shell-tests`, so the latest reports exist.
 2. Generate the note with `deploy/release-notes.sh <epic>`. It fills every fact it can from git, the compose and env files, `images.yaml` and the reports, and marks the rest `TODO(author)`.
-3. Write the narrative parts, remove every `TODO(author)`, set `Status: done`, and run `deploy/release-notes.sh check docs/release-notes/epic-NN-<slug>.md`. It fails on a remaining `TODO(author)` or a KEV or High/Critical count other than 0.
+3. Write the narrative parts, remove every `TODO(author)`, set `Status: done`, and run `deploy/release-notes.sh check docs/release-notes/epic-NN-<slug>.md`. It fails on a remaining `TODO(author)`, a KEV or High/Critical count other than 0, or a story spec of the epic whose `status` is not `done`.
    The note is generated before the last PR is squash-merged, so its commit hash does not exist on `main`. Before merging, or in a follow-up docs PR, replace the `Commit` row and the last entry under "Changes" with the squash commit.
-4. After the epic's last PR is merged, tag the merge commit on `main` with `deploy/release-notes.sh tag <epic>` (it runs the check first) and push the tag. The next epic's note compares against it.
+4. After the epic's last PR is merged, tag the merge commit on `main` with `deploy/release-notes.sh tag <epic>` (it runs the check with `--strict` first, which also fails when the note's `Commit` hash is not on `main`) and push the tag. The next epic's note compares against it.
 
 Details: [release-notes/README.md](release-notes/README.md).

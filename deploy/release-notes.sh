@@ -6,8 +6,10 @@
 #                                             pre-filled from git, the compose/env/image files and the latest reports.
 #                                             Refuses to overwrite an existing note unless --force is given.
 #   deploy/release-notes.sh check <file>      fail if the note's KEV or High/Critical count is not 0, the scan
-#                                             did not pass, or (Status: done) a TODO(author) remains.
-#                                             --strict applies the "done" rules whatever the Status line says.
+#                                             did not pass, or (Status: done) a TODO(author) remains or a story
+#                                             spec of the epic (spec-<epic>-*.md) has a status other than done.
+#                                             --strict applies the "done" rules whatever the Status line says,
+#                                             and also fails when the note's Commit hash is not on main (#101).
 #   deploy/release-notes.sh tag <epic>        run the strict check, then tag HEAD `epic-NN` (local; push it yourself).
 #   deploy/release-notes.sh shell-tests       run deploy/tests/*.test.sh and write build/test-reports/shell-tests.tsv
 #                                             (suite, passed, failed, seconds) for the next generated note.
@@ -17,7 +19,7 @@
 #   backend/target/surefire-reports/TEST-*.xml, site/jacoco/jacoco.csv     ./mvnw verify
 #   frontend/test-results/junit.xml, coverage/coverage-summary.json        Vitest (Story 1.8 wires these)
 #   build/test-reports/shell-tests.tsv                                      this script, shell-tests
-# Test hooks: LS_ROOT, LS_EPICS_DIR.
+# Test hooks: LS_ROOT, LS_EPICS_DIR, LS_SPECS_DIR, LS_MAIN_REF.
 
 set -euo pipefail
 shopt -u patsub_replacement 2>/dev/null || true   # bash 5.2: keep & and \ in titles literal
@@ -25,6 +27,8 @@ shopt -u patsub_replacement 2>/dev/null || true   # bash 5.2: keep & and \ in ti
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="${LS_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 EPICS_DIR="${LS_EPICS_DIR:-$ROOT/.specs/planning-artifacts/epics}"
+SPECS_DIR="${LS_SPECS_DIR:-$ROOT/.specs/implementation-artifacts}"
+MAIN_REF="${LS_MAIN_REF:-main}"
 NOTES_DIR="$ROOT/docs/release-notes"
 TEMPLATE="$NOTES_DIR/TEMPLATE.md"
 SEC_DIR="$ROOT/build/security"
@@ -326,6 +330,32 @@ cmd_check() {
     if [ "$status" = "done" ]; then
       fail "$todos TODO(author) remain:"; grep -n 'TODO(author)' "$file" | sed 's/^/     line /' | cut -c1-140
     else echo "note: $todos TODO(author) remain (allowed while Status is draft)"; fi
+  fi
+  # Bookkeeping (#101): a done note needs every story spec of its epic done, and a strict check needs the
+  # note's Commit on main. Missing evidence fails; it is never read as "nothing to check".
+  if [ "$status" = "done" ]; then
+    local epic spec specs=0 st
+    # The title line ("# Release note: Epic 02, ...") names the epic; the file name is the fallback.
+    epic="$(sed -n -E 's/^# Release note: Epic 0*([0-9]+).*$/\1/p' "$file" | head -1)"
+    [ -n "$epic" ] || epic="$(basename "$orig" | sed -n -E 's/^epic-0*([0-9]+)-.*$/\1/p')"
+    if [ -z "$epic" ]; then fail "cannot tell which epic the note is for (no 'Release note: Epic NN' title, no epic-NN file name)"
+    else
+      for spec in "$SPECS_DIR"/spec-"$epic"-*.md; do
+        [ -f "$spec" ] || continue
+        specs=$((specs + 1))
+        st="$(awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} /^status:/{print; exit}' "$spec" | sed -E "s/^status: *//; s/^['\"]//; s/['\"] *$//; s/ *$//")"
+        [ "$st" = "done" ] || fail "story spec $(basename "$spec") has status '${st:-missing}', must be done"
+      done
+      [ "$specs" -gt 0 ] || fail "no story specs spec-$epic-*.md found in ${SPECS_DIR#"$ROOT"/}"
+    fi
+  fi
+  if [ "$strict" = 1 ]; then
+    local hash
+    hash="$(sed -n -E 's/^\| Commit \| *([0-9a-f]{7,40}) *\|.*$/\1/p' "$file" | head -1)"
+    if [ -z "$hash" ]; then fail "no 'Commit' row with a commit hash"
+    elif ! git -C "$ROOT" merge-base --is-ancestor "$hash" "$MAIN_REF" 2>/dev/null; then
+      fail "the Commit '$hash' is not a commit on $MAIN_REF; replace it with the squash commit"
+    fi
   fi
   rm -f "$tmp"
   if [ "$fails" -gt 0 ]; then echo "release-notes check: FAILED ($fails)"; return 1; fi
