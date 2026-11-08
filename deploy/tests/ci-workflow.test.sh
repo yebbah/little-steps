@@ -28,6 +28,8 @@ has "runs on push" "$CI" '^  push:'
 has "runs on pull request" "$CI" '^  pull_request:'
 has "backend: ./mvnw verify" "$CI" 'run: \./mvnw .*verify'
 has "backend: logs in to dhi.io before Testcontainers pulls the image" "$CI" "name: \"Backend: log in to dhi.io"
+has "backend: the dhi.io login is retried" "$CI" 'for attempt in 1 2 3 4'
+has "backend: the dhi.io login still fails loudly after the retries" "$CI" 'the login failed after 4 attempts'
 has "frontend: npm ci" "$CI" 'run: npm ci$'
 has "frontend: lint" "$CI" 'run: npm run lint$'
 has "frontend: typecheck" "$CI" 'run: npm run typecheck$'

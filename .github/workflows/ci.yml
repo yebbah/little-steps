@@ -49,7 +49,17 @@ jobs:
             echo "::error title=dhi.io login::the DHI_USERNAME and DHI_TOKEN repository secrets are not available (a pull request from a fork never gets them). Add them under Settings, Secrets and variables, Actions."
             exit 1
           fi
-          printf '%s' "$DHI_TOKEN" | docker login dhi.io --username "$DHI_USERNAME" --password-stdin
+          # The registry sometimes answers 503 (#102). Retry a few times with a pause; if it never succeeds the
+          # job still fails here, so a missing login is never skipped.
+          for attempt in 1 2 3 4; do
+            if printf '%s' "$DHI_TOKEN" | docker login dhi.io --username "$DHI_USERNAME" --password-stdin; then
+              exit 0
+            fi
+            echo "::warning title=dhi.io login::attempt $attempt of 4 failed"
+            [ "$attempt" -lt 4 ] && sleep $((attempt * 10))
+          done
+          echo "::error title=dhi.io login::the login failed after 4 attempts"
+          exit 1
 
       # Runs every unit and integration test (ModularityTests, Testcontainers tests once they exist),
       # JaCoCo coverage and the SBOM. The guardrail-eval tag is excluded in backend/pom.xml (Epic 13).
