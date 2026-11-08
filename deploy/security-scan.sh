@@ -215,7 +215,7 @@ policy_result() {
   kevfile="$(kev_path)" || exit 1
   kev="$(jq -c '[.vulnerabilities[].cveID]' "$kevfile")"
   exc="$(exceptions_checked | jq -c '.valid')"
-  jq -c --argjson kev "$kev" --argjson exceptions "$exc" -f "$POLICY" "$report" \
+  jq -c --argjson kev "$kev" --argjson exceptions "$exc" --argjson latestImage "${LS_IMAGE_IS_LATEST:-false}" -f "$POLICY" "$report" \
     | jq -c --arg target "$target" --argjson components "$components" \
         '{target: $target, components: $components, findings: .,
           status: (if any(.[]; .status == "block") then "FAIL" else "PASS" end)}'
@@ -357,8 +357,30 @@ cmd_images() {
     END { flush(); exit bad }' "${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}"
 }
 
+# image_is_latest NAME@DIGEST: true when the digest is the current digest of the tag that deploy/images.yaml
+# pins it under (AD-25). A missing tag, a failed lookup or a different digest is false, so a library fix
+# then still counts as available.
+image_is_latest() {
+  local ref="$1" name digest tag current
+  name="${ref%@*}"; digest="${ref#*@}"
+  tag="$(awk -v n="$name" -v d="$digest" '
+    function val(s) { sub(/^[^:]*:[ \t]*/, "", s); gsub(/["\047]/, "", s); sub(/[ \t]+#.*$/, "", s); return s }
+    /^[ \t]*-?[ \t]*name:/ { cn = val($0); ct = ""; next }
+    /^[ \t]*tag:/ { ct = val($0); next }
+    /^[ \t]*digest:/ { if (cn == n && val($0) == d) { print ct; exit } }' "${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}")"
+  [ -n "$tag" ] || return 1
+  current="$(LS_LATEST_DIGEST_CMD="${LS_LATEST_DIGEST_CMD:-}" latest_digest "$name:$tag")" || return 1
+  [ "$current" = "$digest" ]
+}
+
+# latest_digest NAME:TAG -> the digest the tag points to now. Tests replace it with LS_LATEST_DIGEST_CMD.
+latest_digest() {
+  if [ -n "${LS_LATEST_DIGEST_CMD:-}" ]; then "$LS_LATEST_DIGEST_CMD" "$1"; return; fi
+  docker buildx imagetools inspect "$1" 2>/dev/null | awk '/^Digest:/ { print $2; found = 1; exit } END { exit !found }'
+}
+
 scan_images() {
-  local manifest="${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}" refs ref n=0 failed=0 out safe
+  local manifest="${LS_IMAGES_FILE:-$ROOT/deploy/images.yaml}" refs ref n=0 failed=0 out safe latest
   if [ ! -f "$manifest" ]; then
     if [ -f "$ROOT/deploy/compose.yaml" ] || [ -f "$ROOT/deploy/Dockerfile" ]; then
       echo "[FAIL] images: deploy/compose.yaml or deploy/Dockerfile exists but deploy/images.yaml does not. Add the manifest so every image is scanned."
@@ -378,7 +400,8 @@ scan_images() {
       echo "[FAIL] image $ref could not be pulled or scanned (see build/security/image-$safe.err; dhi.io images need 'docker login dhi.io')"
       failed=1; continue
     fi
-    finish_target "image $ref" "$out" "$(jq '[.matches[]?.artifact.id] | unique | length' "$out")" report || failed=1
+    latest=false; image_is_latest "$ref" && latest=true
+    LS_IMAGE_IS_LATEST="$latest" finish_target "image $ref" "$out" "$(jq '[.matches[]?.artifact.id] | unique | length' "$out")" report || failed=1
   done <<EOF
 $refs
 EOF

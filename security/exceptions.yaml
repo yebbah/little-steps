@@ -1,5 +1,6 @@
 # Written exceptions for vulnerabilities that have NO fixed version yet (AD-25).
-# An exception never covers a finding that has a fix: upgrade instead.
+# An exception never covers a finding that has a fix available: upgrade instead. For a container image,
+# a fixed library version counts only when it is in the latest available image of the pinned tag (AD-25).
 # Every entry needs all four fields. `expires` is YYYY-MM-DD, not in the past and at most
 # 30 days from today. An expired or malformed entry fails the whole scan.
 # Every active exception is listed in the epic's release note.
@@ -88,4 +89,10 @@ exceptions:
   - cve: CVE-2026-76844
     reason: No fixed version published; zlib1g 1:1.3.dfsg+really1.3.1-1+deb13u0+dhi4 in dhi.io/keycloak:26.8.2 and in the dhi.io/eclipse-temurin:25 runtime image, the newest DHI tags on 2026-11-06.
     mitigation: Keycloak is a local development container on 127.0.0.1 with fictional data. The Temurin runtime image is the app image, not deployed anywhere yet (hosting is decided at launch). Re-scanned on every commit; replace the digests when DHI publishes newer ones, and do not deploy the app image while this exception is open.
+    expires: 2026-12-04
+
+  # 2026-11-08: zlib in axllent/mailpit:v1.33.0. Tracked in the `deferred` issue #146 (target date = expires). Policy: #145.
+  - cve: CVE-2026-4738
+    reason: zlib 1.4-r0 exists, but no Mailpit image carries it; axllent/mailpit:v1.33.0 is the latest release and the latest tag points at the same digest (checked 2026-11-08).
+    mitigation: Mailpit is a local development container published on 127.0.0.1 only, holding fictional data. Never deployed. Re-scanned on every commit; replace the digest when a Mailpit image with zlib 1.4 or later is published.
     expires: 2026-12-04

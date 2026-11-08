@@ -76,7 +76,7 @@ Rule: [security/README.md](../security/README.md#blocking-rule).
 flowchart TD
   X["Scan finding"] --> K{"In CISA KEV, or CVSS 7.0+,<br/>or unscored High/Critical?"}
   K -- "no" --> WARN["Passes with a warning<br/>(deferred issue if it needs follow-up)"]
-  K -- "yes" --> FV{"Fixed version exists?"}
+  K -- "yes" --> FV{"Fix available?<br/>(images: in the latest image of the tag)"}
   FV -- "yes" --> UP["Upgrade, replace or remove the component"]
   FV -- "no" --> EX["Entry in security/exceptions.yaml:<br/>reason, mitigation, expiry at most 30 days"]
   EX --> ISS["One deferred issue per set, target date = expiry"]

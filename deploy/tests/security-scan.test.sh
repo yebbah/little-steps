@@ -95,6 +95,25 @@ LS_EXCEPTIONS_FILE="$TMP/garbled.yaml" \
 LS_EXCEPTIONS_FILE="$(exceptions CVE-2030-0002 2026-11-16)" \
   check "exception ignored when a fix exists" 1 "BLOCK.*exception ignored" "$SCAN" evaluate "$TMP/high.json"
 
+LS_IMAGE_IS_LATEST=true LS_EXCEPTIONS_FILE="$(exceptions CVE-2030-0002 2026-11-16)" \
+  check "image: library fix not in the latest image, valid exception passes" 0 "EXCEPTED.*library fix not in the latest image|EXCEPTED.*exception until" "$SCAN" evaluate "$TMP/high.json"
+LS_IMAGE_IS_LATEST=true check "image: library fix not in the latest image, no exception still blocks" 1 "BLOCK" "$SCAN" evaluate "$TMP/high.json"
+LS_IMAGE_IS_LATEST=false LS_EXCEPTIONS_FILE="$(exceptions CVE-2030-0002 2026-11-16)" \
+  check "image: a newer image exists, exception ignored" 1 "BLOCK.*exception ignored" "$SCAN" evaluate "$TMP/high.json"
+
+# image_is_latest: the pinned digest must equal the tag's current digest; any doubt is "not latest".
+printf 'images:\n  - name: acme/tool\n    tag: "1.2"\n    digest: sha256:aaa\n' > "$TMP/latest-images.yaml"
+printf '#!/bin/sh\necho sha256:aaa\n' > "$TMP/digest-same.sh"; printf '#!/bin/sh\necho sha256:bbb\n' > "$TMP/digest-new.sh"; printf '#!/bin/sh\nexit 1\n' > "$TMP/digest-fail.sh"
+chmod +x "$TMP"/digest-*.sh
+latest_check() { # CMD -> prints yes or no
+  ( ROOT="$HERE/../.."; LS_IMAGES_FILE="$TMP/latest-images.yaml"; LS_LATEST_DIGEST_CMD="$1"
+    eval "$(awk '/^image_is_latest\(\) \{/,/^}/; /^latest_digest\(\) \{/,/^}/' "$SCAN")"
+    if image_is_latest "acme/tool@sha256:aaa"; then echo yes; else echo no; fi )
+}
+check "image_is_latest: same digest" 0 "yes" latest_check "$TMP/digest-same.sh"
+check "image_is_latest: tag moved on" 0 "no" latest_check "$TMP/digest-new.sh"
+check "image_is_latest: lookup failed, fails closed" 0 "no" latest_check "$TMP/digest-fail.sh"
+
 report GHSA-aaaa-bbbb-cccc 5.0 null | jq '.matches[0].relatedVulnerabilities = [{id: "CVE-2000-0001"}]' > "$TMP/alias.json"
 check "KEV match through a GHSA alias blocks" 1 "BLOCK.*CVE-2000-0001.*KEV=yes" "$SCAN" evaluate "$TMP/alias.json"
 
