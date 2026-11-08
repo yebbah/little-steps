@@ -44,7 +44,7 @@ A Caregiver with an invite signs in, gives consent, creates a Family, and invite
   - Invites (pilot and Family) expire after 7 days and are single-use.
   - Epic 3 delivers security notices by banner and email. Epic 16 adds push and the deletion notices.
   - When the last Caregiver leaves, the 7-day Family deletion starts. That Caregiver can undo it by signing in again before the date.
-  - Operator tasks live in an in-app maintainer console, gated by a Keycloak realm role `maintainer`. A maintainer can never read Family content (AD-2). Its first tool is pilot invites. The console lives in a new platform module `operator` that depends only on `family.api` and `notifications` (proposed AD-28; the PRD and UX addenda follow).
+  - Operator tasks live in an in-app maintainer console, gated by a Keycloak realm role `maintainer`. A maintainer can never read Family content (AD-2). Its first tool is pilot invites. The console lives in a new platform module `operator` that depends only on `family.api` and `notifications` (proposed AD-29; the PRD and UX addenda follow).
   - An invite can be accepted only by an account whose verified email matches the invited email.
   - Audit recording is its own story (3.7), separate from Family creation.
 - **Not in this epic:**
@@ -224,6 +224,7 @@ So that we can always check who accessed our child's information and when.
 **And** a public `audit.api.AuditEventTypes` lists the membership types (`caregiver_joined`, `caregiver_left`, `caregiver_removed`, `family_deletion_requested`, `family_deletion_cancelled`). Later stories publish these and the same listener records them.
 **And** the `ExportContributor` and the viewer for this table come in Epic 17.
 **And** tests cover: the recorded types, no row before membership, idempotent replay, and a direct `UPDATE` or `DELETE` failing under the app role.
+**And** this is the first real `@ApplicationModuleListener`, so the tests also cover startup resubmission: an incomplete `event_publication` row is picked up by a fresh context on the same container with no manual call, and the `prod` profile refuses to start without its datasource variables (AD-1, #83).
 
 ### Story 3.8: Invite a co-caregiver and join the Family
 

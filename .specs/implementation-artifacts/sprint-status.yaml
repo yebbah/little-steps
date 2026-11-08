@@ -107,7 +107,7 @@ action_items:
     ref: ".specs/implementation-artifacts/epic-1-retro-2026-11-06.md"
   - id: "epic-1-retro-item-6-before-epic-3"
     epic: 1
-    action: "A6: land #88 and #83 before Epic 3"
+    action: "A6: land #83 before Story 3.7 (first real listener) and #88 as an ordinary CI task; no longer a gate for Story 3.1 (Epic 2 team discussion)"
     owner: ""
     status: open
     ref: ".specs/implementation-artifacts/epic-1-retro-2026-11-06.md"
@@ -136,8 +136,7 @@ action_items:
     ref: "frontend/README.md"
   - id: "epic-2-retro-item-10-r1-confirm-t1-nightly-webkit-and-firefox"
     epic: 2
-    action: "R1: confirm T1 (nightly WebKit and Firefox #134, no performance budget,
-      frontend coverage target)"
+    action: "R1: confirm T1 after one recorded manual WebKit and Firefox run (#144, #134); nightly only if it finds defects; decide the frontend coverage target"
     owner: "maintainer"
     status: open
     ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
@@ -150,13 +149,13 @@ action_items:
     ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
   - id: "epic-2-retro-item-12-r4-replace-the-three-hand-rolled-externa"
     epic: 2
-    action: "R4: replace the three hand-rolled external stores with one shared helper"
+    action: "R4: dropped. The three external stores share about six lines and differ in meaning; no defect traces to the duplication (Epic 2 team discussion)"
     owner: "frontend dev"
-    status: open
+    status: done
     ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
   - id: "epic-2-retro-item-13-r5-move-shell-statuscontext-ts-so-surfac"
     epic: 2
-    action: "R5: move shell/statusContext.ts so surfaces does not import from shell"
+    action: "R5: move shell/statusContext.ts so surfaces does not import from shell, then enforce it with a lint rule (AD-28, #143)"
     owner: "frontend dev"
     status: open
     ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
@@ -185,7 +184,7 @@ action_items:
     epic: 2
     action: "R9: write in Story 2.8 acceptance how first open is counted (spec reconciliation)"
     owner: "maintainer"
-    status: open
+    status: done
     ref: ".specs/implementation-artifacts/epic-2-retro-2026-11-07.md"
   - id: "epic-2-retro-item-18-r10-allow-the-merge-command-in-agent-per"
     epic: 2
