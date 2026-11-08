@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install --with-deps chromium"
+    "test:e2e:install": "playwright install --with-deps chromium",
+    "test:e2e:install:all": "playwright install --with-deps chromium webkit firefox"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.3.1",

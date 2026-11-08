@@ -28,6 +28,7 @@ npx playwright test --debug       # step through with the inspector
 npx playwright test -g "axe"      # by title
 E2E_ALL_BROWSERS=true npm run test:e2e   # add WebKit and Firefox (nightly matrix)
 BASE_URL=http://localhost:4173 npm run test:e2e   # use a server you already started
+E2E_SERVER=preview npm run test:e2e                # build the bundle and test it with vite preview (what the nightly run does)
 E2E_REUSE_SERVER=true npm run test:e2e        # reuse a test-mode server already on the port (by default a busy port fails fast)
 API_URL=http://localhost:8080 npm run test:e2e    # also run the optional API samples
 ```
@@ -61,7 +62,7 @@ Component tests opt into jsdom with `// @vitest-environment jsdom` on the first 
 
 ## CI
 
-The "Frontend" job runs lint, the lint rule tests, typecheck, Vitest and build. The separate job "Frontend: accessibility" runs `npm run test:e2e:install` then `npm run test:e2e` against the Vite test-mode server (the gallery on), and uploads `playwright-report/` and `test-results/`. Pull requests run Chromium only. A nightly WebKit and Firefox run (`E2E_ALL_BROWSERS=true`) is not scheduled yet: it is tracked in #134.
+The "Frontend" job runs lint, the lint rule tests, typecheck, Vitest and build. The separate job "Frontend: accessibility" runs `npm run test:e2e:install` then `npm run test:e2e` against the Vite test-mode server (the gallery on), and uploads `playwright-report/` and `test-results/`. Pull requests run Chromium only. The scheduled workflow `nightly-e2e.yml` runs all three browsers every night against the built bundle (`E2E_ALL_BROWSERS=true E2E_SERVER=preview`, #134); start it by hand from the Actions tab with "Run workflow".
 
 ## Not set up
 
