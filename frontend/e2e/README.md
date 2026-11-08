@@ -52,6 +52,7 @@ Component tests opt into jsdom with `// @vitest-environment jsdom` on the first 
 
 - Specs import `test`, `expect` and `log` from `../support/merged-fixtures`, never from `@playwright/test` (playwright-utils mandate).
 - Select by role and accessible name first (`getByRole`, `getByLabel`). Use `data-testid` only when no accessible name exists. This also keeps tests honest about accessibility.
+- Press Tab with `pressTab(page)` from `support/helpers/keyboard.ts`, never `page.keyboard.press('Tab')`: Safari skips buttons and links on a plain Tab (Option+Tab reaches them), so on WebKit the helper presses Option+Tab.
 - No `waitForTimeout`. Wait on a condition: web-first `expect`, or `recurse` for eventually consistent state.
 - Declare `interceptNetworkCall({ url })` before `page.goto`, await it after, once the app calls an API.
 - Every test is independent: no shared state, no order. Tests name their priority: `[P0]`, `[P1]`.
