@@ -4,6 +4,8 @@
 # input:   a Grype report (`grype -o json`)
 # --argjson kev         array of CVE ids in the CISA KEV catalog
 # --argjson exceptions  array of VALIDATED exception entries ({cve, reason, mitigation, expires})
+# --argjson latestImage true when the scanned image is the latest available image of its pinned tag.
+#                       Then a fixed library version is not a fix available (AD-25): the fix has not reached the image.
 #
 # A finding blocks when: a CVE it maps to is in KEV, or its highest CVSS base score is 7.0 or more,
 # or it has no score at all and Grype rates it High or Critical (unknown is treated as worst case).
@@ -20,7 +22,8 @@ def scores:
   | ids as $ids
   | (scores | if length == 0 then null else max end) as $cvss
   | ([$ids[] | select(. as $i | $kev | index($i))] | length > 0) as $isKev
-  | ((.vulnerability.fix.versions // []) | map(select(. != ""))) as $fixed
+  | ((.vulnerability.fix.versions // []) | map(select(. != ""))) as $libraryFixed
+  | (if $latestImage then [] else $libraryFixed end) as $fixed
   | ((.vulnerability.severity // "") | ascii_downcase) as $sev
   | ($isKev or ($cvss != null and $cvss >= 7.0)
       or ($cvss == null and ($sev == "high" or $sev == "critical"))) as $blocking
@@ -32,12 +35,14 @@ def scores:
       kev: $isKev,
       cvss: $cvss,
       severity: .vulnerability.severity,
-      fixed: $fixed,
+      fixed: $libraryFixed,
       status: (if ($blocking | not) then "warn"
                elif ($fixed | length) == 0 and $exc != null then "excepted"
                else "block" end),
       exceptionNote: (if $blocking and ($fixed | length) > 0 and $exc != null
                       then "exception ignored: a fixed version exists, upgrade instead"
+                      elif $blocking and ($libraryFixed | length) > 0 and ($fixed | length) == 0 and $exc != null
+                      then "library fix not in the latest image"
                       else null end),
       exceptionExpires: (if $exc != null then $exc.expires else null end) }
 ] | group_by([.package, .version, .cve])

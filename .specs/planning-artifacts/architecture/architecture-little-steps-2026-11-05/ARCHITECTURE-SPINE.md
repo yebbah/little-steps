@@ -356,7 +356,7 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
     - the images listed in `deploy/images.yaml`
   - **Blocking rule:** any finding whose CVE is in the CISA KEV catalog, or whose CVSS is High or Critical (7.0 or above), blocks the commit or build until it is fixed by upgrading, replacing or removing the component.
   - The KEV feed is cached daily. With no cache, the scan blocks.
-  - The only way past a blocking finding without a fix is when no fixed version exists. That needs an entry in `security/exceptions.yaml` with the CVE, the reason, the mitigation and an expiry of at most 30 days. An expired entry blocks again. Every active exception appears in the release note (AD-27).
+  - The only way past a blocking finding without a fix is when no fix is available. For dependencies that means no fixed version exists. For a container image, a fixed library version does not count unless it is in the latest available image of the pinned tag: a pin that is not the tag's latest digest is upgraded, and a pin that is the latest digest keeps the finding without a fix. A failed lookup of the latest digest counts as a fix available. An exception needs an entry in `security/exceptions.yaml` with the CVE, the reason, the mitigation and an expiry of at most 30 days. An expired entry blocks again. Every active exception appears in the release note (AD-27).
   - Scan reports (`build/security/`) feed the release note.
   - GitHub Actions are pinned to full commit SHAs. Scanner versions are pinned, and their checksums are verified by the script.
 
