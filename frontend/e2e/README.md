@@ -28,6 +28,7 @@ npx playwright test --debug       # step through with the inspector
 npx playwright test -g "axe"      # by title
 E2E_ALL_BROWSERS=true npm run test:e2e   # add WebKit and Firefox (nightly matrix)
 BASE_URL=http://localhost:4173 npm run test:e2e   # use a server you already started
+E2E_REUSE_SERVER=true npm run test:e2e        # reuse a test-mode server already on the port (by default a busy port fails fast)
 API_URL=http://localhost:8080 npm run test:e2e    # also run the optional API samples
 ```
 
