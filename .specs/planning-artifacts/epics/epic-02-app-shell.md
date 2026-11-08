@@ -13,6 +13,7 @@ The app gets its "Playroom" visual identity, its navigation shell, a single stat
 - The component gallery (`/dev/gallery`) renders every Epic 2 component in light and dark, at 360px, 768px and 1280px. It exists only in local and test builds: a production build contains no gallery route or code, and a test checks this.
 - Automated accessibility checks pass: axe, contrast, reflow at 320px and at 200% text, and reduced motion.
 - The app installs as a PWA shell, and the five nav destinations open placeholder screens with correct focus and titles. Settings opens from Family and holds the theme choice.
+- One recorded run of the Playwright suite on WebKit and Firefox backs the browser support claim (NFR-10). A nightly run is added only if that run finds defects (AD-28, #134).
 - The Definition of done in the index is met (clean scan, full test suite passing, release note).
 
 ## Requirements covered
@@ -24,7 +25,7 @@ The app gets its "Playroom" visual identity, its navigation shell, a single stat
   - UX-DR128–129 (breakpoints, install)
   - UX-DR135–137 (voice, tone, copy catalogue)
 - **NFRs:** NFR-8 (tone), NFR-9 and NFR-10 (PWA, browsers), NFR-14 (accessibility), NFR-15 (language)
-- **Architecture:** AD-18 (UI copy in catalogs), AD-23 (Radix with CSS modules on token variables; service worker precaches the shell only)
+- **Architecture:** AD-18 (UI copy in catalogs), AD-23 (Radix with CSS modules on token variables; service worker precaches the shell only), AD-28 (`surfaces` never imports from `shell`; browser evidence)
 - **Not in this epic:**
   - UX-DR15 (image-layer focus) comes in Epic 18.
   - UX-DR130 (push offer) comes in Epic 16.
@@ -111,9 +112,10 @@ So that I can reach anything quickly by touch, keyboard or screen reader.
 **When** the new screen renders
 **Then** `document.title` becomes "<Screen>: <subject> · LittleSteps", and focus moves to the `<h1>` (UX-DR117).
 **And** one `role="status"` region lives in the shell, outside routed content, present and empty from first load. A `useStatus()` hook is the only way to announce. For navigating actions the order is: route → title → focus the `<h1>` → message on the next frame (UX-DR116).
-**And** browser and OS Back works on every screen and restores scroll and focus position (UX-DR112).
+**And** browser and OS Back works on every screen and restores scroll and focus position (UX-DR112). Scroll is the router's. Focus returns to the element that held it when that element carries a `data-focus-key` and still exists; on a screen with no such element, focus goes to the `<h1>`. Each screen story that has a list or a card to return to gives it a `data-focus-key` and tests Back (retro item R8).
 **And** orientation is never locked (UX-DR124).
 **And** routing uses React Router, and a route-change test checks the title, the focus on the `<h1>` and Back with restored scroll and focus.
+**And** `statusContext.ts` lives in a neutral module, and an import-boundary lint rule fails on any import from `surfaces` to `shell` (AD-28, #143).
 
 ### Story 2.4: Core controls
 
@@ -256,7 +258,7 @@ So that it opens like an app while still working fully in the browser.
 **Given** the install offer component
 **When** a feature calls `offerInstall()` (first called after the first saved Review in Epic 9)
 **Then** it uses the browser's own install prompt where one is available, or short instructions where there isn't (iOS Safari, Firefox), based on feature detection, never on browser name (NFR-10, UX-DR129).
-**And** it is never shown on first open, never shown again after "Not now" unless the Caregiver chooses "Add to home screen" in Settings (Story 2.9), and every feature works uninstalled.
+**And** it is never shown on first open: an offer started by a feature waits for the Caregiver's second browser session (one visit is counted per browser session, kept on the device), and a device that blocks storage never gets a feature-triggered offer. It is never shown again after "Not now" unless the Caregiver chooses "Add to home screen" in Settings (Story 2.9), and every feature works uninstalled.
 **And** tests cover the prompt path, the instructions path and the "Not now" path.
 
 ### Story 2.9: Settings shell and theme choice

@@ -396,6 +396,15 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
     - Test results: new tests for this epic (positive and negative cases), plus the full non-regression suite with counts and duration
     - Known issues
 
+### AD-28 — Frontend source layers are closed, and a lint rule enforces them
+
+- **Binds:** frontend
+- **Prevents:** import cycles between the app shell and the components it hosts, found only when the first screen imports both.
+- **Rule:**
+  - `surfaces` (status line, banners, sheets, dialogs) never imports from `shell` (app shell, navigation, screens). `shell` may import from `surfaces`. Anything both need lives in a neutral module.
+  - An import-boundary lint rule fails the build on a `surfaces` import from `shell`, like `ModularityTests` does for backend modules (AD-1). Adding a layer or an edge means amending this AD.
+  - Browser support (NFR-10) is claimed only for browsers whose results are recorded. Pull requests run the Playwright suite on Chromium. WebKit and Firefox are run once by hand and recorded in #134. A nightly WebKit and Firefox workflow is added only if that run finds defects.
+
 ## Consistency Conventions
 
 | Concern | Convention |

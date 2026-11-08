@@ -45,3 +45,4 @@
 - #137  2027-01-06  Plural-aware catalog strings  (origin #3, Epic 2 review)
 - #138  2027-01-06  Catalog coverage tests read the spines  (origin #3, Epic 2 review)
 - #139  2027-01-06  Axe incomplete results for contrast over the scrim  (origin #3, Epic 2 review)
+- #146  2026-12-04  Mailpit exception: re-check for an image with zlib 1.4 (CVE-2026-4738)  (origin #145, image-fix policy)
