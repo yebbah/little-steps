@@ -5,7 +5,7 @@ import { isInstalled, offerInstall } from '../pwa/install.ts'
 import { StatusLine } from '../surfaces/StatusLine.tsx'
 import { appliedThemeChoice, setThemeChoice, isThemeChoice, type ThemeChoice } from '../styles/theme.ts'
 import { Button, ChoiceChips } from '../ui/index.ts'
-import { useStatus } from './statusContext.ts'
+import { useStatus } from '../status/statusContext.ts'
 import { FOCUS_KEY_ATTRIBUTE } from './useRouteFocus.ts'
 import styles from './SettingsScreen.module.css'
 
