@@ -1,4 +1,5 @@
 import { test, expect, log } from '../support/merged-fixtures'
+import { pressTab } from '../support/helpers/keyboard'
 
 // R-03 (Story 2.3): title, focus and announcements on route change.
 // Assumes nav links named Today / Goals / Activities / Share / Family (Story 2.3 AC). Adjust if the labels change.
@@ -43,7 +44,7 @@ test.describe('app shell layout and Back', () => {
 
   test('[P0] Skip to content is the first tab stop and focuses main', async ({ page }) => {
     await page.goto('/today')
-    await page.keyboard.press('Tab')
+    await pressTab(page)
     const skip = page.getByRole('link', { name: 'Skip to content' })
     await expect(skip).toBeFocused()
     await page.keyboard.press('Enter')

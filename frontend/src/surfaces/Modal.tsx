@@ -1,5 +1,5 @@
 import * as RadixDialog from '@radix-ui/react-dialog'
-import { useLayoutEffect, useRef, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, type PointerEvent, type ReactNode } from 'react'
 import { t } from '../i18n/messages.ts'
 import { Button } from '../ui/Button.tsx'
 import { ActionRow } from './ActionRow.tsx'
@@ -32,6 +32,9 @@ interface ModalProps extends SheetProps {
   footerLayout?: 'free' | 'actions'
 }
 
+/** A click older than this did not open the modal. */
+const RECENT_CLICK_MS = 1000
+
 /**
  * The shared modal (UX-DR28, UX-DR113), on Radix: `role="dialog" aria-modal="true" aria-labelledby`, focus
  * to the heading on open, trapped inside, back to the invoker on close, the page behind inert. Closes on Esc,
@@ -41,15 +44,39 @@ function Modal({ open, onOpenChange, title, description, children, footer, foote
   const titleRef = useRef<HTMLHeadingElement>(null)
   const startY = useRef<number | null>(null)
   const { container, visible } = useModalLevel(open, onOpenChange)
-  // Radix returns focus only to its own Trigger. Sheets are opened by any button, so the invoker is whatever
-  // had focus when the modal was asked to open. A layout effect runs before Radix moves focus into the modal.
+  // Radix returns focus only to its own Trigger. Sheets are opened by any button, so the invoker is the control
+  // that was just activated, else whatever had focus when the modal was asked to open. A layout effect runs
+  // before Radix moves focus into the modal.
+  const lastActivated = useRef<{ element: HTMLElement; at: number } | null>(null)
+  useEffect(() => {
+    // Capture phase: runs before the click handler that opens the modal.
+    const remember = (event: MouseEvent) => {
+      const target = event.target instanceof Element ? event.target.closest<HTMLElement>('button, [role="button"], a[href]') : null
+      lastActivated.current = target ? { element: target, at: event.timeStamp } : null
+    }
+    document.addEventListener('click', remember, true)
+    return () => document.removeEventListener('click', remember, true)
+  }, [])
   const invoker = useRef<HTMLElement | null>(null)
+  const wasOpen = useRef(false)
   useLayoutEffect(() => {
-    if (!open) return
+    if (!open) {
+      wasOpen.current = false
+      return
+    }
+    // The portal container can change while the modal is open; only the moment it opens names the invoker.
+    if (wasOpen.current) return
+    wasOpen.current = true
     const active = document.activeElement
     const usable = active instanceof HTMLElement && active !== document.body && !container?.contains(active)
-    // Nothing usable has focus: forget the previous invoker so focus never returns to a stale element.
-    invoker.current = usable ? active : null
+    // The control that was just activated is the invoker. Safari does not focus a button on click, so
+    // activeElement can be something else (the body, or the page's main after a route change) (#154).
+    const activated = lastActivated.current
+    lastActivated.current = null
+    const recent = activated !== null && performance.now() - activated.at < RECENT_CLICK_MS
+    const clicked = recent && activated.element.isConnected && !container?.contains(activated.element) ? activated.element : null
+    // Nothing usable has focus or was activated: forget the previous invoker so focus never returns to a stale element.
+    invoker.current = clicked ?? (usable ? active : null)
   }, [open, container])
 
   const swipeStart = (event: PointerEvent) => {

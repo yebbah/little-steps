@@ -66,6 +66,18 @@ test('Esc closes the sheet and returns focus to the invoker', async () => {
   await waitFor(() => expect(invoker).toHaveFocus())
 })
 
+test('when a click does not focus the button (Safari), focus still returns to the invoker (#154)', async () => {
+  render(<Host />)
+  const invoker = screen.getByRole('button', { name: OPEN })
+  // fireEvent.click dispatches the click without focusing the button, as Safari does.
+  fireEvent.click(invoker)
+  expect(document.activeElement).not.toBe(invoker)
+  await screen.findByRole('dialog')
+  await userEvent.keyboard('{Escape}')
+  expect(screen.queryByRole('dialog')).toBeNull()
+  await waitFor(() => expect(invoker).toHaveFocus())
+})
+
 test('Close closes the sheet and returns focus to the invoker', async () => {
   render(<Host />)
   const invoker = screen.getByRole('button', { name: OPEN })

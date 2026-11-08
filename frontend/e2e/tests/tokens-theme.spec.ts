@@ -1,4 +1,5 @@
 import { test, expect, log } from '../support/merged-fixtures'
+import { pressTab } from '../support/helpers/keyboard'
 import { seriousViolations } from '../support/helpers/a11y'
 import { FRAME_WIDTHS, viewport } from '../support/helpers/viewports'
 
@@ -87,7 +88,7 @@ test.describe('component gallery at /dev/gallery', () => {
     await page.goto('/dev/gallery')
     // The gallery is a lazy chunk: wait for it to render before pressing Tab (#116).
     await expect(page.getByRole('heading', { level: 1, name: 'Component gallery' })).toBeVisible()
-    await page.keyboard.press('Tab')
+    await pressTab(page)
     const toggle = page.getByRole('button', { name: 'Light' })
     await expect(toggle).toBeFocused()
     await expect(toggle).toHaveCSS('outline-width', '2px')
