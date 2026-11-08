@@ -106,7 +106,7 @@ printf 'images:\n  - name: acme/tool\n    tag: "1.2"\n    digest: sha256:aaa\n' 
 printf '#!/bin/sh\necho sha256:aaa\n' > "$TMP/digest-same.sh"; printf '#!/bin/sh\necho sha256:bbb\n' > "$TMP/digest-new.sh"; printf '#!/bin/sh\nexit 1\n' > "$TMP/digest-fail.sh"
 chmod +x "$TMP"/digest-*.sh
 latest_check() { # CMD -> prints yes or no
-  ( ROOT="$HERE/../.."; LS_IMAGES_FILE="$TMP/latest-images.yaml"; LS_LATEST_DIGEST_CMD="$1"
+  ( export ROOT="$HERE/../.." LS_IMAGES_FILE="$TMP/latest-images.yaml" LS_LATEST_DIGEST_CMD="$1"
     eval "$(awk '/^image_is_latest\(\) \{/,/^}/; /^latest_digest\(\) \{/,/^}/' "$SCAN")"
     if image_is_latest "acme/tool@sha256:aaa"; then echo yes; else echo no; fi )
 }
