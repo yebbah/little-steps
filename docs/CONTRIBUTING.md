@@ -57,6 +57,7 @@ Example: `feature/epic-01-issue-28-hardened-local-infrastructure`.
 - CI ([ci.yml](../.github/workflows/ci.yml)) runs on every push and pull request. The jobs, secrets, artifacts and caches are in the [README](../README.md#continuous-integration); the flow is in [workflow.md](workflow.md#5-continuous-integration).
 - A PR is merged only when all CI jobs are green. Never merge on red, never skip or disable a job to get green, and never rerun a failing job until it passes without finding out why (a flaky test becomes a `deferred` issue).
 - A change to the CI workflow follows the same rules as code: spec first when it changes what a spec requires (for example which scans run in CI), and every action is pinned to a full commit SHA.
+- Backend test classes end in `Test` or `Tests`: Maven Surefire runs no other name, so a misnamed class passes by never running. CI fails when the `ModularityTests` or `PersistenceBaselineTests` report is missing.
 - A required CI script or report that is missing fails the job. CI never skips a check because its script has not arrived yet (the skip in the OpenAPI type check is removed by #88).
 - Checks that CI does not run (image scans, app image build) are run by hand before a release and recorded in the epic's release note.
 

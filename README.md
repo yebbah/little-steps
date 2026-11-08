@@ -150,7 +150,7 @@ Reports are written to `build/security/`. The first run downloads the vulnerabil
 
 | Job | Runs |
 |---|---|
-| Backend | `./mvnw verify`: all tests, JaCoCo coverage, SBOM. Tests tagged `guardrail-eval` are excluded by default (wired up in Epic 13) |
+| Backend | `./mvnw verify`: all tests, JaCoCo coverage, SBOM, then a check that the `ModularityTests` and `PersistenceBaselineTests` reports exist. Tests tagged `guardrail-eval` are excluded by default (wired up in Epic 13) |
 | Frontend | `npm ci`, lint (oxlint and stylelint), lint rule tests, typecheck, Vitest with coverage, build, then the OpenAPI type drift check (`api:check`) |
 | Frontend: accessibility | Playwright against a test-mode build with the gallery on: axe (no serious or critical violation, light and dark, every shell screen and gallery frame), reflow at 320px and 200% text, the reflow rules, focus and the sheet and dialog rules. Chromium on pull requests; results are listed in [docs/a11y-passes.md](docs/a11y-passes.md) |
 | Scripts | `deploy/check-actions.sh` (every action pinned to a commit SHA, version in a comment), `shellcheck` on `deploy/*.sh`, `deploy/tests/*.sh` and `.githooks/*`, `deploy/check-images.sh`, and the tests of the check scripts |
