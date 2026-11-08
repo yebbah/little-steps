@@ -46,6 +46,8 @@ test.describe('sheet and dialog', () => {
 
     await invoker.click()
     await expect(page.getByRole('dialog')).toBeVisible()
+    // The scrim only takes a tap once the sheet has finished opening: wait for its animation, not a fixed time.
+    await page.getByRole('dialog').evaluate((el) => Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)))
     await page.mouse.click(5, 5)
     await expect(page.getByRole('dialog')).toBeHidden()
     await expect(invoker).toBeFocused()

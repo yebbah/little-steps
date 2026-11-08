@@ -44,7 +44,11 @@ export default defineConfig({
   webServer: process.env.BASE_URL
     ? undefined
     : {
-        command: `npx vite --mode test --port ${PORT} --strictPort`,
+        // E2E_SERVER=preview tests the built bundle (what the nightly run uses); the default is the dev server.
+        command:
+          process.env.E2E_SERVER === 'preview'
+            ? `npx vite build --mode test && npx vite preview --mode test --port ${PORT} --strictPort`
+            : `npx vite --mode test --port ${PORT} --strictPort`,
         url: BASE_URL,
         // A leftover server on this port would run the tests against stale code. Reuse one only when asked.
         reuseExistingServer: process.env.E2E_REUSE_SERVER === 'true',

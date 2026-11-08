@@ -36,6 +36,15 @@ has "frontend: typecheck" "$CI" 'run: npm run typecheck$'
 has "frontend: Vitest with coverage" "$CI" 'run: npm run test:coverage$'
 VITE="$HERE/../../frontend/vite.config.ts"
 has "frontend: the coverage floor is 80% for lines, statements, functions and branches (AD-28)" "$VITE" 'thresholds: \{ lines: 80, statements: 80, functions: 80, branches: 80 \}'
+NIGHTLY="$HERE/../../.github/workflows/nightly-e2e.yml"
+[ -f "$NIGHTLY" ] || { fail=$((fail + 1)); echo "FAIL missing $NIGHTLY"; }
+has "nightly: runs on a schedule" "$NIGHTLY" '^  schedule:'
+has "nightly: can be started by hand" "$NIGHTLY" '^  workflow_dispatch:'
+has "nightly: all three browsers" "$NIGHTLY" 'E2E_ALL_BROWSERS: "true"'
+has "nightly: tests the built bundle, not the dev server" "$NIGHTLY" 'E2E_SERVER: preview'
+has "nightly: installs Chromium, WebKit and Firefox" "$NIGHTLY" 'run: npm run test:e2e:install:all$'
+has "nightly: uploads its reports" "$NIGHTLY" 'name: nightly-browser-reports'
+lacks "nightly: no write permission" "$NIGHTLY" 'contents: write'
 has "frontend: build" "$CI" 'run: npm run build$'
 has "frontend: OpenAPI drift check" "$CI" 'run: npm run api:check$'
 lacks "frontend: the drift check never skips" "$CI" 'api:check script arrives|skipped, the'

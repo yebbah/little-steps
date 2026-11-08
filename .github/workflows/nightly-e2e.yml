@@ -1,0 +1,62 @@
+# Nightly browser matrix (AD-28, #134). Pull requests run Chromium only (ci.yml); this runs the whole
+# Playwright suite on Chromium, WebKit and Firefox against the built bundle, not the dev server.
+# A red night is a defect: raise an issue (docs/CONTRIBUTING.md), do not rerun until green.
+name: Nightly browsers
+
+on:
+  schedule:
+    # 03:17 UTC every day, off the hour to avoid the busiest minutes on GitHub-hosted runners.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  browsers:
+    name: "Frontend: Chromium, WebKit and Firefox on the built bundle"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node 24 (npm cache on)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: "Nightly: npm ci"
+        run: npm ci
+
+      - name: "Nightly: install Chromium, WebKit and Firefox"
+        run: npm run test:e2e:install:all
+
+      # E2E_SERVER=preview makes Playwright run `vite build --mode test` and serve it with `vite preview`;
+      # E2E_ALL_BROWSERS=true adds the WebKit and Firefox projects (playwright.config.ts).
+      - name: "Nightly: Playwright on all three browsers"
+        env:
+          E2E_SERVER: preview
+          E2E_ALL_BROWSERS: "true"
+        run: npm run test:e2e
+
+      - name: Upload nightly reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: nightly-browser-reports
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          if-no-files-found: warn
+          retention-days: 30
