@@ -386,6 +386,7 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
     - quality reports
     - test results
   - The narrative sections are written by the developer or agent closing the epic.
+  - `deploy/release-notes.sh check` also reads the epic's story specs (`.specs/implementation-artifacts/spec-<epic>-*.md`) and the note's `Commit` row. A note with `Status: done` fails when a story spec's `status` is not `done`. With `--strict`, which `tag` runs after the epic's last merge, it also fails when the `Commit` hash is not a commit on `main`. A draft note skips the story check, and a done note skips the commit check before that merge, because the squash commit does not exist yet.
   - Required sections:
     - Summary
     - New features (by story)
@@ -403,7 +404,8 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
 - **Rule:**
   - `surfaces` (status line, banners, sheets, dialogs) never imports from `shell` (app shell, navigation, screens). `shell` may import from `surfaces`. Anything both need lives in a neutral module.
   - An import-boundary lint rule fails the build on a `surfaces` import from `shell`, like `ModularityTests` does for backend modules (AD-1). Adding a layer or an edge means amending this AD.
-  - Browser support (NFR-10) is claimed only for browsers whose results are recorded. Pull requests run the Playwright suite on Chromium. WebKit and Firefox are run once by hand and recorded in #134. A nightly WebKit and Firefox workflow is added only if that run finds defects.
+  - Browser support (NFR-10) is claimed only for browsers whose results are recorded. Pull requests run the Playwright suite on Chromium. WebKit and Firefox were run once and recorded in #134. That run found a defect (#154), so a scheduled workflow now runs the suite on Chromium, WebKit and Firefox every night against the built bundle (`vite build --mode test` served by `vite preview`), not the dev server. A red night is reported by the failed run and is fixed through an issue like any other defect.
+  - Frontend coverage must stay at or above 80% for lines, statements, functions and branches. Vitest fails the build below that. This is the enforced form of the 80%-on-new-code target: a diff-coverage tool is not added while the whole suite is far above the floor, and this is revisited if the measured figure nears 80%.
 
 ## Consistency Conventions
 

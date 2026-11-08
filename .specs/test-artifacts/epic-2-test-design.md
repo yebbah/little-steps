@@ -104,8 +104,8 @@ TECH technical/architecture · SEC security · PERF performance · DATA data int
 **Unknown thresholds:**
 
 - Performance: no load-time or bundle-size budget in the epic or NFRs. Clarify before adding any perf test.
-- Browser matrix: NFR-10 says "current" browsers but not which engines CI runs. Assumption: Chromium on every PR, WebKit and Firefox nightly. Needs confirming.
-- Coverage threshold: no frontend target found in the CI workflow. Using ≥80% on new code as a proposal.
+- Browser matrix: decided (T1, 2026-11-08). Chromium on every PR; WebKit and Firefox in a nightly workflow on the built bundle, added because the recorded run found a defect (#154, AD-28).
+- Coverage threshold: decided (T1, 2026-11-08). At least 80% for lines, statements, functions and branches, enforced by Vitest over the whole frontend (AD-28). The suite measures above 90%, so the floor holds new code to the bar.
 
 ---
 
@@ -193,7 +193,7 @@ None identified.
 **Philosophy:** Run everything on pull requests while the suite stays under 15 minutes.
 
 - **Pull request:** Vitest (unit, component), build and CI tests, and the Playwright "Frontend: accessibility" job on Chromium.
-- **Nightly:** WebKit and Firefox projects for focus, forced-colors and install-instruction paths, once the browser matrix is confirmed.
+- **Nightly:** the whole Playwright suite on Chromium, WebKit and Firefox against the built bundle (AD-28, #134).
 - **Weekly:** None. Manual screen-reader passes come in Epic 24.
 
 ---
@@ -224,7 +224,7 @@ None identified.
 - **P1 pass rate**: ≥95%
 - **P2 pass rate**: ≥90%
 - **High-risk mitigations**: 100% complete (R-01, R-02, R-03, R-04, R-08, R-10) or approved waiver
-- **Coverage:** ≥80% on new frontend code (proposal, see Unknown thresholds)
+- **Coverage:** at least 80% for the frontend, enforced by Vitest (decided, see Unknown thresholds)
 - **Security:** R-01 test passes 100%
 
 ### Non-Negotiable Requirements
