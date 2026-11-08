@@ -57,6 +57,19 @@ jobs:
         working-directory: backend
         run: ./mvnw --batch-mode --no-transfer-progress verify
 
+      # Surefire only runs classes named *Test or *Tests, so a misnamed class passes by never running.
+      # These reports must exist: the module boundary check and a Testcontainers PostgreSQL test (#88).
+      - name: "Backend: required test reports exist"
+        working-directory: backend
+        run: |
+          for t in ModularityTests PersistenceBaselineTests; do
+            f="target/surefire-reports/TEST-app.littlesteps.$t.xml"
+            if [ ! -s "$f" ]; then
+              echo "::error title=Missing test report::$f was not produced, so $t did not run (check the class name ends in Test or Tests)"
+              exit 1
+            fi
+          done
+
       - name: Upload backend test and coverage reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -108,15 +121,9 @@ jobs:
       - name: "Frontend: build"
         run: npm run build
 
-      # The OpenAPI type drift check arrives with Story 1.7 as the `api:check` script. Until it exists
-      # this step says so instead of passing silently; once it exists it runs and a drift fails the job.
+      # A missing api:check script is an error (npm fails on an unknown script), never a skip (#88).
       - name: "Frontend: OpenAPI type drift check (api:check)"
-        run: |
-          if node -e 'process.exit(require("./package.json").scripts?.["api:check"] ? 0 : 1)'; then
-            npm run api:check
-          else
-            echo "::notice title=OpenAPI type drift check::skipped, the api:check script arrives with Story 1.7 (issue #32)"
-          fi
+        run: npm run api:check
 
       - name: Upload frontend coverage report
         if: always()

@@ -89,7 +89,7 @@ Rule: [Continuous integration](CONTRIBUTING.md#continuous-integration). Jobs and
 
 ```mermaid
 flowchart LR
-  E["push or pull request"] --> J1["Backend<br/>mvnw verify, tests, JaCoCo, SBOM"]
+  E["push or pull request"] --> J1["Backend<br/>mvnw verify, tests, JaCoCo, SBOM,<br/>required test reports exist"]
   E --> J2["Frontend<br/>lint, typecheck, Vitest, build,<br/>OpenAPI drift check"]
   E --> JA["Frontend: accessibility<br/>Playwright, axe, reflow"]
   E --> J3["Scripts<br/>action SHA pins, shellcheck,<br/>images.yaml digests"]
