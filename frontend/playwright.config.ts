@@ -46,7 +46,8 @@ export default defineConfig({
     : {
         command: `npx vite --mode test --port ${PORT} --strictPort`,
         url: BASE_URL,
-        reuseExistingServer: !isCI,
+        // A leftover server on this port would run the tests against stale code. Reuse one only when asked.
+        reuseExistingServer: process.env.E2E_REUSE_SERVER === 'true',
         timeout: 120_000,
         env: { VITE_ENABLE_GALLERY: 'true' },
       },
