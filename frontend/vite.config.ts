@@ -19,7 +19,13 @@ export default defineConfig(({ mode }) => ({
     // The JUnit file feeds the epic release note (deploy/release-notes.sh).
     reporters: ['default', 'junit'],
     outputFile: { junit: 'test-results/junit.xml' },
-    coverage: { provider: 'v8', include: ['src/**'], reporter: ['text', 'lcov', 'json-summary'] },
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      reporter: ['text', 'lcov', 'json-summary'],
+      // The floor from AD-28: the build fails below 80%. Lowering it is a spec change.
+      thresholds: { lines: 80, statements: 80, functions: 80, branches: 80 },
+    },
   },
   server: {
     // Day-to-day development: run the backend from the IDE (port 8080) and `npm run dev`.

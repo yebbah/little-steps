@@ -34,6 +34,8 @@ has "frontend: npm ci" "$CI" 'run: npm ci$'
 has "frontend: lint" "$CI" 'run: npm run lint$'
 has "frontend: typecheck" "$CI" 'run: npm run typecheck$'
 has "frontend: Vitest with coverage" "$CI" 'run: npm run test:coverage$'
+VITE="$HERE/../../frontend/vite.config.ts"
+has "frontend: the coverage floor is 80% for lines, statements, functions and branches (AD-28)" "$VITE" 'thresholds: \{ lines: 80, statements: 80, functions: 80, branches: 80 \}'
 has "frontend: build" "$CI" 'run: npm run build$'
 has "frontend: OpenAPI drift check" "$CI" 'run: npm run api:check$'
 lacks "frontend: the drift check never skips" "$CI" 'api:check script arrives|skipped, the'
