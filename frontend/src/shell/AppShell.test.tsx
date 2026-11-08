@@ -5,7 +5,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { routes } from './routes.tsx'
 import { Screen } from './Screen.tsx'
-import { useStatus } from './statusContext.ts'
+import { useStatus } from '../status/statusContext.ts'
 import { FOCUS_KEY_ATTRIBUTE } from './useRouteFocus.ts'
 
 const ANNOUNCE = 'announce'

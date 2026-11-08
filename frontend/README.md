@@ -36,6 +36,7 @@ npm run test:e2e   # Playwright and axe; see e2e/README.md
 - `src/ui/`: shared controls (`Button`, `TextField`, `ChoiceChips`, `Stepper`, `DisclosureRow`), one CSS module each, tests beside them. Import from `src/ui/index.ts`.
 - `src/surfaces/`: cards, `Sheet` and `Dialog` (Radix), `StatusLine` and its provider (mounted by the shell), `Banner` and `Notices`, and the source, AI and check labels. Import from `src/surfaces/index.ts`.
 - `src/shell/`: the app shell (skip link, nav, main, the one status region), the routes, and the Family and Settings screens.
+- `src/status/`: the status API (`useStatus`) that both the shell and the surfaces use. `surfaces` never imports from `shell` (AD-28); `npm run lint` fails on it, and anything both need lives in a neutral module like this one.
 - `src/pwa/`: the install offer (`offerInstall`, `InstallOffer`) and the update hook (`useAppUpdate`). The manifest and service worker rules are in `pwa.config.ts`; `public/icons/` holds the icon SVG and its generated PNGs (`npm run icons`).
 - `src/gallery/`: the dev-only gallery at `/dev/gallery`; its sample text lives in `strings.ts`, not in the product catalog.
 - `src/i18n/`: the message catalog and tone check. `src/styles/`: tokens, base styles and theme.

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useNavigation } from 'react-router'
-import { StatusContext, type StatusApi } from './statusContext.ts'
+import { StatusContext, type StatusApi } from '../status/statusContext.ts'
 import styles from './AppShell.module.css'
 
 /** Owns the one `role="status"` region. It sits outside the routed content and is empty from first load. */

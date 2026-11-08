@@ -20,5 +20,25 @@
         "ignoreProps": true
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/surfaces/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "(^|/)shell(/|$)",
+                "message": "surfaces never imports from shell (AD-28). Move what both need to a neutral module."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

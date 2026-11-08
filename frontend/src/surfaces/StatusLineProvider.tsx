@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useStatus } from '../shell/statusContext.ts'
+import { useStatus } from '../status/statusContext.ts'
 import { StatusLineContext, StatusLineValueContext, type StatusLineApi, type StatusLineValue } from './statusLineContext.ts'
 
 /** Keys that only move focus, move through content (screen-reader navigation) or change a modifier are not an action. */
