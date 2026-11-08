@@ -130,7 +130,7 @@ flowchart TD
   A["Last story merged"] --> B["Full scan, mvnw verify,<br/>frontend tests, shell tests"]
   B --> C["release-notes.sh epic"]
   C --> D["Write narrative, remove TODO(author), Status: done"]
-  D --> E{"release-notes.sh check passes?<br/>(no TODO, KEV and High/Critical = 0)"}
+  D --> E{"release-notes.sh check passes?<br/>(no TODO, KEV and High/Critical = 0,<br/>every story spec done)"}
   E -- "no" --> D
   E -- "yes" --> F["Merge, tag main, push the tag"]
   F --> G["Retrospective reviews open deferred issues"]

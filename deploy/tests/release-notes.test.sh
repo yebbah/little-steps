@@ -36,7 +36,7 @@ git_q() { git -C "$R" -c user.email=t@example.com -c user.name=t -c commit.gpgsi
 # make_repo DIR : a fixture repo with epic 1 (two stories), one changelog and report, images, env, compose
 make_repo() {
   R="$1"; mkdir -p "$R"/{deploy,docs/release-notes,docs/changelogs,docs/security-reports,.specs/planning-artifacts/epics,.specs/implementation-artifacts,build/security}
-  git init -q "$R"
+  git init -q -b main "$R"
   echo 'build/' > "$R/.gitignore"
   cp "$TEMPLATE_SRC" "$R/docs/release-notes/TEMPLATE.md"
   cat > "$R/.specs/planning-artifacts/epics/epic-01-first-epic.md" <<'EOT'
@@ -54,6 +54,10 @@ title: Second epic
 ---
 ### Story 2.1: Tokens
 EOT
+  local s
+  for s in 1-1-scaffold 1-2-scan 2-1-tokens; do
+    printf -- "---\ntitle: 'Story %s'\nstatus: 'done'\n---\n# body\nstatus: not frontmatter\n" "${s%%-*}.${s#*-}" > "$R/.specs/implementation-artifacts/spec-$s.md"
+  done
   printf '# Changelog\n\n## Summary\n\nAdds the scaffold.\n\n## Added\n' > "$R/docs/changelogs/story-1-1-scaffold.md"
   printf '# Security report\n' > "$R/docs/security-reports/story-1-1-scaffold.md"
   printf 'LS_APP_PORT=8080\nLS_DB_PASSWORD=change-me\n' > "$R/deploy/local.env.example"
@@ -192,6 +196,30 @@ check "failed tests in the suite fail the check" 1 "full suite has 3 failed" rn 
 sed 's/PASS (2 tests)/FAIL/' "$TMP/clean.md" > "$TMP/modfail.md"
 check "failed modularity verification fails" 1 "modularity verification failed" rn check "$TMP/modfail.md"
 sed 's/$/\r/' "$TMP/clean.md" > "$TMP/crlf.md"
+# ---- check: bookkeeping (#101) -------------------------------------------------------------
+SP="$R/.specs/implementation-artifacts"
+sed -i.bak "s/^status: 'done'/status: 'in-review'/" "$SP/spec-1-2-scan.md"; rm -f "$SP/spec-1-2-scan.md.bak"
+check "a story spec that is not done fails a done note" 1 "spec-1-2-scan.md has status 'in-review'.*FAILED" rn check "$TMP/clean.md"
+check "a story spec that is not done fails --strict too" 1 "spec-1-2-scan.md has status 'in-review'" rn check --strict "$TMP/clean.md"
+sed 's/^Status: done/Status: draft/' "$TMP/clean.md" > "$TMP/cleand.md"
+check "a draft note skips the story spec check" 0 "OK \(draft\)" rn check "$TMP/cleand.md"
+sed -i.bak "s/^status: 'in-review'/status: 'done'/" "$SP/spec-1-2-scan.md"; rm -f "$SP/spec-1-2-scan.md.bak"
+check "all story specs done passes again" 0 "OK \(done\)" rn check "$TMP/clean.md"
+printf -- "---\ntitle: 'Story 1.2'\n---\n" > "$SP/spec-1-2-scan.md"
+check "a story spec with no status fails" 1 "spec-1-2-scan.md has status 'missing'" rn check "$TMP/clean.md"
+printf -- "---\ntitle: 'Story 1.2'\nstatus: 'done'\n---\n" > "$SP/spec-1-2-scan.md"
+mkdir -p "$TMP/nospecs"
+check "an epic with no story specs fails" 1 "no story specs spec-1-\*.md found" env LS_SPECS_DIR="$TMP/nospecs" LS_ROOT="$R" "$SCRIPT" check "$TMP/clean.md"
+sed 's/^# Release note: Epic 01.*/# Release note/' "$TMP/clean.md" > "$TMP/notitle.md"
+check "a note that names no epic fails" 1 "cannot tell which epic" rn check "$TMP/notitle.md"
+check "a note without a Commit row fails --strict" 1 "no 'Commit' row" rn check --strict "$(grep -v '^| Commit |' "$TMP/clean.md" > "$TMP/nocommit.md"; echo "$TMP/nocommit.md")"
+check "a Commit on main passes --strict" 0 "OK \(done\)" rn check --strict "$TMP/clean.md"
+sed 's/^| Commit | [0-9a-f]* |/| Commit | 1234567 |/' "$TMP/clean.md" > "$TMP/badhash.md"
+check "a Commit that does not exist fails --strict" 1 "Commit '1234567' is not a commit on main" rn check --strict "$TMP/badhash.md"
+check "a done note before the merge may name a Commit not yet on main" 0 "OK \(done\)" rn check "$TMP/badhash.md"
+git_q checkout -q -b side; git_q commit -q --allow-empty -m "side only"; SIDE="$(git_q rev-parse --short HEAD)"; git_q checkout -q main
+sed "s/^| Commit | [0-9a-f]* |/| Commit | $SIDE |/" "$TMP/clean.md" > "$TMP/side.md"
+check "a pre-squash Commit on another branch fails --strict" 1 "Commit '$SIDE' is not a commit on main" rn check --strict "$TMP/side.md"
 check "CRLF note passes" 0 "OK \(done\)" rn check "$TMP/crlf.md"
 check "template comment does not count as a TODO" 0 "OK \(done\)" rn check "$TMP/clean.md"
 
