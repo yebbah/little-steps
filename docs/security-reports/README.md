@@ -4,7 +4,7 @@ One security report per story, from [TEMPLATE.md](TEMPLATE.md), named `story-<N>
 
 ## Non-story pull requests
 
-Pull requests that are not stories get a report named `pr-<number>-<slug>.md` from the same template. The scan numbers come from the CI "Security scan" job on the pull request's head commit (container images are scanned by the pre-commit hook, not in CI). The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests). Newest first.
+Pull requests that are not stories get a report named `pr-<number>-<slug>.md` from the same template. The scan numbers come from the CI "Security scan" job on the pull request's head commit (container images are scanned by the pre-commit hook, not in CI). The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests); pull requests that only add these records are exempt. Newest first.
 
 | PR | Title | Report |
 |---|---|---|

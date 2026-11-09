@@ -29,7 +29,7 @@ Newest first. Add a line here with every new changelog.
 
 ## Non-story pull requests
 
-Fix, CI, spec, test-tooling and chore pull requests have no story, so they get a changelog named `pr-<number>-<slug>.md` from the same [template](TEMPLATE.md) (the Story and Epic rows become Pull request and Kind), and a security report with the same name. The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests). Newest first.
+Fix, CI, spec, test-tooling and chore pull requests have no story, so they get a changelog named `pr-<number>-<slug>.md` from the same [template](TEMPLATE.md) (the Story and Epic rows become Pull request and Kind), and a security report with the same name. The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests); pull requests that only add these records are exempt. Newest first.
 
 | PR | Title | Changelog | Security report |
 |---|---|---|---|

@@ -95,6 +95,8 @@ A pull request that is not a story (a fix, a CI or test-tooling change, a spec, 
 
 The pull request number exists only once the pull request is open, so these files may be added in a follow-up docs pull request after the merge. Merging first does not remove the duty: they are due before the next pull request is opened. The three-reviewer pass applies to stories; record in the report that none was run.
 
+**Exempt:** a pull request that only adds or updates these records, or the rule about them, needs none of its own (otherwise the rule would never end). Non-story pull requests before #147 are not backfilled.
+
 ## Review triage log format
 
 One table per story, in the story's spec under `## Review Triage Log`, with these columns:
