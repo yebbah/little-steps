@@ -68,4 +68,4 @@ No reviewer pass was run outside a story. The proposal was reviewed by the maint
 
 ## 10. Sign-off
 
-Maintainer approval of the epic and its stories: 2026-11-09. Decision to merge: after CI is green.
+Maintainer approval of the epic and its stories: 2026-11-09. Decision to merge: the maintainer merged with the CI Security scan job red, because it could not download the pinned scan tools (GitHub release downloads returned 504 after 4 attempts, the known issue #175) and the change is documentation only. The local pre-commit scan of the branch passed (section 2). This is a recorded exception to the rule against merging on red.

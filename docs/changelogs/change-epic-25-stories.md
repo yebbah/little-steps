@@ -58,5 +58,6 @@ Not applicable (specs and records only). CI records check, link and manifest che
 
 ## Deferred and known issues
 
+- Merged with the CI Security scan job red: the pinned scan tools could not be downloaded (504 from GitHub release downloads, issue #175), and the change is documentation only. The local scan passed. Recorded in the security report.
 - A build-order comment on every epic issue was not added: the Build order column in the epic index is the single source, and the issues linked to Epic 3 to 6, 12 and 13 point to it.
 - The roughly 45 `deferred` issues are untouched; a triage pass is still to do.
