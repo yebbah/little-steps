@@ -78,7 +78,7 @@ Moved from Epic 3 (Story 3.2, first half). Signing in again in place after a `40
 **When** the data layer is added
 **Then** server reads use TanStack Query, and one Dexie database holds the outbox, drafts and (later) the offline snapshot. No server data is mirrored into a global store (AD-23).
 **And** the data layer reads the current `sub` from a `session` port. In this epic the demo session (Story 25.5) supplies it; Story 3.1 supplies the Keycloak session.
-**And** every mutation goes through `outbox.enqueue(command)`, which writes to Dexie before any network call. An ESLint rule fails on `fetch` with a non-GET method outside the outbox (AD-5).
+**And** every mutation goes through `outbox.enqueue(command)`, which writes to Dexie before any network call. A lint rule (oxlint, the linter of AD-23) fails on `fetch` with a non-GET method outside the outbox (AD-5).
 **And** each command stores the `sub` that enqueued it and replays only under that `sub`. Unsent commands for the same target ID coalesce to the latest body. Replay is FIFO with backoff.
 **And** a `4xx` problem other than 401 parks the command on its record with "Couldn't save just now… Retry", and keeps the local data. A `401` pauses replay and keeps the queue.
 **And** a `useDraft(key)` hook autosaves form state to Dexie on change and restores it on return.
