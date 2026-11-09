@@ -8,6 +8,7 @@ Every pull request that is not a story carries a report in the same pull request
 
 | PR | Title | Report |
 |---|---|---|
+| issue #172 | Backfill changelogs and security reports for the older non-story pull requests | [change-epic-02-issue-172-records-backfill.md](change-epic-02-issue-172-records-backfill.md) |
 | issue #172 | Records travel in the same pull request, enforced by CI | [change-epic-02-issue-172-records-in-same-pr.md](change-epic-02-issue-172-records-in-same-pr.md) |
 | #171 | Exempt records-only pull requests from the changelog and security report rule | [pr-171-records-only-prs-exempt.md](pr-171-records-only-prs-exempt.md) |
 | #169 | Changelogs and security reports for the non-story pull requests | [pr-169-changelogs-and-security-reports-for-non-story-prs.md](pr-169-changelogs-and-security-reports-for-non-story-prs.md) |
@@ -26,3 +27,23 @@ Every pull request that is not a story carries a report in the same pull request
 | #149 | Surfaces never imports shell, enforced by lint | [pr-149-surfaces-never-imports-shell.md](pr-149-surfaces-never-imports-shell.md) |
 | #148 | Spec the Epic 2 retrospective follow-ups | [pr-148-spec-epic-2-retro-follow-ups.md](pr-148-spec-epic-2-retro-follow-ups.md) |
 | #147 | Base image zlib CVE, and images count a fix only from the latest image | [pr-147-base-image-zlib-cve-and-latest-image-rule.md](pr-147-base-image-zlib-cve-and-latest-image-rule.md) |
+| #142 | Record the Epic 2 squash commit in the release note | [pr-142-epic-2-release-note-commit.md](pr-142-epic-2-release-note-commit.md) |
+| #141 | Epic 2 acceptance, retrospective, release note and Story 2.2 spec reconciliation | [pr-141-epic-2-acceptance-retro-release-note.md](pr-141-epic-2-acceptance-retro-release-note.md) |
+| #140 | Fix Epic 2 code review findings | [pr-140-epic-2-code-review-fixes.md](pr-140-epic-2-code-review-fixes.md) |
+| #123 | BMAD setup and new-workspace steps | [pr-123-bmad-setup.md](pr-123-bmad-setup.md) |
+| #122 | Keep Test Architect outputs in the repo | [pr-122-test-architect-outputs-in-repo.md](pr-122-test-architect-outputs-in-repo.md) |
+| #121 | Update sprint status action item T2 | [pr-121-sprint-status-action-item-t2.md](pr-121-sprint-status-action-item-t2.md) |
+| #109 | Epic 2 test framework and red-phase tests for R-01 to R-04 | [pr-109-epic-2-test-framework.md](pr-109-epic-2-test-framework.md) |
+| #108 | Epic 2 spec update (gallery, Settings shell, router, copy catalog split, Epic 24) | [pr-108-epic-2-spec-update.md](pr-108-epic-2-spec-update.md) |
+| #103 | Epic 1 retrospective and close-out fixes | [pr-103-epic-1-retrospective-and-close-out.md](pr-103-epic-1-retrospective-and-close-out.md) |
+| #100 | Fix workflow documentation drift | [pr-100-workflow-documentation-drift-fixes.md](pr-100-workflow-documentation-drift-fixes.md) |
+| #99 | Sync specs with the code (spec drift audit) | [pr-99-spec-drift-sync.md](pr-99-spec-drift-sync.md) |
+| #98 | Spec-first policy, CI policy and workflow decision trees | [pr-98-spec-first-ci-policy-and-workflow-trees.md](pr-98-spec-first-ci-policy-and-workflow-trees.md) |
+| #78 | Add infrastructure and component architecture diagrams | [pr-78-architecture-diagrams.md](pr-78-architecture-diagrams.md) |
+| #77 | Deferred index sync, scan cadence and triage log format | [pr-77-deferred-index-sync-scan-cadence-triage-log.md](pr-77-deferred-index-sync-scan-cadence-triage-log.md) |
+| #64 | Make CONTRIBUTING.md the single source for policies | [pr-64-single-source-policies.md](pr-64-single-source-policies.md) |
+| #63 | Refresh the README and require a README review in every story | [pr-63-readme-every-story.md](pr-63-readme-every-story.md) |
+| #55 | Add project policies (AGENTS.md, CLAUDE.md, CONTRIBUTING.md) | [pr-55-project-policies.md](pr-55-project-policies.md) |
+| #43 | Add Epic 3 stories: sign-in, Family and consent | [pr-43-epic-3-stories.md](pr-43-epic-3-stories.md) |
+| #25 | LittleSteps v1 planning set: PRD, UX, architecture, spec and epics | [pr-25-v1-planning-set.md](pr-25-v1-planning-set.md) |
+| #1 | Revise PRD UJ-1 to a prep, activity, review flow | [pr-1-prd-uj-1-prep-activity-review.md](pr-1-prd-uj-1-prep-activity-review.md) |
