@@ -69,7 +69,7 @@ The secret scan passed (for the commit history in CI, and for the staged changes
 
 ## 8. Review findings with security impact
 
-None recorded. The three-reviewer pass applies to stories; this non-story change was gated by CI and the maintainer's instruction. 
+None recorded. The three-reviewer pass applies to stories; none was run for this non-story change. 
 
 ## 9. Residual risks and follow-ups
 
