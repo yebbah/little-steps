@@ -31,6 +31,7 @@ The decision trees behind these policies are drawn in [workflow.md](workflow.md)
   ```
 
 - The epic issue carries a "Tracked as sub-issues #X to #Y" line instead of a checklist.
+- The label `in-progress` marks the epic and the story being worked on now. Add it to the story when its branch is cut (and to its epic if not already there), and remove it from the story when it closes; the epic keeps it until its last story closes. Post a short progress comment on the epic issue when a story closes.
 
 ## Branching
 
