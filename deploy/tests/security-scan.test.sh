@@ -107,12 +107,21 @@ printf '#!/bin/sh\necho sha256:aaa\n' > "$TMP/digest-same.sh"; printf '#!/bin/sh
 chmod +x "$TMP"/digest-*.sh
 latest_check() { # CMD -> prints yes or no
   ( export ROOT="$HERE/../.." LS_IMAGES_FILE="$TMP/latest-images.yaml" LS_LATEST_DIGEST_CMD="$1"
-    eval "$(awk '/^image_is_latest\(\) \{/,/^}/; /^latest_digest\(\) \{/,/^}/' "$SCAN")"
+    eval "$(awk '/^image_is_latest\(\) \{/,/^}/; /^latest_digest\(\) \{/,/^}/; /^run_limited\(\) \{/,/^}/' "$SCAN")"
     if image_is_latest "acme/tool@sha256:aaa"; then echo yes; else echo no; fi )
 }
 check "image_is_latest: same digest" 0 "yes" latest_check "$TMP/digest-same.sh"
 check "image_is_latest: tag moved on" 0 "no" latest_check "$TMP/digest-new.sh"
 check "image_is_latest: lookup failed, fails closed" 0 "no" latest_check "$TMP/digest-fail.sh"
+# A lookup that hangs is cut off after LS_LOOKUP_TIMEOUT and counts as a failed lookup (#163).
+printf '#!/bin/sh\nsleep 30\necho sha256:aaa\n' > "$TMP/digest-hang.sh"; chmod +x "$TMP/digest-hang.sh"
+hang_check() { # prints the answer and how many seconds it took
+  local start=$SECONDS answer
+  answer="$(LS_LOOKUP_TIMEOUT=1 latest_check "$TMP/digest-hang.sh" 2>&1)"
+  echo "$answer in $((SECONDS - start))s"
+}
+check "image_is_latest: a hanging lookup is cut off and fails closed" 0 "timed out after 1s.*no in [0-4]s" hang_check
+check "image_is_latest: a fast lookup is not affected by the limit" 0 "yes" env LS_LOOKUP_TIMEOUT=5 bash -c "$(declare -f latest_check); HERE='$HERE' TMP='$TMP' SCAN='$SCAN'; latest_check '$TMP/digest-same.sh'"
 
 # download_file: a 5xx from the release host is retried; a permanent failure stops after the last attempt (#165).
 download_check() { # FAILS -> prints the exit status, the number of curl calls and the file content
