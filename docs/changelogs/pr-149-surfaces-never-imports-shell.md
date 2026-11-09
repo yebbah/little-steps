@@ -37,7 +37,7 @@ Moves the shared status context to a neutral module and adds a lint rule that fa
 
 ## Security
 
-No dependency or runtime behaviour changed. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-149-surfaces-never-imports-shell.md).
+No dependency or runtime behaviour changed. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-149-surfaces-never-imports-shell.md).
 
 ## Operations impact
 

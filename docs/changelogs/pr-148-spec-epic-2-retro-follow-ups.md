@@ -36,7 +36,7 @@ Records the retrospective decisions in the specs before any code: a new architec
 
 ## Security
 
-No code or configuration changed. Verdict: pass with warnings (the usual frontend warnings, unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-148-spec-epic-2-retro-follow-ups.md).
+No code or configuration changed. Verdict: pass with warnings (the usual frontend warnings, unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-148-spec-epic-2-retro-follow-ups.md).
 
 ## Operations impact
 

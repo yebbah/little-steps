@@ -36,7 +36,7 @@ The check that compares a pinned image digest with the tag's current digest had 
 
 ## Security
 
-The fail-closed rule is unchanged: a lookup that does not answer counts as a fix being available, so the exception rule is not loosened by a timeout. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-168-latest-image-lookup-timeout.md).
+The fail-closed rule is unchanged: a lookup that does not answer counts as a fix being available, so the exception rule is not loosened by a timeout. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-168-latest-image-lookup-timeout.md).
 
 ## Operations impact
 

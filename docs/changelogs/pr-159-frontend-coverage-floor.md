@@ -35,7 +35,7 @@ Vitest now fails the build when frontend coverage drops below 80% for lines, sta
 
 ## Security
 
-No security-relevant change. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-159-frontend-coverage-floor.md).
+No security-relevant change. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-159-frontend-coverage-floor.md).
 
 ## Operations impact
 

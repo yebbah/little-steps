@@ -33,7 +33,7 @@ Removes the closed deferred issues #101 and #134 from the index and narrows #89 
 
 ## Security
 
-Documentation only. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-162-deferred-work-index-update.md).
+Documentation only. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-162-deferred-work-index-update.md).
 
 ## Operations impact
 

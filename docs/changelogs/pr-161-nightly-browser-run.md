@@ -35,7 +35,7 @@ A scheduled workflow runs the whole Playwright suite on Chromium, WebKit and Fir
 
 ## Security
 
-A new scheduled workflow with read-only permissions and the same pinned actions as `ci.yml`. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-161-nightly-browser-run.md).
+A new scheduled workflow with read-only permissions and the same pinned actions as `ci.yml`. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-161-nightly-browser-run.md).
 
 ## Operations impact
 

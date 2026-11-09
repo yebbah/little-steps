@@ -197,6 +197,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # The records check needs the history back to the merge base.
+          fetch-depth: 0
 
       - name: "Check: every GitHub Action is pinned to a commit SHA"
         run: deploy/check-actions.sh
@@ -207,6 +209,12 @@ jobs:
       - name: "Check: images.yaml matches compose.yaml and the Dockerfile (digests)"
         run: deploy/check-images.sh
 
+      - name: "Check: this pull request carries its changelog and security report"
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: deploy/check-records.sh "origin/$BASE_REF"
+
       - name: "Check: tests of the check scripts"
         run: |
           deploy/tests/check-actions.test.sh
@@ -215,6 +223,7 @@ jobs:
           deploy/tests/realm.test.sh
           deploy/tests/dev-scripts.test.sh
           deploy/tests/check-urls.test.sh
+          deploy/tests/check-records.test.sh
 
   security:
     name: Security scan (secrets, backend and frontend dependencies)

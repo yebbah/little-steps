@@ -33,7 +33,7 @@ A leftover dev server on the test port used to be reused silently, so tests coul
 
 ## Security
 
-No security-relevant change. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-153-playwright-refuses-stale-server.md).
+No security-relevant change. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-153-playwright-refuses-stale-server.md).
 
 ## Operations impact
 

@@ -4,10 +4,13 @@ One security report per story, from [TEMPLATE.md](TEMPLATE.md), named `story-<N>
 
 ## Non-story pull requests
 
-Pull requests that are not stories get a report named `pr-<number>-<slug>.md` from the same template. The scan numbers come from the CI "Security scan" job on the pull request's head commit (container images are scanned by the pre-commit hook, not in CI). The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests); pull requests that only add these records are exempt. Newest first.
+Every pull request that is not a story carries a report in the same pull request, from the same template: `change-<branch slug>.md` (up to #171 the reports are named `pr-<number>-<slug>.md`). The numbers come from the local scan of the branch (`build/security/summary.txt`), or, for the records written after the merge, from the CI "Security scan" job on the pull request's head commit; container images are scanned by the pre-commit hook, not in CI. CI fails a pull request without a record. The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests). Newest first.
 
 | PR | Title | Report |
 |---|---|---|
+| issue #172 | Records travel in the same pull request, enforced by CI | [change-epic-02-issue-172-records-in-same-pr.md](change-epic-02-issue-172-records-in-same-pr.md) |
+| #171 | Exempt records-only pull requests from the changelog and security report rule | [pr-171-records-only-prs-exempt.md](pr-171-records-only-prs-exempt.md) |
+| #169 | Changelogs and security reports for the non-story pull requests | [pr-169-changelogs-and-security-reports-for-non-story-prs.md](pr-169-changelogs-and-security-reports-for-non-story-prs.md) |
 | #168 | Time-limit the latest-image lookup in the security scan | [pr-168-latest-image-lookup-timeout.md](pr-168-latest-image-lookup-timeout.md) |
 | #166 | Retry the pinned scan tool download when GitHub releases answer 5xx | [pr-166-scan-tool-download-retry.md](pr-166-scan-tool-download-retry.md) |
 | #164 | Bump the Keycloak 26.8.2 digest to the current image | [pr-164-keycloak-digest-bump.md](pr-164-keycloak-digest-bump.md) |

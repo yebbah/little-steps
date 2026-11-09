@@ -36,7 +36,7 @@ Two CI checks that could silently skip are now mandatory: the OpenAPI type drift
 
 ## Security
 
-No dependency or image changed; the change makes an existing quality gate harder to bypass. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-152-mandatory-openapi-drift-and-test-reports.md).
+No dependency or image changed; the change makes an existing quality gate harder to bypass. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-152-mandatory-openapi-drift-and-test-reports.md).
 
 ## Operations impact
 

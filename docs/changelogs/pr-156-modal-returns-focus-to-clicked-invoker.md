@@ -36,7 +36,7 @@ In Safari, a click does not focus a button, so a sheet or dialog recorded the wr
 
 ## Security
 
-No dependency, image or data flow changed. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-156-modal-returns-focus-to-clicked-invoker.md).
+No dependency, image or data flow changed. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-156-modal-returns-focus-to-clicked-invoker.md).
 
 ## Operations impact
 
