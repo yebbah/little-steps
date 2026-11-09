@@ -7,14 +7,17 @@ phase: P1
 
 # Epic 3: Sign-in, Family and consent
 
-A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family. Caregivers can leave or be removed, and the others are told. This epic also lays the ground every later feature writes on: Family tenancy, the device outbox, the audit table, and a maintainer console for operator tasks.
+A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family. Caregivers can leave or be removed, and the others are told. This epic also adds the audit table and a maintainer console for operator tasks.
+
+**Build order (sprint change 2026-11-09):** this epic is built after Epic 13. Family tenancy (the `families` and membership tables, the tenant resolver and the isolation test) and the device data layer (outbox, Dexie, drafts) are built earlier, in [Epic 25](epic-25-demo-family-foundations.md), together with a demo identity that stands in for sign-in until this epic lands. This epic builds on them and replaces the demo identity as the default local mode.
 
 **Done when:**
 - A maintainer issues a pilot invite from the maintainer console. The invitee opens the link, creates an account, reads the three consent cards, agrees, and creates a Family.
 - That Caregiver invites a co-caregiver, who accepts, gives their own consent and joins the same Family. The first Caregiver sees a "joined" banner and gets an email in Mailpit.
 - One Caregiver removes the other. The removed device shows "You're no longer part of this family." and signs out, and the remaining Caregiver gets the security notice by banner and email.
 - An expired or used invite never creates an account. A Caregiver with no invite gets `invite-required`, and one with no consent gets `consent-required`.
-- A cross-Family isolation test proves that one Family can never read another's rows.
+- The cross-Family isolation test from Epic 25 still passes with real sign-in: one Family can never read another's rows.
+- The demo identity from Epic 25 is no longer the default local mode: a local run signs in through Keycloak, and the demo mode stays an opt-in flag.
 - The Definition of done in the index is met (clean scan, full test suite passing, release note).
 
 ## Requirements covered
@@ -82,21 +85,15 @@ So that my family's information is only reachable by me and the people I invite.
 **Then** the Keycloak session ends, in-memory tokens are cleared, and the device data is wiped (AD-5). They return to the sign-in screen.
 **And** tests cover: a missing token, an expired token, a token for another realm, the first-request upsert, and `invite-required`.
 
-### Story 3.2: Device data layer and signing in again in place
+### Story 3.2: Signing in again in place
 
 As a Caregiver,
-I want what I type to be saved on my device first and never lost when my session expires,
-So that a weak connection or a timeout never costs me my work.
+I want my session to renew without losing what I was typing,
+So that a timeout never costs me my work.
+
+This story builds on the device data layer from Story 25.2 (TanStack Query, Dexie, the outbox, `useDraft`), which moved to Epic 25 in the 2026-11-09 sprint change.
 
 **Acceptance Criteria:**
-
-**Given** the frontend
-**When** the data layer is added
-**Then** server reads use TanStack Query, and one Dexie database holds the outbox, drafts and (later) the offline snapshot. No server data is mirrored into a global store (AD-23).
-**And** every mutation goes through `outbox.enqueue(command)`, which writes to Dexie before any network call. An ESLint rule fails on `fetch` with a non-GET method outside the outbox (AD-5).
-**And** each command stores the `sub` that enqueued it and replays only under that `sub`. Unsent commands for the same target ID coalesce to the latest body. Replay is FIFO with backoff.
-**And** a `4xx` problem other than 401 parks the command on its record with "Couldn't save just now… Retry", and keeps the local data.
-**And** a `useDraft(key)` hook autosaves form state to Dexie on change and restores it on return.
 
 **Given** a Caregiver mid-form whose session has expired
 **When** the outbox or a query gets `401`
@@ -105,7 +102,7 @@ So that a weak connection or a timeout never costs me my work.
 
 **Given** the test suite
 **When** it runs
-**Then** unit tests cover: enqueue order, coalescing, `sub` ownership, 401 pause and resume, parking with Retry, the wipe on sign-out and on user change, and draft restore. A test-profile-only endpoint `PUT /api/v1/dev/echo/{id}` exercises the outbox end to end. It is not registered in the `local` or `prod` profiles, and the consent command in Story 3.5 is the first real command to use the outbox.
+**Then** unit and end-to-end tests cover: 401 pause and resume, draft restore after re-sign-in, and the wipe on user change. The consent command in Story 3.5 is the first real command to use the outbox with a real session.
 
 ### Story 3.3: Maintainer console and pilot invites
 
@@ -171,7 +168,7 @@ So that I know exactly what I'm agreeing to.
 **And** the cards are a focus-managed flow (UX-DR117). Each card's heading takes focus when shown, and Back returns to the previous card.
 
 **When** the Caregiver chooses "I agree"
-**Then** the app enqueues the consent command through the outbox (Story 3.2), and `PUT /api/v1/me/consent/{consentVersion}` records the consent version, the time and the Caregiver. The record is insert-only and is the source of truth for the `consent-required` check.
+**Then** the app enqueues the consent command through the outbox (Story 25.2), and `PUT /api/v1/me/consent/{consentVersion}` records the consent version, the time and the Caregiver. The record is insert-only and is the source of truth for the `consent-required` check.
 
 **Given** a Caregiver without consent to the current version
 **When** they call any Family-data endpoint
@@ -188,11 +185,10 @@ So that everything I add from now on is kept for this Family only.
 
 **Acceptance Criteria:**
 
-**Given** the `family` module
-**When** the Family migrations run
-**Then** they create `families` (`timezone` IANA, `week_start` default Monday, `created_at`) and `caregiver_membership` (Caregiver, Family, `role` = caregiver, `joined_at`, `ended_at`, `end_reason`).
-**And** every Family-owned table from now on has `family_id uuid NOT NULL REFERENCES families ON DELETE CASCADE` and is mapped with `@TenantId`. The tenant resolver takes the Family only from the Caregiver's active membership, never from a request parameter, and no request path resolves to the root tenant (AD-2).
-**And** an architecture test fails if any entity without `@TenantId` is missing from `GLOBAL_TABLES.md`, and a test runs every native query to check that it filters on `family_id`.
+**Given** the `families`, `caregivers` and membership tables and the tenant resolver from Story 25.1
+**When** the real sign-in is added
+**Then** the tenant resolver takes the Family from the signed-in Caregiver's active membership, exactly as the demo resolver did, and no request path resolves to the root tenant (AD-2).
+**And** `caregiver_membership` carries `role` = caregiver, `joined_at`, `ended_at` and `end_reason`, and the architecture test and native-query test from Story 25.1 still pass.
 
 **Given** a consented Caregiver holding an accepted pilot invite
 **When** they continue in onboarding
@@ -200,8 +196,8 @@ So that everything I add from now on is kept for this Family only.
 **And** the Caregiver becomes its first active member, the pilot invite is consumed, and `FamilyCreated` is published.
 **And** onboarding moves to the next step. Until Epic 4, that is the optional invite step (Story 3.8), then Today (UX-DR88).
 
-**Given** two Families, each with one Caregiver
-**When** the isolation test reads and writes through every Family endpoint as each Caregiver
+**Given** two Families, each with one Caregiver, signed in through Keycloak
+**When** the isolation test from Story 25.1 is run against real sign-in
 **Then** neither sees nor changes the other's rows (NFR-4).
 **And** a Caregiver with no pilot invite who tries to create a Family gets `invite-required`.
 
