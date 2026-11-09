@@ -73,7 +73,7 @@ So that my family's information is only reachable by me and the people I invite.
 
 **Given** a valid token for a `sub` the app has not seen
 **When** the first API request arrives
-**Then** a `caregiver` row keyed by `sub` is created, and display name and email are upserted from the token claims on each new session (AD-3). `caregiver` is listed in `backend/GLOBAL_TABLES.md`.
+**Then** a row in `caregivers` (created in Story 25.1) keyed by `sub` is created, and display name and email are upserted from the token claims on each new session (AD-3). The Keycloak resolver replaces the demo resolver as the supplier of `CurrentCaregiver`.
 **And** the first request under a new session ID publishes `CaregiverSignedIn` with IDs only (AD-19).
 
 **Given** a signed-in Caregiver with no accepted invite and no membership

@@ -22,7 +22,7 @@ The decision trees behind these policies are drawn in [workflow.md](workflow.md)
 
 ## Issues
 
-- Epic N is GitHub issue #N+1, labelled `epic` plus `P1` or `P2`. The exception is Epic 24, which is #107 because #25 was already a pull request.
+- Epic N is GitHub issue #N+1, labelled `epic` plus `P1` or `P2`. The exceptions are Epic 24, which is #107 because #25 was already a pull request, and Epic 25, which is #178 because it was added after the other epics had their issues.
 - When an epic is approved, each of its stories is created as a sub-issue (labels `story` plus `P1`/`P2`, full story text):
 
   ```sh
