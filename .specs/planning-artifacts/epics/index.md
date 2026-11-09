@@ -30,7 +30,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 | # | Epic | Status | Build order | Issue |
 | --- | --- | --- | --- | --- |
 | 1 | [Local environment and project skeleton](epic-01-local-environment.md) | done | done | [#2](https://github.com/yebbah/little-steps/issues/2) |
-| 2 | [App shell and design foundations](epic-02-app-shell.md) | approved | done | [#3](https://github.com/yebbah/little-steps/issues/3) |
+| 2 | [App shell and design foundations](epic-02-app-shell.md) | done | done | [#3](https://github.com/yebbah/little-steps/issues/3) |
 | 3 | [Sign-in, Family and consent](epic-03-sign-in-family-consent.md) | approved | 9 | [#4](https://github.com/yebbah/little-steps/issues/4) |
 | 4 | Child Profile and Care Team | planned | 10 | [#5](https://github.com/yebbah/little-steps/issues/5) |
 | 5 | Goals and Goal Periods | planned | 11 | [#6](https://github.com/yebbah/little-steps/issues/6) |
@@ -53,7 +53,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 | 22 | Inventory and tagged notes (P2) | planned | 21 | [#23](https://github.com/yebbah/little-steps/issues/23) |
 | 23 | Progress trends and AI descriptions (P2) | planned | 22 | [#24](https://github.com/yebbah/little-steps/issues/24) |
 | 24 | Assistive-technology passes (P2) | planned | 23 | [#107](https://github.com/yebbah/little-steps/issues/107) |
-| 25 | [Demo Family and domain foundations](epic-25-demo-family-foundations.md) | approved | 1 | [#178](https://github.com/yebbah/little-steps/issues/178) |
+| 25 | [Demo Family and domain foundations](epic-25-demo-family-foundations.md) | in-progress | 1 | [#178](https://github.com/yebbah/little-steps/issues/178) |
 
 ### Epic 1: Local environment and project skeleton
 A developer can start and stop the whole product on a Mac with one command each. A skeleton app builds, boots and passes CI. Every commit is security-scanned, images are hardened, and the release-note tooling exists.
