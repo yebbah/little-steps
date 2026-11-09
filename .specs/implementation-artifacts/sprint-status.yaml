@@ -62,7 +62,7 @@ development_status:
   epic-2-retrospective: done
 
   epic-25: backlog
-  25-1-demo-identity-and-the-tenant-resolver: backlog
+  25-1-demo-identity-and-the-tenant-resolver: ready-for-dev
   25-2-device-data-layer: backlog
   25-3-child-care-team-and-goal-model-with-read-apis: backlog
   25-4-strategies-restrictions-and-guardrail: backlog
