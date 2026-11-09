@@ -30,13 +30,16 @@ echo base > "$R/README.md"; echo idx > "$R/docs/changelogs/README.md"; echo tpl 
 echo idx > "$R/docs/security-reports/README.md"; echo tpl > "$R/docs/security-reports/TEMPLATE.md"
 g add -A; g commit -qm "base"
 g update-ref refs/remotes/origin/main HEAD
-cr() { LS_ROOT="$R" "$SCRIPT" "$@"; }
+# GITHUB_HEAD_REF is set in CI and would override the fixture branch name: tests unset it, or set it explicitly.
+cr() { env -u GITHUB_HEAD_REF LS_ROOT="$R" "$SCRIPT" "$@"; }
 new_branch() { g checkout -q main; g checkout -q -B "$1"; }
 
 new_branch feature/epic-02-issue-1-code-only
 echo code > "$R/app.txt"; g add -A; g commit -qm "code only"
 check "no records at all fails" 1 "FAIL docs/changelogs.*FAIL docs/security-reports.*FAILED" cr
 check "the failure names the expected file" 1 "change-epic-02-issue-1-code-only\.md" cr
+
+check "in CI the pull request branch names the expected file" 1 "change-epic-09-issue-9-from-ci\.md" env GITHUB_HEAD_REF=feature/epic-09-issue-9-from-ci LS_ROOT="$R" "$SCRIPT"
 
 echo cl > "$R/docs/changelogs/change-epic-02-issue-1-code-only.md"; g add -A; g commit -qm "changelog only"
 check "a changelog without a security report fails" 1 "ok   docs/changelogs.*FAIL docs/security-reports" cr
