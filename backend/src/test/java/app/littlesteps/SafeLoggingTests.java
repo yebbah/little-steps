@@ -29,7 +29,7 @@ class SafeLoggingTests extends IntegrationTest {
 	@Test
 	void caregiverTextNeverReachesTheLogsEvenWhenLoggedOnPurposeBySloppyCode(CapturedOutput output) {
 		client.post()
-			.uri("/api/v1/test/note")
+			.uri("/test-support/note")
 			.contentType(MediaType.TEXT_PLAIN)
 			.header("X-Request-Id", "req-for-log-test")
 			.body(SECRET)
@@ -45,7 +45,7 @@ class SafeLoggingTests extends IntegrationTest {
 	@Test
 	void requestBodyIsNotEchoedInTheResponseWhenTheRequestFails(CapturedOutput output) {
 		String responseBody = client.post()
-			.uri("/api/v1/test/boom")
+			.uri("/test-support/boom")
 			.contentType(MediaType.TEXT_PLAIN)
 			.body(SECRET)
 			.exchange()
@@ -90,7 +90,7 @@ class SafeLoggingTests extends IntegrationTest {
 
 	@Test
 	void failureLogLineHasTheRequestIdAndTheStackTrace(CapturedOutput output) {
-		client.post().uri("/api/v1/test/boom").contentType(MediaType.TEXT_PLAIN).header("X-Request-Id", "boom-req-0001")
+		client.post().uri("/test-support/boom").contentType(MediaType.TEXT_PLAIN).header("X-Request-Id", "boom-req-0001")
 			.body(SECRET).exchange().expectStatus().is5xxServerError();
 
 		String line = output.getAll().lines().filter(l -> l.contains("Unhandled exception")).findFirst().orElseThrow();
@@ -100,8 +100,17 @@ class SafeLoggingTests extends IntegrationTest {
 
 	@Test
 	void malformedJsonBodyIsNotLogged(CapturedOutput output) {
-		client.post().uri("/api/v1/test/json").contentType(MediaType.APPLICATION_JSON).body("{\"note\":\"" + SECRET + "\"")
+		client.post().uri("/test-support/json").contentType(MediaType.APPLICATION_JSON).body("{\"note\":\"" + SECRET + "\"")
 			.exchange().expectStatus().isBadRequest();
+
+		assertThat(output.getAll()).doesNotContain(SECRET);
+	}
+
+	@Test
+	void aSecretInAnApiV1PathIsNeverLoggedWithOrWithoutACaregiver(CapturedOutput output) {
+		client.get().uri("/api/v1/nope-" + SECRET).exchange().expectStatus().isUnauthorized();
+		client.get().uri("/api/v1/nope-" + SECRET).header("X-Demo-Caregiver", SECRET).exchange().expectStatus()
+			.isUnauthorized();
 
 		assertThat(output.getAll()).doesNotContain(SECRET);
 	}
@@ -115,7 +124,7 @@ class SafeLoggingTests extends IntegrationTest {
 
 	@Test
 	void pathValuesAreNotLoggedOnlyTheRoutePattern(CapturedOutput output) {
-		client.get().uri("/api/v1/nope-" + SECRET).exchange().expectStatus().isNotFound();
+		client.get().uri("/api/v2/nope-" + SECRET).exchange().expectStatus().isNotFound();
 
 		assertThat(output.getAll()).doesNotContain(SECRET).contains("-> 404");
 	}

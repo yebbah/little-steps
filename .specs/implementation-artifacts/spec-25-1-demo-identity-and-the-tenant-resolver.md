@@ -2,7 +2,7 @@
 title: 'Story 25.1: Demo identity and the tenant resolver'
 type: 'feature'
 created: '2026-11-09'
-status: 'ready-for-dev'
+status: 'in-review'
 baseline_commit: 'c76c97bc52a35977b689c2f62c2ad53af7e56223'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -65,20 +65,53 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Migration, entities, repositories -- `families`, `caregivers`, `caregiver_membership`
-- [ ] `CurrentCaregiver` port, request filter, `401` path, tenant holder and Hibernate resolver
-- [ ] Demo resolver, flag, startup guard, `GET /api/v1/session`
-- [ ] `GLOBAL_TABLES.md`, architecture test (an entity without `@TenantId` must be listed) and a native-query test (every native query filters on `family_id`)
-- [ ] Test-only `tenant_probe` and the two-Family isolation test; tests for the matrix, including the `prod` guard with `ApplicationContextRunner`
-- [ ] Refresh `openapi.json` and frontend types; README and CONTRIBUTING lines for the flag; changelog, security report, sprint status
+- [x] Migration, entities, repositories -- `families`, `caregivers`, `caregiver_membership`
+- [x] `CurrentCaregiver` port, request filter, `401` path, tenant holder and Hibernate resolver
+- [x] Demo resolver, flag, startup guard, `GET /api/v1/session`
+- [x] `GLOBAL_TABLES.md`, architecture test (an entity without `@TenantId` must be listed) and a native-query test (every native query filters on `family_id`)
+- [x] Test-only `tenant_probe` and the two-Family isolation test; tests for the matrix, including the `prod` guard with `ApplicationContextRunner`
+- [x] Refresh `openapi.json` and frontend types; README and CONTRIBUTING lines for the flag; changelog, security report, sprint status
 
 **Acceptance Criteria:** the Story 25.1 acceptance criteria in the epic file.
 
 ## Implementation Notes
 
+- Added `family` tables, `CurrentCaregiver` port, a temporary servlet filter, the demo resolver and guard, `GET /api/v1/session`, and the `shared.persistence` tenant holder and Hibernate resolver. The 401 gate matches the container's decoded, normalised path after review finding 1.
+- The membership table is read by `caregiver_id` and `ended_at is null`, because the Family is not known yet; its `family_id` column is indexed.
+- `caregivers.email` is NOT NULL (the spec lists the column but not its nullability).
+- Existing tests changed: logging test endpoints moved to `/test-support/...`; the 404 tests use `/api/v2/...` (unknown `/api/v1` paths are 401 without a Caregiver, covered by new tests with one); `PersistenceBaselineTests` and `ModuleSkeletonTests` expect the new tables.
+- Maven needs `JAVA_HOME` set to the Homebrew `openjdk@25` (the default JDK is 17). No JaCoCo gate exists in `pom.xml`.
+- Verification after review: `./mvnw verify` 94 tests, 0 failures, 0 skipped; `deploy/security-scan.sh` PASS; `npm run api:check` up to date.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Reviewers: BH blind, EC edge, VG verification gap (three separate subagents). The review diff left out the spec, sprint status and the two generated files (`openapi.json`, `schema.d.ts`).
+
+| # | Finding | Verdict | Route | Evidence |
+|---|---------|---------|-------|----------|
+| 1 | `CaregiverFilter.shouldNotFilter` matches the raw request URI: encoded (`/api/%76%31/..`), `;` path parameter and dot-segment forms skip the filter while Spring MVC still routes them, so the 401 gate fails open [BH, EC, VG] | high | patch, fixed | `CaregiverFilter.java` matches on the container's decoded, normalised path; new variant cases in `DemoFlagOffTests` |
+| 2 | The 404 and no-leak-in-logs tests moved to `/api/v2`, so the not-found contract and log redaction for unknown `/api/v1` paths are no longer tested [BH, EC] | medium | patch, fixed | demo-on test for a `not-found` problem without detail, and a no-leak log case for `/api/v1` |
+| 3 | A 401 from the filter may lack `X-Request-Id` and the access log line [BH] | false | rejected | `RequestIdFilter` is `HIGHEST_PRECEDENCE`, so it runs before `CaregiverFilter` (+10); the verify log shows `GET UNMATCHED -> 401` with a `requestId` |
+| 4 | `GET /api/v1/session` lists every Caregiver, across Families [BH] | low | patch, fixed | by spec (demo only); docs state it plainly in CONTRIBUTING |
+| 5 | `TenantContext` is a ThreadLocal: not carried into async, listener or job threads, and no tenant silently reads nothing [BH, EC] | low | patch, fixed | fail-closed by design (reads empty, writes fail on the FK); CONTRIBUTING states that a listener or job opens `TenantContext` from the payload's `family_id` |
+| 6 | The `OncePerRequestFilter` skips async and error dispatch [EC] | low | rejected | no async endpoint exists; the filtered request already set its tenant |
+| 7 | `Uuids.v7()` is not monotonic within a millisecond [BH, EC] | low | rejected | AD-4 asks for UUIDv7, and RFC 9562 does not require monotonic order within a millisecond |
+| 8 | Nothing asserts `Uuids.v7()` version, variant, timestamp or ordering across calls [VG, BH] | medium | patch, fixed | new `UuidsTests` |
+| 9 | `DemoGuard` is tested only on a hand-built context, so removing `@Component` or the `LS_DEMO` mapping would pass [BH, VG] | medium | patch, fixed | a test boots the real application with `prod` and `LS_DEMO=true` and expects the guard's failure |
+| 10 | "Tenant is cleared after the request" asserts on the test thread, not the request thread [VG] | medium | patch, fixed | direct `TenantContextTests` (close, nested restore, close after an exception) |
+| 11 | Weak isolation tests: the cross-write accepts any 4xx, and the "naming another Family" test passes if nothing is stored [BH] | medium | patch, fixed | assert the exact status and outcome |
+| 12 | The spec requires `openapi.json`, frontend types and sprint status, and the diff shows none [BH, EC] | false | rejected | they changed (types 64 lines, `OpenApiContractTests` passes); the review diff excluded them |
+| 13 | Changelog "80+ tests", placeholder commit field, reviewer pass "not run", deferred wording without issue links [BH, EC] | low | patch, fixed | records updated after review, in the finishing step |
+| 14 | `ZoneId.of` accepts offsets such as `+02:00`, which are not IANA IDs [EC] | low | patch, fixed | `Family` requires `ZoneId.getAvailableZoneIds()`; test |
+| 15 | `GlobalTablesTests` reads only an entity's own fields, not a `@MappedSuperclass` [EC] | low | patch, fixed | walk the class hierarchy |
+| 16 | The native-query check is a substring test and misses other routes [EC] | low | rejected | no native query exists; main code bans `createNativeQuery`, `JdbcTemplate` and `JdbcClient` outright; a stronger check is a design choice for the first native query |
+| 17 | No default Caregiver when the earliest has no membership [EC] | low | rejected | spec: the earliest-created Caregiver, and no membership is 401 |
+| 18 | A repeated or lenient-form `X-Demo-Caregiver` is accepted [EC] | low | rejected | the parsed value must equal an existing Caregiver ID, so no wrong match is possible |
+| 19 | A resolver exception (database failure) is a generic problem, untested [VG] | low | rejected | fails closed as an unexpected-error problem; no known trigger |
+| 20 | Migration and entity nitpicks: `week_start` checked twice, `role` limited to one value, `email` NOT NULL, no `@Version`, no code path to end a membership [BH] | low | rejected | defence in depth, and the spec's own model; membership ending is Story 3.9 |
+| 21 | Test import order, `GlobalTablesTests` scanning test classes, `DemoFixtures` assuming the probe table [BH] | low | rejected | cosmetic or test-only; `DemoFixtures` is used only where the probe migration runs |
 
 ## Design Notes
 

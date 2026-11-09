@@ -71,6 +71,13 @@ Example: `feature/epic-01-issue-28-hardened-local-infrastructure`.
 - Container images come from Docker Hardened Images (`dhi.io`) when the catalog has them. An image from elsewhere is listed as a warning in the epic's release note.
 - Background: AD-25, AD-26 and AD-27 in the architecture spine, NFR-20 to NFR-22, and the epic Definition of done.
 
+## Demo identity and tenancy
+
+- `LS_DEMO=true` (property `littlesteps.demo.enabled`, default off) makes requests run as a demo Caregiver, chosen with the `X-Demo-Caregiver` header (default: the earliest-created Caregiver). It is honoured only in the `local` and `test` profiles; the app refuses to start with it on in `prod` or with no profile, and the demo resolver is not a bean there.
+- Without it, every `/api/v1` endpoint except `/api/v1/ping` answers `401` (`unauthenticated`), and so does `GET /api/v1/session`.
+- The Family always comes from the Caregiver's active membership, never from a request value. A Family-owned table has `family_id uuid NOT NULL REFERENCES families ON DELETE CASCADE` and is mapped with `@TenantId`. A table without `family_id` is listed in `backend/GLOBAL_TABLES.md`; every native query filters on `family_id`. Nothing but a scheduled job may use the root tenant.
+- `GET /api/v1/session` lists every Caregiver, across Families, and exists only with the demo flag. A listener or job opens `TenantContext` with the `family_id` from its payload, because the tenant is a ThreadLocal; with none set, reads return nothing and writes fail on the foreign key. There is no seed data until Story 25.5.
+
 ## Finishing a story
 
 Before a story's last commit:

@@ -85,9 +85,10 @@ class ModuleSkeletonTests {
 	}
 
 	@Test
-	void noH2AndGlobalTablesListsNoTablesYet() throws IOException {
+	void noH2AndGlobalTablesListsTheFamilyTables() throws IOException {
 		assertThat(Files.readString(Path.of("pom.xml")).toLowerCase()).doesNotContain("h2database");
-		assertThat(Files.readString(Path.of("GLOBAL_TABLES.md"))).contains("None yet");
+		assertThat(Files.readString(Path.of("GLOBAL_TABLES.md"))).contains("`families`", "`caregivers`",
+				"`caregiver_membership`");
 	}
 
 	private static Set<String> declared(String module) throws Exception {

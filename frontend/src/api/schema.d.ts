@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/v1/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The demo session
+         * @description Demo only: the Caregiver and Family the request runs as, and every demo Caregiver. 401 unless the demo flag is on.
+         */
+        get: operations["session"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ping": {
         parameters: {
             query?: never;
@@ -41,6 +61,21 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        CaregiverSummary: {
+            /** Format: uuid */
+            id?: string;
+            displayName?: string;
+        };
+        SessionResponse: {
+            /** Format: uuid */
+            caregiverId?: string;
+            sub?: string;
+            displayName?: string;
+            /** Format: uuid */
+            familyId?: string;
+            demo?: boolean;
+            caregivers?: components["schemas"]["CaregiverSummary"][];
+        };
         Pong: {
             status?: string;
             /** Format: int32 */
@@ -55,6 +90,35 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The demo session */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            /** @description No Caregiver, or the demo flag is off */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
     ping: {
         parameters: {
             query?: {

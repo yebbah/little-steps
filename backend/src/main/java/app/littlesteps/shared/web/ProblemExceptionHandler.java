@@ -28,6 +28,11 @@ class ProblemExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(ProblemExceptionHandler.class);
 
+	@ExceptionHandler(UnauthenticatedException.class)
+	ResponseEntity<Object> handleUnauthenticated(UnauthenticatedException ex, WebRequest request) {
+		return handleExceptionInternal(ex, null, new HttpHeaders(), ProblemTypes.UNAUTHENTICATED.status(), request);
+	}
+
 	@ExceptionHandler(Exception.class)
 	ResponseEntity<Object> handleUnexpected(Exception ex, WebRequest request) {
 		// Stack trace kept for now (decision on #32). The message and trace can contain request values;
