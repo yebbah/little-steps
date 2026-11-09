@@ -17,7 +17,7 @@ images:
   - name: dhi.io/keycloak
     source: dhi
     tag: "26.8.2"
-    digest: sha256:aeda9dd828bc6760a29f14365d5ef9b6cd56ac0c7b90ab9dd0384b8bbf341aa0
+    digest: sha256:50a09844dc6063ee54cb99259ffbc070ac53ded09a6d1c0075ccaff9e5032f1c
   - name: dhi.io/node
     source: dhi
     tag: "24-alpine3.23-dev"
