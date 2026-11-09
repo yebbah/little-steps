@@ -87,15 +87,15 @@ Before a story's last commit:
 
 ## Non-story pull requests
 
-A pull request that is not a story (a fix, a CI or test-tooling change, a spec, a dependency or image bump, a docs change) also gets both records, named by pull request:
+Every pull request carries its own changelog and security report, in the same pull request as the change. A story uses the story names. Anything else (a fix, a CI or test-tooling change, a spec, a dependency or image bump, a docs change, a change to these rules) uses the change names:
 
-- `docs/changelogs/pr-<number>-<slug>.md` from [changelogs/TEMPLATE.md](changelogs/TEMPLATE.md). The Story and Epic rows become Pull request, Kind and Origin. Fill every section; write "Not applicable (reason)" where one does not apply, for example Tests for a spec-only change.
-- `docs/security-reports/pr-<number>-<slug>.md` from [security-reports/TEMPLATE.md](security-reports/TEMPLATE.md). Take the scan numbers from the CI "Security scan" job on the pull request's head commit, not from memory. Container images are scanned by the pre-commit hook, not in CI, so state that.
+- `docs/changelogs/change-<branch slug>.md` from [changelogs/TEMPLATE.md](changelogs/TEMPLATE.md). The Story and Epic rows become Issue, Kind and Origin. Fill every section; write "Not applicable (reason)" where one does not apply, for example Tests for a spec-only change.
+- `docs/security-reports/change-<branch slug>.md` from [security-reports/TEMPLATE.md](security-reports/TEMPLATE.md). Take the numbers from the local scan of the branch (`build/security/summary.txt` and `report.json`), as for a story. Container images are scanned by the pre-commit hook, not in CI; say so. No reviewer pass is required outside stories; record that none was run.
 - A row in the index of each folder.
 
-The pull request number exists only once the pull request is open, so these files may be added in a follow-up docs pull request after the merge. Merging first does not remove the duty: they are due before the next pull request is opened. The three-reviewer pass applies to stories; record in the report that none was run.
+The branch slug is the branch name after its prefix (`feature/epic-02-issue-154-webkit-focus-tests` gives `epic-02-issue-154-webkit-focus-tests`). It is known before the pull request exists, so the records are committed with the change and no follow-up pull request is ever needed. A pull request that only adds or edits records carries its own records like any other. The pull request number goes in the index and in the squash commit title, not in the file name.
 
-**Exempt:** a pull request that only adds or updates these records, or the rule about them, needs none of its own (otherwise the rule would never end). Non-story pull requests before #147 are not backfilled.
+CI enforces this: `deploy/check-records.sh` fails a pull request that adds or changes no changelog and no security report (`story-`, `change-` or `pr-` names). Pull requests up to #171 keep the `pr-<number>-<slug>` names they were written under.
 
 ## Review triage log format
 

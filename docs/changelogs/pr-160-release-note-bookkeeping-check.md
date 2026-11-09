@@ -35,7 +35,7 @@
 
 ## Security
 
-Local tooling only; no dependency or image changed. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-160-release-note-bookkeeping-check.md).
+Local tooling only; no dependency or image changed. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-160-release-note-bookkeeping-check.md).
 
 ## Operations impact
 

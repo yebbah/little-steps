@@ -33,7 +33,7 @@ The `26.8.2` tag moved to a new image that has the zlib fix for CVE-2026-76844 a
 
 ## Security
 
-The upgraded Keycloak image scans clean (23 components). Verdict: pass with warnings; the other Keycloak exceptions remain under #56. Details, scan numbers and the CI run are in the [security report](../security-reports/pr-164-keycloak-digest-bump.md).
+The upgraded Keycloak image scans clean (23 components). Verdict: pass with warnings; the other Keycloak exceptions remain under #56. Details, scan numbers and the scan source are in the [security report](../security-reports/pr-164-keycloak-digest-bump.md).
 
 ## Operations impact
 

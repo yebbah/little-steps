@@ -14,11 +14,11 @@ Specification changes only. Verdict: pass with warnings.
 
 ## 2. Scan result
 
-Scan tool versions: Grype 0.121.2, Syft 1.57.0, gitleaks 8.30.1. Blocking rule: CVE in CISA KEV, or CVSS 7.0 or above. Numbers are from the CI "Security scan" job on the pull request's head commit (run 42450588111). Specs and docs only: no dependency or image changed, so the scan result is the same as on `main`.
+Scan tool versions: Grype 0.121.2, Syft 1.57.0, gitleaks 8.30.1. Blocking rule: CVE in CISA KEV, or CVSS 7.0 or above. Numbers are from the CI Security scan job on the pull request's head commit (run 42450588111). Specs and docs only: no dependency or image changed, so the scan result is the same as on `main`.
 
 | Target | Components | Result | Blocking | Warnings |
 |---|---|---|---|---|
-| Commit history secrets (gitleaks) | n/a | PASS | 0 | 0 |
+| Secrets (gitleaks) | n/a | PASS | 0 | 0 |
 | Backend dependencies | 178 | PASS | 0 | 0 |
 | Frontend dependencies | 653 | PASS | 0 | 3 |
 | Container images | see section 4 | PASS (pre-commit hook; images are not scanned in CI) | 0 | n/a (local scan) |
@@ -33,7 +33,7 @@ Scan tool versions: Grype 0.121.2, Syft 1.57.0, gitleaks 8.30.1. Blocking rule: 
 
 ## 3. Exceptions
 
-19 active entries in `security/exceptions.yaml` at the merge commit: CVE-2017-18018, CVE-2018-20796, CVE-2019-1010022, CVE-2019-1010023, CVE-2019-9192, CVE-2025-69720, CVE-2026-102010, CVE-2026-19499, CVE-2026-4738, CVE-2026-5435, CVE-2026-54369, CVE-2026-54370, CVE-2026-54371, CVE-2026-56109, CVE-2026-56109, CVE-2026-76844, CVE-2026-84243, CVE-2026-85091, CVE-2026-95619. All are Debian base packages in the local Keycloak image (expiry 2026-12-04, tracked in #56) or the alsa-lib build-stage package (tracked in #68), plus the Mailpit zlib exception CVE-2026-4738 (expiry 2026-12-04, tracked in #146). This pull request did not add or change an exception.
+19 entries in `security/exceptions.yaml` at the merge commit (18 distinct CVEs): CVE-2017-18018, CVE-2018-20796, CVE-2019-1010022, CVE-2019-1010023, CVE-2019-9192, CVE-2025-69720, CVE-2026-102010, CVE-2026-19499, CVE-2026-4738, CVE-2026-5435, CVE-2026-54369, CVE-2026-54370, CVE-2026-54371, CVE-2026-56109, CVE-2026-76844, CVE-2026-84243, CVE-2026-85091, CVE-2026-95619. Each entry's package, reason, mitigation and expiry (2026-12-04 at the latest) are in that file at the merge commit, and every active exception is listed in the epic's release note. This pull request did not add or change an exception.
 
 ## 4. Container images
 
@@ -58,7 +58,7 @@ None.
 
 ## 6. Secrets and data handling
 
-The secret scan of the commit history passed in CI, and the staged changes passed in the pre-commit hook. No change.
+The secret scan passed (for the commit history in CI, and for the staged changes in the pre-commit hook). No change.
 
 ## 7. Tests
 
@@ -69,7 +69,7 @@ The secret scan of the commit history passed in CI, and the staged changes passe
 
 ## 8. Review findings with security impact
 
-None recorded. The three-reviewer pass applies to stories; this non-story pull request was gated by CI and the maintainer's instruction. 
+None recorded. The three-reviewer pass applies to stories; this non-story change was gated by CI and the maintainer's instruction. 
 
 ## 9. Residual risks and follow-ups
 

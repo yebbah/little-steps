@@ -35,7 +35,7 @@ Specifies three changes before code: a nightly Chromium, WebKit and Firefox run,
 
 ## Security
 
-Specifications only. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-157-spec-nightly-coverage-floor-release-note-check.md).
+Specifications only. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-157-spec-nightly-coverage-floor-release-note-check.md).
 
 ## Operations impact
 

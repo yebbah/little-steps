@@ -34,7 +34,7 @@ The backend CI job logs in to `dhi.io` before Testcontainers pulls PostgreSQL. A
 
 ## Security
 
-No secret handling changed: the login still uses the repository secrets and fails after the last attempt. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-155-dhi-login-retry.md).
+No secret handling changed: the login still uses the repository secrets and fails after the last attempt. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-155-dhi-login-retry.md).
 
 ## Operations impact
 

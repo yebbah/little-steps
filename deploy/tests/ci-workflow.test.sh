@@ -45,6 +45,10 @@ has "nightly: tests the built bundle, not the dev server" "$NIGHTLY" 'E2E_SERVER
 has "nightly: installs Chromium, WebKit and Firefox" "$NIGHTLY" 'run: npm run test:e2e:install:all$'
 has "nightly: uploads its reports" "$NIGHTLY" 'name: nightly-browser-reports'
 lacks "nightly: no write permission" "$NIGHTLY" 'contents: write'
+has "scripts: the records check runs on pull requests only" "$CI" "if: github.event_name == 'pull_request'"
+has "scripts: the records check runs" "$CI" 'run: deploy/check-records.sh "origin/.BASE_REF"'
+has "scripts: the records check has the full history" "$CI" 'fetch-depth: 0'
+has "scripts: the records check tests run" "$CI" 'deploy/tests/check-records.test.sh'
 has "frontend: build" "$CI" 'run: npm run build$'
 has "frontend: OpenAPI drift check" "$CI" 'run: npm run api:check$'
 lacks "frontend: the drift check never skips" "$CI" 'api:check script arrives|skipped, the'

@@ -34,7 +34,7 @@ The scanner downloads grype, syft and gitleaks from GitHub releases. A brief 5xx
 
 ## Security
 
-Retries do not weaken the pin: the SHA-256 of every tool archive is still checked against the value in the script, and a mismatch still stops the install. Verdict: pass with warnings (unchanged). Details, scan numbers and the CI run are in the [security report](../security-reports/pr-166-scan-tool-download-retry.md).
+Retries do not weaken the pin: the SHA-256 of every tool archive is still checked against the value in the script, and a mismatch still stops the install. Verdict: pass with warnings (unchanged). Details, scan numbers and the scan source are in the [security report](../security-reports/pr-166-scan-tool-download-retry.md).
 
 ## Operations impact
 

@@ -29,10 +29,13 @@ Newest first. Add a line here with every new changelog.
 
 ## Non-story pull requests
 
-Fix, CI, spec, test-tooling and chore pull requests have no story, so they get a changelog named `pr-<number>-<slug>.md` from the same [template](TEMPLATE.md) (the Story and Epic rows become Pull request and Kind), and a security report with the same name. The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests); pull requests that only add these records are exempt. Newest first.
+Every pull request that is not a story carries a changelog and a security report in the same pull request, from the same [template](TEMPLATE.md) (the Story and Epic rows become Issue and Kind). Records written for pull requests up to #171 are named `pr-<number>-<slug>.md`; later ones are named `change-<branch slug>.md`, so they exist before the pull request does. CI fails a pull request without them. The rule is in [CONTRIBUTING.md](../CONTRIBUTING.md#non-story-pull-requests). Newest first.
 
 | PR | Title | Changelog | Security report |
 |---|---|---|---|
+| issue #172 | Records travel in the same pull request, enforced by CI | [change-epic-02-issue-172-records-in-same-pr.md](change-epic-02-issue-172-records-in-same-pr.md) | [report](../security-reports/change-epic-02-issue-172-records-in-same-pr.md) |
+| #171 | Exempt records-only pull requests from the changelog and security report rule | [pr-171-records-only-prs-exempt.md](pr-171-records-only-prs-exempt.md) | [report](../security-reports/pr-171-records-only-prs-exempt.md) |
+| #169 | Changelogs and security reports for the non-story pull requests | [pr-169-changelogs-and-security-reports-for-non-story-prs.md](pr-169-changelogs-and-security-reports-for-non-story-prs.md) | [report](../security-reports/pr-169-changelogs-and-security-reports-for-non-story-prs.md) |
 | #168 | Time-limit the latest-image lookup in the security scan | [pr-168-latest-image-lookup-timeout.md](pr-168-latest-image-lookup-timeout.md) | [report](../security-reports/pr-168-latest-image-lookup-timeout.md) |
 | #166 | Retry the pinned scan tool download when GitHub releases answer 5xx | [pr-166-scan-tool-download-retry.md](pr-166-scan-tool-download-retry.md) | [report](../security-reports/pr-166-scan-tool-download-retry.md) |
 | #164 | Bump the Keycloak 26.8.2 digest to the current image | [pr-164-keycloak-digest-bump.md](pr-164-keycloak-digest-bump.md) | [report](../security-reports/pr-164-keycloak-digest-bump.md) |
