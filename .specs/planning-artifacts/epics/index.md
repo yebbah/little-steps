@@ -53,7 +53,7 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
 | 22 | Inventory and tagged notes (P2) | planned | 21 | [#23](https://github.com/yebbah/little-steps/issues/23) |
 | 23 | Progress trends and AI descriptions (P2) | planned | 22 | [#24](https://github.com/yebbah/little-steps/issues/24) |
 | 24 | Assistive-technology passes (P2) | planned | 23 | [#107](https://github.com/yebbah/little-steps/issues/107) |
-| 25 | [Demo Family and domain foundations](epic-25-demo-family-foundations.md) | planned | 1 | TBD (created when the epic is approved) |
+| 25 | [Demo Family and domain foundations](epic-25-demo-family-foundations.md) | draft | 1 | TBD (created when the epic is approved) |
 
 ### Epic 1: Local environment and project skeleton
 A developer can start and stop the whole product on a Mac with one command each. A skeleton app builds, boots and passes CI. Every commit is security-scanned, images are hardened, and the release-note tooling exists.
@@ -178,7 +178,7 @@ Caregivers who use screen readers are covered by recorded manual passes on the r
 ### Epic 25: Demo Family and domain foundations
 A developer or maintainer starts the app signed in as a seeded demo Caregiver, in a demo Family that already has a Child Profile, Care Team, Goals, Strategies and Restrictions, so the core loop can be tried before sign-in and the setup screens exist. Also builds Family tenancy, the device data layer, the read side of Epics 4–6 and `Guardrail.check()`. Built first.
 **FRs covered:** none directly (foundations for FR-1 tenancy, FR-2 to FR-4, FR-6, FR-7 read side; AD-2, AD-5, AD-11, AD-23)
-**Done when:** `dev-up.sh --demo` starts the app, the shell opens as the demo Caregiver with a visible "Demo data" indicator, the seeded Family's data is readable through the real APIs, a second demo Caregiver can be switched to, `Guardrail.check()` blocks a seeded Restriction, a second demo Family cannot read the first's rows, and the demo resolver is provably absent in `prod`.
+**Done when:** `dev-up.sh --full --demo` starts the stack with the demo flag on, the shell opens as the demo Caregiver with a visible "Demo data" indicator, the seeded Family's data is readable through the real APIs, a second demo Caregiver can be switched to, `Guardrail.check()` blocks a seeded Restriction, a second demo Family cannot read the first's rows, and the demo resolver is provably absent in `prod`.
 
 ## FR Coverage Map
 
