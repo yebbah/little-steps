@@ -85,6 +85,16 @@ Before a story's last commit:
 5. Log every deferred item as a GitHub issue (see "Deferred items" below) before pushing, put the issue number in the triage log's `defer` rows, and run the index sync check in [deferred-items.md](deferred-items.md#keeping-it-fresh-one-command-at-story-finish).
 6. Push the branch and close the story's issue with a short comment (commit, result, links to the deferred issues).
 
+## Non-story pull requests
+
+A pull request that is not a story (a fix, a CI or test-tooling change, a spec, a dependency or image bump, a docs change) also gets both records, named by pull request:
+
+- `docs/changelogs/pr-<number>-<slug>.md` from [changelogs/TEMPLATE.md](changelogs/TEMPLATE.md). The Story and Epic rows become Pull request, Kind and Origin. Fill every section; write "Not applicable (reason)" where one does not apply, for example Tests for a spec-only change.
+- `docs/security-reports/pr-<number>-<slug>.md` from [security-reports/TEMPLATE.md](security-reports/TEMPLATE.md). Take the scan numbers from the CI "Security scan" job on the pull request's head commit, not from memory. Container images are scanned by the pre-commit hook, not in CI, so state that.
+- A row in the index of each folder.
+
+The pull request number exists only once the pull request is open, so these files may be added in a follow-up docs pull request after the merge. Merging first does not remove the duty: they are due before the next pull request is opened. The three-reviewer pass applies to stories; record in the report that none was run.
+
 ## Review triage log format
 
 One table per story, in the story's spec under `## Review Triage Log`, with these columns:
