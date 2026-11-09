@@ -373,10 +373,28 @@ image_is_latest() {
   [ "$current" = "$digest" ]
 }
 
+# run_limited SECONDS COMMAND... : run the command and kill it after SECONDS (macOS has no `timeout`).
+# Prints its output; returns its status, or 124 when it was killed. The watcher keeps no pipe open.
+run_limited() {
+  local secs="$1" out pid watcher rc; shift
+  out="$(mktemp)"
+  "$@" > "$out" 2>/dev/null &
+  pid=$!
+  ( sleep "$secs"; kill "$pid" 2>/dev/null ) > /dev/null 2>&1 &
+  watcher=$!
+  wait "$pid" 2> /dev/null; rc=$?
+  kill "$watcher" 2> /dev/null; wait "$watcher" 2> /dev/null
+  cat "$out"; rm -f "$out"
+  if [ "$rc" = 143 ]; then echo "security-scan: the registry lookup timed out after ${secs}s; counted as a failed lookup" >&2; return 124; fi
+  return "$rc"
+}
+
 # latest_digest NAME:TAG -> the digest the tag points to now. Tests replace it with LS_LATEST_DIGEST_CMD.
+# A lookup that does not answer within LS_LOOKUP_TIMEOUT seconds (default 30) is a failed lookup (AD-25).
 latest_digest() {
-  if [ -n "${LS_LATEST_DIGEST_CMD:-}" ]; then "$LS_LATEST_DIGEST_CMD" "$1"; return; fi
-  docker buildx imagetools inspect "$1" 2>/dev/null | awk '/^Digest:/ { print $2; found = 1; exit } END { exit !found }'
+  local limit="${LS_LOOKUP_TIMEOUT:-30}"
+  if [ -n "${LS_LATEST_DIGEST_CMD:-}" ]; then run_limited "$limit" "$LS_LATEST_DIGEST_CMD" "$1"; return; fi
+  run_limited "$limit" docker buildx imagetools inspect "$1" | awk '/^Digest:/ { print $2; found = 1; exit } END { exit !found }'
 }
 
 scan_images() {
