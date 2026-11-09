@@ -20,36 +20,40 @@ LittleSteps v1 is split into small, feature-sized epics. Each epic is built, tes
   - Each story gets a sub-issue, labelled `story` and `P1` or `P2`, when its epic is approved. Epic 1 is #26–#34, Epic 2 is #35–#42 plus #104–#106 (Stories 2.9 to 2.11), and Epic 3 is #44–#53.
   - A story's issue is closed, with a summary comment, when the story is confirmed.
   - The epic's PR closes the epic issue.
-- **Order:** epics 1–17 are P1, and the core loop works online at the end of epic 9. Epics 18–24 are P2, and start only after P1 works end to end.
+- **Order:** epics 1–17 and 25 are P1. Epics 18–24 are P2, and start only after P1 works end to end. Epics are built in the **Build order** column, which differs from the epic numbers (sprint change proposal of 2026-11-09, [sprint-change-proposal-2026-11-09.md](../sprint-change-proposal-2026-11-09.md)):
+  - Epic 25 comes first and gives a seeded demo Family, so the core loop (Epics 7–12) is built and tried on demo data before sign-in and the setup screens exist.
+  - The core loop works online on demo data at the end of Epic 9, and on real accounts after Epic 6.
+  - Epics 4–6 are split. Their tables and read endpoints are built in Epic 25. Their forms, editing and history are built after Epic 3.
 
 ## Epic List
 
-| # | Epic | Status | Issue |
-| --- | --- | --- | --- |
-| 1 | [Local environment and project skeleton](epic-01-local-environment.md) | done | [#2](https://github.com/yebbah/little-steps/issues/2) |
-| 2 | [App shell and design foundations](epic-02-app-shell.md) | approved | [#3](https://github.com/yebbah/little-steps/issues/3) |
-| 3 | [Sign-in, Family and consent](epic-03-sign-in-family-consent.md) | approved | [#4](https://github.com/yebbah/little-steps/issues/4) |
-| 4 | Child Profile and Care Team | planned | [#5](https://github.com/yebbah/little-steps/issues/5) |
-| 5 | Goals and Goal Periods | planned | [#6](https://github.com/yebbah/little-steps/issues/6) |
-| 6 | Strategies and Restrictions | planned | [#7](https://github.com/yebbah/little-steps/issues/7) |
-| 7 | Activity library and Prep card | planned | [#8](https://github.com/yebbah/little-steps/issues/8) |
-| 8 | Weekly Plan and Today | planned | [#9](https://github.com/yebbah/little-steps/issues/9) |
-| 9 | Practice session and Review | planned | [#10](https://github.com/yebbah/little-steps/issues/10) |
-| 10 | Offline practice | planned | [#11](https://github.com/yebbah/little-steps/issues/11) |
-| 11 | Log a moment and Observation history | planned | [#12](https://github.com/yebbah/little-steps/issues/12) |
-| 12 | Progress view (basic) | planned | [#13](https://github.com/yebbah/little-steps/issues/13) |
-| 13 | AI foundation and AI Coach Tips | planned | [#14](https://github.com/yebbah/little-steps/issues/14) |
-| 14 | Period Summary and sharing | planned | [#15](https://github.com/yebbah/little-steps/issues/15) |
-| 15 | Appointment Feedback | planned | [#16](https://github.com/yebbah/little-steps/issues/16) |
-| 16 | Reminders and notifications | planned | [#17](https://github.com/yebbah/little-steps/issues/17) |
-| 17 | Privacy controls | planned | [#18](https://github.com/yebbah/little-steps/issues/18) |
-| 18 | Document import: upload and masking (P2) | planned | [#19](https://github.com/yebbah/little-steps/issues/19) |
-| 19 | Document import: extraction and draft review (P2) | planned | [#20](https://github.com/yebbah/little-steps/issues/20) |
-| 20 | AI Activity suggestions (P2) | planned | [#21](https://github.com/yebbah/little-steps/issues/21) |
-| 21 | Guided mode (P2) | planned | [#22](https://github.com/yebbah/little-steps/issues/22) |
-| 22 | Inventory and tagged notes (P2) | planned | [#23](https://github.com/yebbah/little-steps/issues/23) |
-| 23 | Progress trends and AI descriptions (P2) | planned | [#24](https://github.com/yebbah/little-steps/issues/24) |
-| 24 | Assistive-technology passes (P2) | planned | [#107](https://github.com/yebbah/little-steps/issues/107) |
+| # | Epic | Status | Build order | Issue |
+| --- | --- | --- | --- | --- |
+| 1 | [Local environment and project skeleton](epic-01-local-environment.md) | done | done | [#2](https://github.com/yebbah/little-steps/issues/2) |
+| 2 | [App shell and design foundations](epic-02-app-shell.md) | approved | done | [#3](https://github.com/yebbah/little-steps/issues/3) |
+| 3 | [Sign-in, Family and consent](epic-03-sign-in-family-consent.md) | approved | 9 | [#4](https://github.com/yebbah/little-steps/issues/4) |
+| 4 | Child Profile and Care Team | planned | 10 | [#5](https://github.com/yebbah/little-steps/issues/5) |
+| 5 | Goals and Goal Periods | planned | 11 | [#6](https://github.com/yebbah/little-steps/issues/6) |
+| 6 | Strategies and Restrictions | planned | 12 | [#7](https://github.com/yebbah/little-steps/issues/7) |
+| 7 | Activity library and Prep card | planned | 2 | [#8](https://github.com/yebbah/little-steps/issues/8) |
+| 8 | Weekly Plan and Today | planned | 3 | [#9](https://github.com/yebbah/little-steps/issues/9) |
+| 9 | Practice session and Review | planned | 4 | [#10](https://github.com/yebbah/little-steps/issues/10) |
+| 10 | Offline practice | planned | 5 | [#11](https://github.com/yebbah/little-steps/issues/11) |
+| 11 | Log a moment and Observation history | planned | 6 | [#12](https://github.com/yebbah/little-steps/issues/12) |
+| 12 | Progress view (basic) | planned | 7 | [#13](https://github.com/yebbah/little-steps/issues/13) |
+| 13 | AI foundation and AI Coach Tips | planned | 8 | [#14](https://github.com/yebbah/little-steps/issues/14) |
+| 14 | Period Summary and sharing | planned | 13 | [#15](https://github.com/yebbah/little-steps/issues/15) |
+| 15 | Appointment Feedback | planned | 14 | [#16](https://github.com/yebbah/little-steps/issues/16) |
+| 16 | Reminders and notifications | planned | 15 | [#17](https://github.com/yebbah/little-steps/issues/17) |
+| 17 | Privacy controls | planned | 16 | [#18](https://github.com/yebbah/little-steps/issues/18) |
+| 18 | Document import: upload and masking (P2) | planned | 17 | [#19](https://github.com/yebbah/little-steps/issues/19) |
+| 19 | Document import: extraction and draft review (P2) | planned | 18 | [#20](https://github.com/yebbah/little-steps/issues/20) |
+| 20 | AI Activity suggestions (P2) | planned | 19 | [#21](https://github.com/yebbah/little-steps/issues/21) |
+| 21 | Guided mode (P2) | planned | 20 | [#22](https://github.com/yebbah/little-steps/issues/22) |
+| 22 | Inventory and tagged notes (P2) | planned | 21 | [#23](https://github.com/yebbah/little-steps/issues/23) |
+| 23 | Progress trends and AI descriptions (P2) | planned | 22 | [#24](https://github.com/yebbah/little-steps/issues/24) |
+| 24 | Assistive-technology passes (P2) | planned | 23 | [#107](https://github.com/yebbah/little-steps/issues/107) |
+| 25 | [Demo Family and domain foundations](epic-25-demo-family-foundations.md) | planned | 1 | TBD (created when the epic is approved) |
 
 ### Epic 1: Local environment and project skeleton
 A developer can start and stop the whole product on a Mac with one command each. A skeleton app builds, boots and passes CI. Every commit is security-scanned, images are hardened, and the release-note tooling exists.
@@ -62,24 +66,24 @@ The app has its visual identity, navigation shell, status region and shared comp
 **Done when:** a component gallery (local and test builds only) renders in light and dark, at phone and laptop widths, and passes the contrast and accessibility checks.
 
 ### Epic 3: Sign-in, Family and consent
-A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family. Also adds Family tenancy, the device outbox, the audit table, and a maintainer console for pilot invites.
+A Caregiver with an invite signs in, gives consent, creates a Family, and invites a co-caregiver, who joins and sees the same Family. Also adds the audit table and a maintainer console for pilot invites. Family tenancy and the device data layer are built earlier, in Epic 25. Built after Epic 13.
 **FRs covered:** FR-1; NFR-4, NFR-5 (recording)
 **Done when:** invite → sign-up → consent → Family → co-caregiver joins, leaves or is removed, and the others are notified.
 
 ### Epic 4: Child Profile and Care Team
-Caregivers describe the child and add the Care Team Members, with their Status Vocabularies and Prompt Levels.
+Caregivers describe the child and add the Care Team Members, with their Status Vocabularies and Prompt Levels. The tables and read endpoints are built in Epic 25; this epic adds the forms, editing and history, and the onboarding steps.
 **FRs covered:** FR-2, FR-3
 **Done when:** the profile, its sensitivities and the members are saved, edited and kept with their history.
 
 ### Epic 5: Goals and Goal Periods
-Caregivers enter Goals by hand and move them through Goal Periods with lineage.
+Caregivers enter Goals by hand and move them through Goal Periods with lineage. The tables and read endpoints are built in Epic 25; this epic adds the forms, carry-over, revision and lineage.
 **FRs covered:** FR-4, FR-6
 **Done when:** parent-proposed and Care Team Goals are created, and a new period carries over, revises and retires Goals with their history intact.
 
 ### Epic 6: Strategies and Restrictions
-Caregivers record Care Team Strategies and Restrictions. The deterministic Restriction check is in place.
+Caregivers record Care Team Strategies and Restrictions. The tables, read endpoints and the deterministic Restriction check (`Guardrail.check()`) are built in Epic 25; this epic adds the forms and editing.
 **FRs covered:** FR-7 (Strategies and Restrictions)
-**Done when:** a Restriction or an "avoid" sensitivity blocks a matching item through `Guardrail.check()`.
+**Done when:** a Restriction or an "avoid" sensitivity recorded in the app changes `restriction_set_version`, and the next Plan or library result reflects it.
 
 ### Epic 7: Activity library and Prep card
 Caregivers browse the curated Activity library by Goal, favourite and hide Activities, record prescribed Activities, and read a Prep card.
@@ -107,7 +111,7 @@ Caregivers log spontaneous moments and edit Observations, with the history kept.
 **Done when:** a moment is logged from Today, edited, and History shows both versions, including two edits made at the same time.
 
 ### Epic 12: Progress view (basic)
-Caregivers see a Goal's three measures across the Goal Period.
+Caregivers see a Goal's three measures across the Goal Period. A story adds seeded Observation history to the demo Family, so the view can be tried on demo data.
 **FRs covered:** FR-16 (P1)
 **Done when:** consistency, performance and generalisation display correctly, the "too few to show a trend" rule applies, and revised Goals are followed back.
 
@@ -171,6 +175,11 @@ Caregivers who use screen readers are covered by recorded manual passes on the r
 **FRs covered:** none directly (NFR-14; UX-DR119 manual passes)
 **Done when:** VoiceOver (iOS and macOS), TalkBack and NVDA passes over the component gallery and the app shell are recorded in `docs/a11y-passes.md`, and every finding is fixed or tracked.
 
+### Epic 25: Demo Family and domain foundations
+A developer or maintainer starts the app signed in as a seeded demo Caregiver, in a demo Family that already has a Child Profile, Care Team, Goals, Strategies and Restrictions, so the core loop can be tried before sign-in and the setup screens exist. Also builds Family tenancy, the device data layer, the read side of Epics 4–6 and `Guardrail.check()`. Built first.
+**FRs covered:** none directly (foundations for FR-1 tenancy, FR-2 to FR-4, FR-6, FR-7 read side; AD-2, AD-5, AD-11, AD-23)
+**Done when:** `dev-up.sh --demo` starts the app, the shell opens as the demo Caregiver with a visible "Demo data" indicator, the seeded Family's data is readable through the real APIs, a second demo Caregiver can be switched to, `Guardrail.check()` blocks a seeded Restriction, a second demo Family cannot read the first's rows, and the demo resolver is provably absent in `prod`.
+
 ## FR Coverage Map
 
 - **FR-1:** Epic 3 (accounts, Family, consent, membership), Epic 16 (security notices)
@@ -192,5 +201,6 @@ Caregivers who use screen readers are covered by recorded manual passes on the r
 - **FR-17:** Epic 14 (Summary and sharing)
 - **FR-18:** Epic 15 (Appointment Feedback)
 - **FR-19:** Epic 1 (local environment)
+- **Epic 25** builds foundations (tenancy, data layer, read side of Epics 4–6, `Guardrail`) and covers no FR on its own. FR-1 to FR-4, FR-6 and FR-7 stay owned by the epics above.
 
 UX-DR and NFR coverage is listed in each epic file, and step 4 checks that all of it is covered.

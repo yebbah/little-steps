@@ -98,6 +98,7 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
 - **Rule:**
   - Every Family-owned table has `family_id uuid NOT NULL REFERENCES families ON DELETE CASCADE`, mapped with Hibernate `@TenantId`.
   - The tenant resolver takes the Family from the authenticated Caregiver's active membership, never from a request parameter.
+  - Until sign-in lands (Epic 3), a demo resolver may supply that membership. It is enabled only by the demo flag in profiles `local` and `test`, is not a bean in `prod`, and startup fails if the flag is set in `prod`. It uses the same Family-scoped path as real sign-in, and an isolation test covers two demo Families.
   - Tables without a Family (curated content, tombstones, `pilot_metric`, `invite` before acceptance) are listed in `backend/GLOBAL_TABLES.md`. Only those tables may omit `family_id`.
   - Only scheduled jobs (AD-16, AD-17) may use the Hibernate root tenant (`isRoot()`), and no request path can resolve to it.
   - Native SQL does not get the automatic tenant filter, so it must filter on `family_id` explicitly. A test checks every native query.
@@ -114,6 +115,7 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
   - Until consent is recorded, every Family-data endpoint returns `consent-required`.
   - When a Caregiver leaves or is removed, the membership is ended, not deleted, so attribution keeps the display name. Caregivers are hard-deleted only by Family purge (AD-16).
   - A Caregiver belongs to at most one Family in v1.
+  - Until Epic 3, the demo resolver of AD-2 stands in for the token. It never accepts credentials, and a demo Caregiver has a fixed `sub` so outbox ownership (AD-5) behaves as for a real Caregiver.
 
 ### AD-4 — IDs: UUIDv7 for aggregates, UUIDv5 for curated content, idempotent creates
 
@@ -206,6 +208,7 @@ Solid arrows mean "may call the `api` of". `shared` holds the kernel: IDs, `Fami
 - **Rule:**
   - `ai` defines the `RestrictionLookup` port, and `goals` implements it. It returns the Family's Restriction set (Restriction rows for the Goal and the Family, plus the Child Profile sensitivities marked "avoid", read live from `child.api`; no derived copies) and a `restriction_set_version`.
   - `Guardrail.check(items, scope)` runs a deterministic Restriction match first, then the scope classifier, which can add the label "check with your therapist". Every endpoint that returns Activities, Plan items, Prep cards or Coach Tips runs it, and results are cached against `restriction_set_version`.
+  - `RestrictionLookup` and `Guardrail` are built in Epic 25, before the Restriction forms of Epic 6, so the core loop is checked from the start.
   - Curated and AI items that fail, or can't be checked, are dropped. Prescribed Activities are never dropped: on a match they are shown with a "conflicts with a recorded Restriction — check with your therapist" flag.
 
 ### AD-12 — All AI access goes through named, allow-listed, budgeted AI tasks
