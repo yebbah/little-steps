@@ -52,7 +52,7 @@ class PingEndpointTests extends IntegrationTest {
 	@Test
 	void problemsNeverCarryDetail() {
 		assertThat(problem("/api/v1/ping?count=0", 400)).doesNotContainKey("detail");
-		assertThat(problem("/api/v1/nope", 404)).doesNotContainKey("detail");
+		assertThat(problem("/api/v2/nope", 404)).doesNotContainKey("detail");
 	}
 
 	@Test
@@ -85,7 +85,7 @@ class PingEndpointTests extends IntegrationTest {
 
 	@Test
 	void unknownApiPathIsANotFoundProblem() {
-		assertThat(problem("/api/v1/nope", 404)).containsEntry("type", "urn:littlesteps:problem:not-found");
+		assertThat(problem("/api/v2/nope", 404)).containsEntry("type", "urn:littlesteps:problem:not-found");
 	}
 
 	@Test
@@ -107,7 +107,7 @@ class PingEndpointTests extends IntegrationTest {
 	@Test
 	void problemIsSentEvenWhenTheClientAsksForHtml() {
 		client.get()
-			.uri("/api/v1/nope")
+			.uri("/api/v2/nope")
 			.accept(MediaType.TEXT_HTML)
 			.exchange()
 			.expectStatus()

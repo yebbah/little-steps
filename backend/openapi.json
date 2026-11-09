@@ -8,6 +8,36 @@
     "url" : "/"
   } ],
   "paths" : {
+    "/api/v1/session" : {
+      "get" : {
+        "tags" : [ "session-controller" ],
+        "summary" : "The demo session",
+        "description" : "Demo only: the Caregiver and Family the request runs as, and every demo Caregiver. 401 unless the demo flag is on.",
+        "operationId" : "session",
+        "responses" : {
+          "200" : {
+            "description" : "The demo session",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver, or the demo flag is off",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ping" : {
       "get" : {
         "tags" : [ "ping-controller" ],
@@ -77,6 +107,46 @@
           "properties" : {
             "type" : "object",
             "additionalProperties" : { }
+          }
+        }
+      },
+      "CaregiverSummary" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "displayName" : {
+            "type" : "string"
+          }
+        }
+      },
+      "SessionResponse" : {
+        "type" : "object",
+        "properties" : {
+          "caregiverId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "sub" : {
+            "type" : "string"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "familyId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "demo" : {
+            "type" : "boolean"
+          },
+          "caregivers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CaregiverSummary"
+            }
           }
         }
       },

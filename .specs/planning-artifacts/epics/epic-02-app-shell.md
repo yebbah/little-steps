@@ -1,7 +1,7 @@
 ---
 epic: 2
 title: App shell and design foundations
-status: approved
+status: done
 phase: P1
 ---
 

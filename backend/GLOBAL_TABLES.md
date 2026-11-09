@@ -1,10 +1,16 @@
 # Global tables
 
-Tables that have no `family_id` column (AD-2). Only tables listed here may omit `family_id`; every other table is Family-owned and tenant-scoped.
+Tables that have no tenant-scoped `family_id` (AD-2). An entity mapped without `@TenantId` must be listed here, and `GlobalTablesTests` fails if it is not; every other table is Family-owned and tenant-scoped.
 
 ## Listed tables
 
-None yet. A story that adds a global table (curated content, tombstones, `pilot_metric`, `invite` before acceptance) adds it here in the same change.
+| Table | Why it is global |
+|---|---|
+| `families` | The tenant itself. Read to resolve a Caregiver's Family. |
+| `caregivers` | A Caregiver exists before and across Families. |
+| `caregiver_membership` | Read before a tenant exists, to find the Caregiver's active Family. It keeps its `family_id` column. |
+
+A story that adds a global table (curated content, tombstones, `pilot_metric`, `invite` before acceptance) adds it here in the same change.
 
 ## Not Family data, and not listed
 

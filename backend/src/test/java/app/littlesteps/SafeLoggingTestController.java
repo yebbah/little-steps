@@ -15,7 +15,7 @@ class SafeLoggingTestController {
 
 	private static final Logger log = LoggerFactory.getLogger(SafeLoggingTestController.class);
 
-	@PostMapping("/api/v1/test/note")
+	@PostMapping("/test-support/note")
 	String note(@RequestBody String body) {
 		// Deliberately sloppy: the value type must still keep the text out of the log.
 		log.info("received note {}", new CaregiverText(body));
@@ -25,12 +25,12 @@ class SafeLoggingTestController {
 	record Note(String note) {
 	}
 
-	@PostMapping(path = "/api/v1/test/json", consumes = "application/json")
+	@PostMapping(path = "/test-support/json", consumes = "application/json")
 	String json(@RequestBody Note body) {
 		return "ok";
 	}
 
-	@PostMapping("/api/v1/test/boom")
+	@PostMapping("/test-support/boom")
 	String boom(@RequestBody String body) {
 		throw new IllegalStateException("failed for " + body);
 	}
