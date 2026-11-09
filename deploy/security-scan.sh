@@ -78,6 +78,20 @@ require_tools() {
   command -v jq >/dev/null || die "jq is required (brew install jq)"
 }
 
+# download_file URL DEST : curl with up to 4 attempts and growing pauses. A 5xx from GitHub releases is
+# usually brief (#165). The checksum check that follows is unchanged. LS_DOWNLOAD_PAUSE sets the pause unit (s).
+download_file() {
+  local url="$1" dest="$2" attempt err=""
+  for attempt in 1 2 3 4; do
+    if err="$(curl --fail --silent --show-error --location --output "$dest" "$url" 2>&1)"; then return 0; fi
+    [ "$attempt" -lt 4 ] || break
+    echo "download attempt $attempt of 4 failed ($err); retrying" >&2
+    sleep $((attempt * ${LS_DOWNLOAD_PAUSE:-5}))
+  done
+  echo "download failed after 4 attempts: $url ($err)" >&2
+  return 1
+}
+
 install_one() { # name version
   local name="$1" version="$2" arch="$ARCH" file url expected actual dir tmp
   [ "$name" = gitleaks ] && [ "$arch" = amd64 ] && arch=x64
@@ -91,7 +105,7 @@ install_one() { # name version
   esac
   tmp="$(mktemp -d)"
   echo "downloading $file"
-  if ! curl --fail --silent --show-error --location --output "$tmp/$file" "$url"; then
+  if ! download_file "$url" "$tmp/$file"; then
     rm -rf "$tmp"; die "download failed: $url"
   fi
   if command -v shasum >/dev/null 2>&1; then

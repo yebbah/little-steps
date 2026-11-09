@@ -114,6 +114,28 @@ check "image_is_latest: same digest" 0 "yes" latest_check "$TMP/digest-same.sh"
 check "image_is_latest: tag moved on" 0 "no" latest_check "$TMP/digest-new.sh"
 check "image_is_latest: lookup failed, fails closed" 0 "no" latest_check "$TMP/digest-fail.sh"
 
+# download_file: a 5xx from the release host is retried; a permanent failure stops after the last attempt (#165).
+download_check() { # FAILS -> prints the exit status, the number of curl calls and the file content
+  rm -f "$TMP/dl.out" "$TMP/curl-calls"
+  ( FAKE_CURL_FAILS="$1"; export LS_DOWNLOAD_PAUSE=0
+    # Stands in for curl (download_file runs it in a command substitution, so calls are counted in a file):
+    # fails the first FAKE_CURL_FAILS calls with a 504, then writes the --output file.
+    # shellcheck disable=SC2329  # called by download_file, which is evaluated below
+    curl() {
+      local out n
+      n=$(( $(cat "$TMP/curl-calls" 2>/dev/null || echo 0) + 1 )); echo "$n" > "$TMP/curl-calls"
+      while [ $# -gt 0 ]; do [ "$1" = "--output" ] && out="$2"; shift; done
+      if [ "$n" -le "$FAKE_CURL_FAILS" ]; then echo "curl: (22) The requested URL returned error: 504" >&2; return 22; fi
+      echo payload > "$out"
+    }
+    eval "$(awk '/^download_file\(\) \{/,/^}/' "$SCAN")"
+    download_file "https://example.invalid/x.tar.gz" "$TMP/dl.out" 2>/dev/null; rc=$?
+    echo "status=$rc calls=$(cat "$TMP/curl-calls") file=$(cat "$TMP/dl.out" 2>/dev/null || echo none)" )
+}
+check "download_file: first try works, one call" 0 "status=0 calls=1 file=payload" download_check 0
+check "download_file: two 504s then success is retried and installed" 0 "status=0 calls=3 file=payload" download_check 2
+check "download_file: three 504s then success on the last attempt" 0 "status=0 calls=4 file=payload" download_check 3
+check "download_file: always failing stops after 4 attempts" 0 "status=1 calls=4 file=none" download_check 99
 report GHSA-aaaa-bbbb-cccc 5.0 null | jq '.matches[0].relatedVulnerabilities = [{id: "CVE-2000-0001"}]' > "$TMP/alias.json"
 check "KEV match through a GHSA alias blocks" 1 "BLOCK.*CVE-2000-0001.*KEV=yes" "$SCAN" evaluate "$TMP/alias.json"
 
