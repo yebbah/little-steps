@@ -6,6 +6,7 @@ Newest first. Add a line here with every new changelog.
 
 | Story | Title | Changelog |
 |---|---|---|
+| 25.2 | Device data layer | [story-25-2-device-data-layer.md](story-25-2-device-data-layer.md) |
 | 25.1 | Demo identity and the tenant resolver | [story-25-1-demo-identity-and-the-tenant-resolver.md](story-25-1-demo-identity-and-the-tenant-resolver.md) |
 | 2.3 | App shell, navigation and focus management | [story-2-3-app-shell-navigation-and-focus-management.md](story-2-3-app-shell-navigation-and-focus-management.md) |
 | 2.11 | Catalog copy for errors, confirmations and security notices | [story-2-11-catalog-copy-for-errors-confirmations-and-security-notices.md](story-2-11-catalog-copy-for-errors-confirmations-and-security-notices.md) |

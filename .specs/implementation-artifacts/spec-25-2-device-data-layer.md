@@ -2,7 +2,7 @@
 title: 'Story 25.2: Device data layer'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-progress'
+status: 'in-review'
 baseline_commit: 'ed64cf90f47d45abf96ca06fcf43a72c5bc6dde0'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -85,11 +85,48 @@ context:
 
 ## Implementation Notes
 
+- Frontend: `frontend/src/data/` (`db`, `http`, `store`, `session`, `lifecycle`, `outbox`, `useDraft`, `runtime`, `queryClient`, `index`). `lifecycle.ts` is the ownership check and wipe; `runtime.ts` builds the singletons; `App.tsx` starts them. `fake-indexeddb/auto` is loaded in `src/test/setup.ts`.
+- Dexie holds `outbox`, `drafts`, `meta` (the owner `sub`) and an empty `snapshot` table reserved for Epic 10.
+- Coalescing merges only a pending, not-in-flight command of the same `sub`, target and method. A parked command does not block those behind it.
+- Backend: the echo endpoint is test-only code under `src/test` (`devecho` package, `@Profile("test")`, `@Hidden`), with a `dev_echo` table in the test Flyway location. An id used by another Family is a 409.
+- The oxlint ban is `no-restricted-globals` on `fetch` plus `no-restricted-properties` on `window.fetch`, `globalThis.fetch` and `self.fetch`, off only for `src/data/http.ts`.
+- The Playwright sample exercises the echo endpoint's replay contract over HTTP, not the outbox in the browser.
+- Review fixes (2026-11-09): the demo session keeps the last known `sub` (localStorage, `littlesteps.lastSub`) for a network failure; `pass()` sets `inFlight` then re-reads the row before sending; replay runs inside a `navigator.locks` lock; 408 and 429 retry; `undo` checks the owner; `useDraft` flushes on `pagehide` and `visibilitychange`; the echo endpoint re-reads on a replay race. Verification after review: frontend 388 tests (coverage about 96%), backend 103 tests, scan PASS.
+- Dependencies: `@tanstack/react-query` 5.105.0 (2026-10-26), `dexie` 4.4.7 (2026-10-19), `fake-indexeddb` 6.2.6 (2026-10-16).
+
 ## Spec Change Log
 
 - 2026-11-09, planning: the epic said "an ESLint rule"; the repo's linter is oxlint (AD-23), as in Epic 1. The epic file, the epic context and issue #180 now say "a lint rule (oxlint)". No behaviour change.
 
 ## Review Triage Log
+
+Reviewers: BH blind, EC edge, VG verification gap (three separate subagents). The review diff left out the spec, sprint status and `package-lock.json`.
+
+| # | Finding | Verdict | Route | Evidence |
+|---|---------|---------|-------|----------|
+| 1 | A cold start while offline reads as signed out: the session read fails with a network error and publishes `sub: null`, so `enqueue` throws and the offline-first guarantee fails [EC, VG] | high | patch, fixed | `session.ts` keeps and persists the last known `sub` for a network failure (not a 401 or other HTTP error); tests |
+| 2 | `pass()` reads a command, then a coalescing edit or undo commits before `inFlight` is set: a stale body is sent and the delete then removes the merged newer edit [EC] | medium | patch, fixed | set `inFlight` first, then re-read the row and send that; tests |
+| 3 | Two tabs run the outbox against the same Dexie queue and may send a command twice [EC] | medium | patch, fixed | one drainer across tabs with `navigator.locks` where available; test |
+| 4 | 408 and 429 are parked instead of retried [EC] | low | patch, fixed | `http.ts` classifies them as retry; test |
+| 5 | `undo` does not check the `sub` that owns the command [BH] | low | patch, fixed | `undo` filters on the current `sub`, like `retry`; test |
+| 6 | The last 500 ms of typing is lost when the tab is hidden or closed without a React unmount [EC] | medium | patch, fixed | `useDraft` flushes on `pagehide` and `visibilitychange`; test |
+| 7 | No test starts the real wiring (`startDataLayer`, `outbox.start`, `session.refresh`): deleting the `App.tsx` effect keeps every test green [VG] | medium | patch, fixed | new test asserts `/api/v1/session` is requested, a stored command replays, and a foreign owner is wiped |
+| 8 | A concurrent replay of the same echo `PUT` gets 409, which would park a good command [EC] | low | patch, fixed | echo endpoint re-reads the row on a violation and returns it; test |
+| 9 | The Playwright echo sample skips itself when the endpoint errors, and never runs in CI [VG, BH] | medium | patch, fixed | skips only on 404, fails on any other error; wiring it into CI is #7 below |
+| 10 | The `fetch` ban misses `window.fetch`, `globalThis.fetch` and `self.fetch` [EC, VG, BH] | medium | patch, fixed | extend the oxlint rule if oxlint can express it, with fixtures; otherwise report and defer |
+| 11 | README restates data-layer rules that CONTRIBUTING owns [BH] | low | patch, fixed | README links to CONTRIBUTING |
+| 12 | Records inconsistent or incomplete (verdict wording, "no review yet", coverage figure, commit and sign-off placeholders) [BH] | low | patch, fixed | records finished after the fixes, in the finishing step |
+| 13 | The frontend sends the write contract to a real backend nowhere in CI, so the two could drift [VG] | medium | defer #186 | the backend side is covered by `DevEchoTests`; wire `API_URL` and a test-profile backend into the nightly e2e |
+| 14 | A command that always gets 5xx holds back every later command [EC] | low | rejected | the spec says a 5xx backs off and retries; parking after N tries is a policy choice for the first screen that shows the queue |
+| 15 | `getJson` does not handle 204, an empty body or non-JSON [EC] | low | rejected | its one caller returns JSON; any failure is an error to Query either way |
+| 16 | After a 401 the Query cache is not cleared [EC] | low | rejected | a 401 is not a sign-out, and the same `sub` signing in again keeps its cache; sign-out wipes in Story 3.1 |
+| 17 | Rows exist but the owner row is missing, so a different `sub` does not wipe them [EC] | low | rejected | the outbox and drafts read only rows with the current `sub`, so nothing foreign is shown or replayed |
+| 18 | A parked command is retried after a newer edit to the same target and overwrites it [EC] | low | rejected | Retry keeps the command's original `seq`, so it replays before the newer one and the final state is the newer |
+| 19 | `startDataLayer` cleanup under StrictMode leaves waiters pending [EC, BH] | low | rejected | the waiters belong to effects that StrictMode also cleans up, and the remount starts a new lifecycle |
+| 20 | Parked-state copy "Your review is kept" is review-specific [BH] | low | rejected | the spec says to reuse `error.saveRejected`; no screen renders the parked state yet |
+| 21 | The echo body is unvalidated and unbounded, the 409 is not a problem response, and `ApplicationContextRunner` is vacuous [BH, VG] | low | rejected | test-only code; the global handler turns `ResponseStatusException` into a problem; the runner test fails without `@Profile("test")` because the repository bean is missing |
+| 22 | The context rewrite drops FR, AD and UX tags, and PATCH and DELETE replays are not idempotent [BH] | low | rejected | the context is a compiled aid and the requirement lists stay in the epic file; only `PUT` creates exist |
+| 23 | Missing tests for a Dexie upgrade, a changelog "above 80%" claim without a figure, `window.fetch` limitation not in CONTRIBUTING, Release row [BH] | low | rejected | version 1 is the first schema; the figure is added in the records; the limitation is fixed in #10 |
 
 ## Design Notes
 

@@ -18,6 +18,7 @@ public final class DemoFixtures {
 
 	public void reset() {
 		jdbc.update("delete from tenant_probe");
+		jdbc.update("delete from dev_echo");
 		jdbc.update("delete from caregiver_membership");
 		jdbc.update("delete from caregivers");
 		jdbc.update("delete from families");

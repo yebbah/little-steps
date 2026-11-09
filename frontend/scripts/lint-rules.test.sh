@@ -36,4 +36,24 @@ expect_boundary() { # name expected(pass|fail) source
 expect_boundary "surfaces importing from shell is flagged" fail "import { routes } from '../shell/routes.tsx'; export const x = routes"
 expect_boundary "surfaces importing the neutral status module passes" pass "import { useStatus } from '../status/statusContext.ts'; export const x = useStatus"
 
+# AD-5: the global fetch is called only in src/data/http.ts (reads for TanStack Query, writes for the outbox).
+ddir="src/data/__lint_fixture__"
+trap 'rm -rf "$dir" "$sdir" "$ddir"' EXIT
+mkdir -p "$ddir"
+expect_fetch() { # name expected(pass|fail) file source
+  printf '%s\n' "$4" >"$3"
+  out="$(npx oxlint --deny-warnings "$3" 2>&1)" && got=pass || got=fail
+  if [ "$got" = fail ] && ! grep -qE 'no-restricted-(globals|properties)' <<<"$out"; then got="fail-other"; fi
+  if [ "$got" = "$2" ]; then echo "PASS  $1"; else echo "FAIL  $1 (expected $2, got $got)"; fail=1; fi
+}
+expect_fetch "a non-GET fetch is flagged" fail "$dir/write.ts" "export const w = () => fetch('/api/v1/x', { method: 'PUT', body: '{}' })"
+expect_fetch "a GET fetch is flagged too" fail "$dir/read.ts" "export const r = () => fetch('/api/v1/x')"
+expect_fetch "fetch is flagged in the data layer outside http.ts" fail "$ddir/other.ts" "export const r = () => fetch('/api/v1/x')"
+for form in window globalThis self; do
+  expect_fetch "$form.fetch is flagged" fail "$dir/$form.ts" "export const r = () => $form.fetch('/api/v1/x')"
+  expect_fetch "$form.fetch is flagged in the data layer outside http.ts" fail "$ddir/$form.ts" "export const r = () => $form.fetch('/api/v1/x')"
+done
+expect_fetch "no fetch passes" pass "$dir/none.ts" "export const n = () => 1"
+# The exempt file: the real src/data/http.ts calls the global fetch and must pass.
+if npx oxlint --deny-warnings "src/data/http.ts" >/dev/null 2>&1; then echo "PASS  src/data/http.ts is exempt"; else echo "FAIL  src/data/http.ts is not exempt"; fail=1; fi
 exit "$fail"

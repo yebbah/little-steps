@@ -73,15 +73,15 @@ class PersistenceBaselineTests extends IntegrationTest {
 	}
 
 	@Test
-	void flywayCreatesTheRegistryTheFamilyTablesAndTheTestProbe() {
+	void flywayCreatesTheRegistryTheFamilyTablesAndTheTestTables() {
 		JdbcTemplate jdbc = new JdbcTemplate(dataSource);
 		List<String> tables = jdbc.queryForList(
 				"select table_name from information_schema.tables where table_schema = 'public' order by 1",
 				String.class);
-		assertThat(tables).containsExactly("caregiver_membership", "caregivers", "event_publication", "families",
+		assertThat(tables).containsExactly("caregiver_membership", "caregivers", "dev_echo", "event_publication", "families",
 				"flyway_schema_history", "tenant_probe");
 		assertThat(jdbc.queryForObject("select count(*) from flyway_schema_history where success", Integer.class))
-			.isEqualTo(3);
+			.isEqualTo(4);
 	}
 
 	@Test
