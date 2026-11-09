@@ -1,7 +1,7 @@
 ---
 epic: 25
 title: Demo Family and domain foundations
-status: draft
+status: approved
 phase: P1
 build-order: 1
 ---
@@ -10,7 +10,7 @@ build-order: 1
 
 A developer or maintainer starts the app signed in as a seeded demo Caregiver, in a demo Family that already has a Child Profile, Care Team, Goals, Strategies and Restrictions, so the core loop (Epics 7 to 12) can be built and tried before sign-in and the setup screens exist. The epic also builds the foundations that Epics 3 to 6 would otherwise have laid, so they can be reused unchanged.
 
-Added by the sprint change of 2026-11-09 ([proposal](../sprint-change-proposal-2026-11-09.md)). Its stories are below for review, one epic at a time. Issues are created when the epic is approved.
+Added by the sprint change of 2026-11-09 ([proposal](../sprint-change-proposal-2026-11-09.md)). Its stories are below for review, one epic at a time. Approved on 2026-11-09. Epic issue #178, stories #179 to #183.
 
 **Done when:**
 - `dev-up.sh --full --demo` starts the stack with the demo flag on, and the shell opens as the demo Caregiver with a visible "Demo data" indicator.
