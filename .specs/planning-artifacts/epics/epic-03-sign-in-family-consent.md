@@ -70,6 +70,7 @@ So that my family's information is only reachable by me and the people I invite.
 **When** a signed-out person opens the app
 **Then** a sign-in screen with copy from the catalog offers "Sign in" and "Create account". Both go to Keycloak using the authorization code flow with PKCE (S256). Tokens live in memory, and the refresh token rotates (AD-3).
 **And** the backend validates the JWT as an OAuth2 resource server on `/api/**`. A request without a valid token gets `401` as an RFC 9457 problem.
+**And** Spring Security denies every request by default. Only a named allowlist is open without a token: `/api/v1/ping`, the health endpoint, the SPA shell and its static assets. The temporary `CaregiverFilter` from Story 25.1 is removed, and the encoded, `;`, dot-segment and double-slash path tests from Story 25.1 still get `401` (sprint change 2026-11-09, Story 25.1 walkthrough).
 
 **Given** a valid token for a `sub` the app has not seen
 **When** the first API request arrives

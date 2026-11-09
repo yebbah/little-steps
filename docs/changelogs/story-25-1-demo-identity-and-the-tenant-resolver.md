@@ -54,9 +54,12 @@ Set `LS_DEMO=true` in the environment of a `local` run to call `/api/v1` endpoin
 
 ## Tests
 
-New: `DemoIdentityTests` (default, switch, unknown, no membership), `DemoFlagOffTests` (401 everywhere, header ignored), `TenantIsolationTests` (two Families: read, by-ID, cross-write, no tenant), `DemoGuardTests` (`ApplicationContextRunner`) and `DemoStartupGuardTests` (the real application: prod and no profile with the flag on fail at start), `GlobalTablesTests`, `TenantContextTests`, `UuidsTests`, `FamilyTests`; `DemoFlagOffTests` also sends encoded, `;`, dot-segment and double-slash paths through a raw HTTP client. Non-regression: `cd backend && ./mvnw verify` passes, 94 tests, 0 failures, 0 skipped.
+New: `DemoIdentityTests` (default, switch, unknown, no membership), `DemoFlagOffTests` (401 everywhere, header ignored), `TenantIsolationTests` (two Families: read, by-ID, cross-write, no tenant), `DemoGuardTests` (`ApplicationContextRunner`) and `DemoStartupGuardTests` (the real application: prod and no profile with the flag on fail at start), `GlobalTablesTests`, `TenantContextTests`, `UuidsTests`, `FamilyTests`; `DemoFlagOffTests` also sends encoded, `;`, dot-segment and double-slash paths through a raw HTTP client. Non-regression: `cd backend && ./mvnw verify` passes, 96 tests, 0 failures, 0 skipped (after the walkthrough fixes).
 
 ## Deferred and known issues
 
 - The independent three-reviewer pass was run (blind, edge and verification-gap subagents). 21 findings: 11 fixed, 10 rejected with evidence, none deferred. The triage log is in the story spec.
 - Demo seed data, the frontend session port and switcher: Stories 25.2 and 25.5.
+- #184: a listener or job with no tenant reads nothing, silently. Decided in Story 3.7 (target 2027-01-08).
+- Deferred index refreshed at story finish: closed #88 and #102 removed, open #175 added.
+- Walkthrough follow-ups fixed in this story: a `DEMO IDENTITY ON` warning at start with the flag on (tested), and a default-deny criterion added to Story 3.1 (issue #44).

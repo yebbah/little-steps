@@ -3,6 +3,9 @@ package app.littlesteps.family.web;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.mockito.Mockito;
 import app.littlesteps.family.persistence.CaregiverMembershipRepository;
 import app.littlesteps.family.persistence.CaregiverRepository;
@@ -53,6 +56,21 @@ class DemoGuardTests {
 	void flagOffInLocalHasNoDemoResolver() {
 		runner.withPropertyValues("spring.profiles.active=local")
 			.run(ctx -> assertThat(ctx).hasNotFailed().doesNotHaveBean(DemoCaregiverResolver.class));
+	}
+
+	@Test
+	@ExtendWith(OutputCaptureExtension.class)
+	void flagOnLogsTheImpersonationWarningAtStart(CapturedOutput output) {
+		runner.withPropertyValues("spring.profiles.active=local", "littlesteps.demo.enabled=true")
+			.run(ctx -> assertThat(ctx).hasNotFailed());
+		assertThat(output).contains("DEMO IDENTITY ON").contains("X-Demo-Caregiver");
+	}
+
+	@Test
+	@ExtendWith(OutputCaptureExtension.class)
+	void flagOffLogsNoWarning(CapturedOutput output) {
+		runner.withPropertyValues("spring.profiles.active=local").run(ctx -> assertThat(ctx).hasNotFailed());
+		assertThat(output).doesNotContain("DEMO IDENTITY ON");
 	}
 
 }

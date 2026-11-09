@@ -81,6 +81,7 @@ context:
 - `caregivers.email` is NOT NULL (the spec lists the column but not its nullability).
 - Existing tests changed: logging test endpoints moved to `/test-support/...`; the 404 tests use `/api/v2/...` (unknown `/api/v1` paths are 401 without a Caregiver, covered by new tests with one); `PersistenceBaselineTests` and `ModuleSkeletonTests` expect the new tables.
 - Maven needs `JAVA_HOME` set to the Homebrew `openjdk@25` (the default JDK is 17). No JaCoCo gate exists in `pom.xml`.
+- Walkthrough (2026-11-09): added the `DEMO IDENTITY ON` start warning with tests, a default-deny criterion on Story 3.1 (#44), and deferred #184. `./mvnw verify` then ran 96 tests, 0 failures.
 - Verification after review: `./mvnw verify` 94 tests, 0 failures, 0 skipped; `deploy/security-scan.sh` PASS; `npm run api:check` up to date.
 
 ## Spec Change Log
@@ -112,6 +113,9 @@ Reviewers: BH blind, EC edge, VG verification gap (three separate subagents). Th
 | 19 | A resolver exception (database failure) is a generic problem, untested [VG] | low | rejected | fails closed as an unexpected-error problem; no known trigger |
 | 20 | Migration and entity nitpicks: `week_start` checked twice, `role` limited to one value, `email` NOT NULL, no `@Version`, no code path to end a membership [BH] | low | rejected | defence in depth, and the spec's own model; membership ending is Story 3.9 |
 | 21 | Test import order, `GlobalTablesTests` scanning test classes, `DemoFixtures` assuming the probe table [BH] | low | rejected | cosmetic or test-only; `DemoFixtures` is used only where the probe migration runs |
+| 22 | Walkthrough risk pass: a listener or job with no tenant reads nothing, silently [walkthrough] | medium | defer #184 | decision between "open from the payload" and "fail loudly" belongs to Story 3.7, the first listener |
+| 23 | Walkthrough risk pass: `LS_DEMO` header impersonation is invisible when the app is reachable from other devices (Tailscale) [walkthrough] | medium | patch, fixed | `DemoConfiguration` logs a `DEMO IDENTITY ON` warning at start; `DemoGuardTests` checks it is logged with the flag and not without; README line |
+| 24 | Walkthrough risk pass: "replaced in Story 3.1" was not an acceptance criterion [walkthrough] | medium | patch, fixed | Story 3.1 gains a default-deny criterion with a named allowlist; issue #44 updated |
 
 ## Design Notes
 

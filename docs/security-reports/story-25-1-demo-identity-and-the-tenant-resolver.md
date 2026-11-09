@@ -59,8 +59,9 @@ Three independent reviewers (blind, edge, verification gap) ran on the diff. One
 
 | Item | Risk | Owner (story) |
 |---|---|---|
-| Temporary servlet filter instead of Spring Security | Weaker than the final design; the gate matches the decoded, normalised path and is covered by variant tests | Story 3.1 |
-| `X-Demo-Caregiver` trusts any caller when the flag is on | Local and test only | accepted |
+| Temporary servlet filter instead of Spring Security | Weaker than the final design; the gate matches the decoded, normalised path and is covered by variant tests | Story 3.1 (default-deny is now an acceptance criterion) |
+| `X-Demo-Caregiver` trusts any caller when the flag is on | Local and test only; a `DEMO IDENTITY ON` warning is logged at start, and the README says never to expose a demo-mode app to other devices | accepted |
+| A listener or job with no tenant reads nothing, silently | Fails closed, but hides a forgotten tenant scope | #184 (Story 3.7) |
 
 ## 10. Sign-off
 
