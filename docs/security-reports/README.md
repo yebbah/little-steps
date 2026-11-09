@@ -8,6 +8,7 @@ Every pull request that is not a story carries a report in the same pull request
 
 | PR | Title | Report |
 |---|---|---|
+| epic 25 | Demo Family first, setup features later (Epic 25 stories) | [change-epic-25-stories.md](change-epic-25-stories.md) |
 | issue #172 | Backfill changelogs and security reports for the older non-story pull requests | [change-epic-02-issue-172-records-backfill.md](change-epic-02-issue-172-records-backfill.md) |
 | issue #172 | Records travel in the same pull request, enforced by CI | [change-epic-02-issue-172-records-in-same-pr.md](change-epic-02-issue-172-records-in-same-pr.md) |
 | #171 | Exempt records-only pull requests from the changelog and security report rule | [pr-171-records-only-prs-exempt.md](pr-171-records-only-prs-exempt.md) |
