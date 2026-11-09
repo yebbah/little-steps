@@ -2,7 +2,7 @@
 title: 'Story 25.1: Demo identity and the tenant resolver'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'c76c97bc52a35977b689c2f62c2ad53af7e56223'
 route: 'dispatch'
 review_loop_iteration: 0

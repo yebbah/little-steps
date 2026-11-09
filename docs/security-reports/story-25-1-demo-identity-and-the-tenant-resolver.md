@@ -6,7 +6,7 @@
 | Branch | feature/epic-25-issue-179-demo-identity-and-tenant-resolver |
 | Commit scanned | the Story 25.1 commit (the pre-commit hook scans it); baseline c76c97bc52a35977b689c2f62c2ad53af7e56223 |
 | Date | 2026-11-09 |
-| Verdict | PASS |
+| Verdict | PASS WITH WARNINGS |
 
 ## 1. Summary
 
@@ -65,4 +65,4 @@ Three independent reviewers (blind, edge, verification gap) ran on the diff. One
 
 ## 10. Sign-off
 
-Pending human validation.
+Accepted by the maintainer on 2026-11-09 after the review pass and a walkthrough. The final scan of the branch (after every triage fix) passed: secrets clean, backend 178 and frontend 653 components with no blocking finding, the same 3 frontend warnings. Decision: merge.
