@@ -31,6 +31,7 @@ The decision trees behind these policies are drawn in [workflow.md](workflow.md)
   ```
 
 - The epic issue carries a "Tracked as sub-issues #X to #Y" line instead of a checklist.
+- The label `in-progress` marks the epic and the story being worked on now. Add it to the story when its branch is cut (and to its epic if not already there), and remove it from the story when it closes; the epic keeps it until its last story closes. Post a short progress comment on the epic issue when a story closes.
 
 ## Branching
 
@@ -77,6 +78,15 @@ Example: `feature/epic-01-issue-28-hardened-local-infrastructure`.
 - Without it, every `/api/v1` endpoint except `/api/v1/ping` answers `401` (`unauthenticated`), and so does `GET /api/v1/session`.
 - The Family always comes from the Caregiver's active membership, never from a request value. A Family-owned table has `family_id uuid NOT NULL REFERENCES families ON DELETE CASCADE` and is mapped with `@TenantId`. A table without `family_id` is listed in `backend/GLOBAL_TABLES.md`; every native query filters on `family_id`. Nothing but a scheduled job may use the root tenant.
 - `GET /api/v1/session` lists every Caregiver, across Families, and exists only with the demo flag. A listener or job opens `TenantContext` with the `family_id` from its payload, because the tenant is a ThreadLocal; with none set, reads return nothing and writes fail on the foreign key. There is no seed data until Story 25.5.
+
+## Frontend data layer
+
+- Server reads go through TanStack Query, with `frontend/src/data/http.ts` as the query function. No server data is copied into a global store.
+- Writes go only through `outbox.enqueue(command)`: it saves to the one Dexie database (`littlesteps`) on the device first, then replays in order, only under the `sub` that made the command. A `4xx` other than 401 parks the command (catalog line `error.saveRejected` with Retry); a 401 pauses replay and keeps the queue; a network error or `5xx` backs off.
+- `fetch` is called only in `src/data/http.ts`. oxlint fails on `fetch`, `window.fetch`, `globalThis.fetch` and `self.fetch` anywhere else in `src/` (`scripts/lint-rules.test.sh` proves it).
+- A start while offline keeps the last known `sub` (a network failure only; a 401 forgets it), so a Caregiver can still save to the outbox.
+- Form state that must survive leaving the page uses `useDraft(key)`. When the `session` port reports a different `sub`, the outbox, drafts and Query cache are wiped before anything is shown or replayed.
+- `PUT /api/v1/dev/echo/{id}` exists only in profile `test` (code under `src/test`) and exercises the outbox against the real backend.
 
 ## Finishing a story
 
