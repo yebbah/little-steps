@@ -2,7 +2,7 @@
 title: 'Story 25.2: Device data layer'
 type: 'feature'
 created: '2026-11-09'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'ed64cf90f47d45abf96ca06fcf43a72c5bc6dde0'
 route: 'dispatch'
 review_loop_iteration: 0
