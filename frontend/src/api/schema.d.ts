@@ -24,6 +24,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/prompt-levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Family's ordered Prompt Levels */
+        get: operations["promptLevels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ping": {
         parameters: {
             query?: never;
@@ -36,6 +53,74 @@ export interface paths {
          * @description Returns status 'ok' and the requested count. A count outside 1 to 10 is a validation problem.
          */
         get: operations["ping"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Family's Goals */
+        get: operations["goals"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/goal-periods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Family's Goal Periods */
+        get: operations["periods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/child-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Family's Child Profile */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/care-team-members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Family's Care Team Members, each with a Status Vocabulary and Prompt Level mapping */
+        get: operations["members"];
         put?: never;
         post?: never;
         delete?: never;
@@ -76,10 +161,101 @@ export interface components {
             demo?: boolean;
             caregivers?: components["schemas"]["CaregiverSummary"][];
         };
+        PromptLevelResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: int32 */
+            ordinal?: number;
+            label?: string;
+            retired?: boolean;
+        };
         Pong: {
             status?: string;
             /** Format: int32 */
             count?: number;
+        };
+        GoalResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            goalPeriodId?: string;
+            domain?: string;
+            description?: string;
+            sourceKind?: string;
+            /** Format: uuid */
+            sourceId?: string;
+            origin?: string;
+            originalText?: string;
+            caregiverText?: string;
+            goalType?: string;
+            /** Format: uuid */
+            parentGoalId?: string;
+            context?: string;
+            baseline?: string;
+            reviewStatus?: string;
+            /** Format: uuid */
+            proposedTo?: string;
+            /** Format: uuid */
+            revisedFrom?: string;
+            lineage?: string;
+            retired?: boolean;
+            criterionKind?: string;
+            /** Format: int32 */
+            criterionTarget?: number;
+            /** Format: int32 */
+            criterionOutOf?: number;
+            /** Format: uuid */
+            criterionPromptLevelId?: string;
+            criterionContext?: string;
+        };
+        GoalPeriodResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            careTeamMemberId?: string;
+            /** Format: date */
+            startsOn?: string;
+            /** Format: date */
+            endsOn?: string;
+            status?: string;
+        };
+        ChildProfileResponse: {
+            /** Format: uuid */
+            id?: string;
+            nickname?: string;
+            ageBand?: string;
+            interests?: string;
+            materials?: string;
+            engagementNotes?: string;
+            sensitivities?: components["schemas"]["SensitivityResponse"][];
+        };
+        SensitivityResponse: {
+            /** Format: uuid */
+            id?: string;
+            text?: string;
+            avoid?: boolean;
+        };
+        CareTeamMemberResponse: {
+            /** Format: uuid */
+            id?: string;
+            role?: string;
+            discipline?: string;
+            careSetting?: string;
+            statusVocabulary?: components["schemas"]["StatusVocabularyItemResponse"][];
+            promptLevelMapping?: components["schemas"]["PromptLevelMappingResponse"][];
+        };
+        PromptLevelMappingResponse: {
+            /** Format: uuid */
+            promptLevelId?: string;
+            label?: string;
+        };
+        StatusVocabularyItemResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: int32 */
+            ordinal?: number;
+            label?: string;
+            retired?: boolean;
         };
     };
     responses: never;
@@ -119,6 +295,35 @@ export interface operations {
             };
         };
     };
+    promptLevels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Prompt Levels in order, retired ones included */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptLevelResponse"][];
+                };
+            };
+            /** @description No Caregiver */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
     ping: {
         parameters: {
             query?: {
@@ -141,6 +346,131 @@ export interface operations {
             };
             /** @description Count outside 1 to 10 or not a number */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
+    goals: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Goals, oldest first, retired ones included */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalResponse"][];
+                };
+            };
+            /** @description No Caregiver */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
+    periods: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Goal Periods, earliest start first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalPeriodResponse"][];
+                };
+            };
+            /** @description No Caregiver */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Child Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChildProfileResponse"];
+                };
+            };
+            /** @description No Caregiver */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+            /** @description The Family has no Child Profile (problem type not-found) */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
+    members: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Care Team Members, oldest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CareTeamMemberResponse"][];
+                };
+            };
+            /** @description No Caregiver */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

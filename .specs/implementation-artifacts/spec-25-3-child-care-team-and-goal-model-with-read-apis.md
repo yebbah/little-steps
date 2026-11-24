@@ -2,7 +2,7 @@
 title: 'Story 25.3: Child, Care Team and Goal model with read APIs'
 type: 'feature'
 created: '2026-11-24'
-status: 'in-progress'
+status: 'in-review'
 baseline_commit: '3c0fca57e294aa80606cbbcc5af6d10d7feb1be8'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -73,9 +73,40 @@ context:
 
 ## Implementation Notes
 
+- Review fixes (2026-11-24): every cross-table reference is a composite foreign key with `family_id`; references to history refuse the delete (NO ACTION), only owned child rows cascade; a trigger makes `goal.original_text` write-once; new checks on origin and source, self-reference, `revised` and blank text; one `current` period per member. Verification after review: backend 138 tests, frontend 388 unit and 89 e2e tests, scan PASS.
+
+- Migrations `child/V20261124_1000`, `careteam/V20261124_1010`, `goals/V20261124_1020`; entities are read-only (getters, protected constructor), each with `@TenantId`. Sensitivities are rows of `child_sensitivity`; the Criterion is flat columns on `goal` and the API returns them flat, all null for a narrative Goal. `criterion_out_of` is checked for trials only. `goal_period_id` is nullable (a parent-proposed Goal need not sit in a period); `source_kind` is limited to `care_team_member` or `caregiver` (AD-10).
+- Ordering: members and Goals by `created_at`, Prompt Levels and vocabulary by `ordinal`, Goal Periods by `starts_on`, all then by `id`. A retired Prompt Level or word gives its ordinal to a new one (partial unique index).
+- No Child Profile is a bare `ResponseStatusException(404)`, rendered as the `not-found` problem. `./mvnw verify`: 122 tests, 0 failures. The three-reviewer pass was not run.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Reviewers: BH blind, EC edge, VG verification gap (three separate subagents). The review diff left out the spec, sprint status, the Epic 25 context and the two generated API files.
+
+| # | Finding | Verdict | Route | Evidence |
+|---|---------|---------|-------|----------|
+| 1 | Cross-Family references are not enforced by the database: a row in Family A can name a member, level, period or goal of Family B, because the foreign keys check `id` only [BH, EC, VG] | high | patch, fixed | composite `(id, family_id)` keys and composite foreign keys on every cross-table reference; a test that a cross-Family reference is refused |
+| 2 | `ON DELETE CASCADE` from member to period and period to goal deletes history, and `SET NULL` drops a Goal's Prompt Level or proposed member silently [BH] | high | patch, fixed | those references refuse the delete (no cascade), the Family purge still cascades from `families`; tests |
+| 3 | `original_text` is write-once only through the JPA mapping, and the test reads the annotation by reflection [BH, EC, VG] | medium | patch, fixed | a database trigger refuses any change of `original_text`; a JDBC test |
+| 4 | The 401 test sends an unknown demo ID with the flag on, not the matrix case of no Caregiver [BH, EC, VG] | medium | patch, fixed | a flag-off test over the five paths |
+| 5 | Migration rules are not exercised: the active-ordinal unique indexes and reuse of a retired ordinal, `ends_on >= starts_on`, positive target, trials `out_of >= target`, the member-level unique pair [VG, BH] | medium | patch, fixed | tests that insert the colliding and the accepted rows |
+| 6 | Two `current` Goal Periods for one member are accepted, so "the member's current period" is ambiguous [BH, EC] | medium | patch, fixed | a partial unique index on `(care_team_member_id) WHERE status = 'current'`; test |
+| 7 | `origin` and `source_kind` can contradict (a prescribed Goal sourced from a Caregiver); a Goal can be its own parent or revision, and `revised` can have no `revised_from`; `original_text` can be blank [EC] | medium | patch, fixed | CHECKs for each; tests |
+| 8 | `PersistenceBaselineTests` compares table names in the database's sort order [EC] | low | patch, fixed | compared in any order |
+| 9 | No test returns `caregiverText` or `lineage` through the API [BH] | low | patch, fixed | assertions added |
+| 10 | Unused `java.time.Instant` import in `MemberPromptLevel` [BH] | low | patch, fixed | removed |
+| 11 | CONTRIBUTING omits retired Goals; the README does not list the endpoints [BH] | low | patch, fixed | one line each, README links to CONTRIBUTING for the rule |
+| 12 | Records incomplete (commit placeholder, "each database check" overstated, review pass not recorded) [BH] | low | patch, fixed | finished after the fixes, in the finishing step |
+| 13 | `openapi.json` and the frontend types are missing from the diff [BH, EC] | false | rejected | they changed (`api:check` passes, `OpenApiContractTests` passes); the review diff left them out |
+| 14 | A `kind` without a target, or an `out_of` with a null target, is possible [EC] | false | rejected | `goal_structured_has_criterion` and `goal_narrative_has_no_criterion` already forbid both |
+| 15 | A current period must have no `ends_on`, a closed one must [EC] | false | rejected | UX-DR61 gives every period an end date (start plus 3 months), so a current period has one |
+| 16 | Entity mappings are uneven (`created_at` getters, `getFamilyId`), `DemoFixtures` style, a magic number, a Javadoc wording [BH] | low | rejected | cosmetic; the fields are not read by any API |
+| 17 | Lists are unbounded and include retired rows; the effective Goal text is left to the client; `Cache-Control` and read audit are not discussed [BH, EC] | low | rejected | Family-scale data; filters and pagination arrive with their first consumer; browsers do not heuristically cache a response without validators; read audit is Epic 17 |
+| 18 | `CareTeamService` loads vocabulary for the whole tenant and drops orphans silently [EC] | low | rejected | tenant-scoped and small; the foreign key prevents orphans |
+| 19 | `goal.source_id` has no foreign key and is not checked against `source_kind` [EC, BH] | low | rejected | a Source is a typed reference to either a member or a Caregiver (AD-10); the kind check and the new origin check bound it |
+| 20 | Missing index on the status vocabulary, mapping and period foreign keys; `child_sensitivity.ordinal` is not unique [BH] | low | rejected | read volume is tiny; ordering falls back to the id |
 
 ## Design Notes
 

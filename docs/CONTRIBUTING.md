@@ -78,6 +78,7 @@ Example: `feature/epic-01-issue-28-hardened-local-infrastructure`.
 - Without it, every `/api/v1` endpoint except `/api/v1/ping` answers `401` (`unauthenticated`), and so does `GET /api/v1/session`.
 - The Family always comes from the Caregiver's active membership, never from a request value. A Family-owned table has `family_id uuid NOT NULL REFERENCES families ON DELETE CASCADE` and is mapped with `@TenantId`. A table without `family_id` is listed in `backend/GLOBAL_TABLES.md`; every native query filters on `family_id`. Nothing but a scheduled job may use the root tenant.
 - `GET /api/v1/session` lists every Caregiver, across Families, and exists only with the demo flag. A listener or job opens `TenantContext` with the `family_id` from its payload, because the tenant is a ThreadLocal; with none set, reads return nothing and writes fail on the foreign key. There is no seed data until Story 25.5.
+- The Child Profile (module `child`), the Care Team with its Prompt Levels and Status Vocabulary (`careteam`) and Goal Periods and Goals (`goals`) are read through `GET /api/v1/child-profile`, `/care-team-members`, `/prompt-levels`, `/goal-periods` and `/goals`. They are read-only until Epics 4 and 5; a Prompt Level, Status Vocabulary item or Goal is retired (`retired_at`), never deleted, and lists include retired items with a `retired` flag. Cross-table references are composite foreign keys with `family_id` and refuse a delete, so history is removed only with its Family. Care Team wording (`original_text`) is write-once.
 
 ## Frontend data layer
 
