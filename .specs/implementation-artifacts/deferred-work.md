@@ -44,4 +44,5 @@
 - #146  2026-12-04  Mailpit exception: re-check for an image with zlib 1.4 (CVE-2026-4738)  (origin #145, image-fix policy)
 - #184  2027-01-08  Listener or job with no tenant reads nothing silently  (origin #179, Story 25.1 walkthrough)
 - #175  2026-11-16  CI: lengthen the retry window for the pinned scan tool download  (origin #165)
+- #186  2027-01-08  Check the frontend write contract against a real backend in the nightly e2e  (origin #180, Story 25.2 review)
 - #189  2026-12-24  OpenSSL 3.5.9 exceptions (9 CVEs) in the pinned images: re-check for fixed images  (origin #180, image gate)

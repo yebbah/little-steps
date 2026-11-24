@@ -13,15 +13,49 @@
         "allowConstantExport": true
       }
     ],
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "fetch",
+        "message": "Never call fetch directly (AD-5). Reads go through TanStack Query with src/data/http.ts as the query function; writes go through outbox.enqueue()."
+      }
+    ],
     "react/jsx-no-literals": [
       "error",
       {
         "noStrings": true,
         "ignoreProps": true
       }
+    ],
+    "no-restricted-properties": [
+      "error",
+      {
+        "object": "window",
+        "property": "fetch",
+        "message": "Never call fetch directly (AD-5). Reads go through TanStack Query with src/data/http.ts as the query function; writes go through outbox.enqueue()."
+      },
+      {
+        "object": "globalThis",
+        "property": "fetch",
+        "message": "Never call fetch directly (AD-5). Reads go through TanStack Query with src/data/http.ts as the query function; writes go through outbox.enqueue()."
+      },
+      {
+        "object": "self",
+        "property": "fetch",
+        "message": "Never call fetch directly (AD-5). Reads go through TanStack Query with src/data/http.ts as the query function; writes go through outbox.enqueue()."
+      }
     ]
   },
   "overrides": [
+    {
+      "files": [
+        "src/data/http.ts"
+      ],
+      "rules": {
+        "no-restricted-globals": "off",
+        "no-restricted-properties": "off"
+      }
+    },
     {
       "files": [
         "src/surfaces/**"
