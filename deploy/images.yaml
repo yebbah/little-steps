@@ -13,7 +13,7 @@ images:
   - name: dhi.io/postgres
     source: dhi
     tag: "18-alpine"
-    digest: sha256:af919daf603560e0b3edf20b16e11adf278c861b74940f79596b12bda8c1ac01
+    digest: sha256:0cdbc51a89a592296aa6d2ef7063f4db283dab5aea4a351ccbd89bb97907c4b4
   - name: dhi.io/keycloak
     source: dhi
     tag: "26.8.2"
