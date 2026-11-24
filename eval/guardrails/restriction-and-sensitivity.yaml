@@ -1,0 +1,161 @@
+cases:
+  - name: a Restriction drops a curated item that says the same thing without the leading "no"
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "No hand-over-hand prompting"
+        items:
+          - { kind: activity, origin: curated, text: "Try hand-over-hand prompting to place the block" }
+          - { kind: activity, origin: curated, text: "Handing out cards to each friend" }
+        expect:
+          - { outcome: drop }
+          - { outcome: keep }
+  - name: an avoid term drops an item
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - { text: "Keep materials dry", avoidTerms: ["sticky"] }
+        items:
+          - { kind: plan_item, origin: curated, text: "Sticky dough play" }
+          - { kind: coach_tip, origin: curated, text: "Use dry sand" }
+        expect:
+          - { outcome: drop }
+          - { outcome: keep }
+  - name: an avoid sensitivity drops an item, ignoring a plural ending
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        sensitivities:
+          - { text: "sticky textures", avoid: true }
+        items:
+          - { kind: activity, origin: curated, text: "Explore a sticky texture board" }
+        expect:
+          - { outcome: drop }
+  - name: a sensitivity that is not marked avoid keeps the item
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        sensitivities:
+          - { text: "sticky textures", avoid: false }
+        items:
+          - { kind: activity, origin: curated, text: "Explore a sticky texture board" }
+        expect:
+          - { outcome: keep }
+  - name: a retired Restriction does not apply
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - { text: "No bubbles", retired: true }
+        items:
+          - { kind: activity, origin: curated, text: "Blow bubbles" }
+        expect:
+          - { outcome: keep }
+  - name: a Goal-level Restriction applies to its Goal only, a Family-level one to every scope
+    tags: [guardrail-eval]
+    steps:
+      - scope: goal-b
+        restrictions:
+          - { text: "No flashcards", goal: a }
+          - { text: "No timers" }
+        items:
+          - { kind: activity, origin: curated, text: "Flashcards of animals" }
+          - { kind: activity, origin: curated, text: "A timer game" }
+        expect:
+          - { outcome: keep }
+          - { outcome: drop }
+      - scope: goal-a
+        restrictions:
+          - { text: "No flashcards", goal: a }
+          - { text: "No timers" }
+        items:
+          - { kind: activity, origin: curated, text: "Flashcards of animals" }
+        expect:
+          - { outcome: drop }
+  - name: a lead-in verb is removed from a Restriction
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "Don't use flashcards"
+        items:
+          - { kind: activity, origin: curated, text: "Flashcards of animals" }
+          - { kind: activity, origin: curated, text: "Animal picture book" }
+        expect:
+          - { outcome: drop }
+          - { outcome: keep }
+  - name: a list in a Restriction gives one target per item of the list
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "No bubbles or whistles"
+        items:
+          - { kind: activity, origin: curated, text: "Blowing bubbles" }
+          - { kind: activity, origin: curated, text: "Toy whistle" }
+          - { kind: activity, origin: curated, text: "Blocks" }
+        expect:
+          - { outcome: drop }
+          - { outcome: drop }
+          - { outcome: keep }
+  - name: a comma list and "and/or" split too
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "Never drums, bells and/or horns"
+        items:
+          - { kind: activity, origin: curated, text: "Ring the bell" }
+          - { kind: activity, origin: curated, text: "A drum circle" }
+          - { kind: activity, origin: curated, text: "Party horn" }
+        expect:
+          - { outcome: drop }
+          - { outcome: drop }
+          - { outcome: drop }
+  - name: a descriptive sensitivity is reduced to what the Child avoids
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        sensitivities:
+          - { text: "dislikes sticky textures", avoid: true }
+          - { text: "afraid of loud noises", avoid: true }
+        items:
+          - { kind: activity, origin: curated, text: "sticky texture play" }
+          - { kind: activity, origin: curated, text: "Loud noise game" }
+          - { kind: activity, origin: curated, text: "Quiet texture play" }
+        expect:
+          - { outcome: drop }
+          - { outcome: drop }
+          - { outcome: keep }
+  - name: a Restriction made only of avoid words is never silently ignored
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "No"
+        items:
+          - { kind: activity, origin: curated, text: "Say no to a snack" }
+          - { kind: activity, origin: curated, text: "Blocks" }
+        expect:
+          - { outcome: drop }
+          - { outcome: keep }
+  - name: a short form is kept unless the Restriction has the avoid term
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "No hand-over-hand prompting"
+        items:
+          - { kind: activity, origin: curated, text: "Use hand-over-hand" }
+        expect:
+          - { outcome: keep }
+      - scope: family
+        restrictions:
+          - { text: "No hand-over-hand prompting", avoidTerms: ["hand over hand"] }
+        versionChanged: true
+        items:
+          - { kind: activity, origin: curated, text: "Use hand-over-hand" }
+        expect:
+          - { outcome: drop }
