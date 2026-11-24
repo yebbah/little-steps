@@ -58,4 +58,4 @@ Three independent reviewers (blind, edge, verification gap) ran on the diff. Fin
 
 ## 10. Sign-off
 
-Pending the maintainer's validation.
+Accepted by the maintainer on 2026-11-24 after the review pass. The final scan of the branch (after every triage fix) passed: secrets clean, backend 178 and frontend 657 components with no blocking finding, the same three frontend warnings. Decision: merge.

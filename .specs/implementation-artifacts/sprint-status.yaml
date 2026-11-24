@@ -64,7 +64,7 @@ development_status:
   epic-25: in-progress
   25-1-demo-identity-and-the-tenant-resolver: done
   25-2-device-data-layer: done
-  25-3-child-care-team-and-goal-model-with-read-apis: review
+  25-3-child-care-team-and-goal-model-with-read-apis: done
   25-4-strategies-restrictions-and-guardrail: backlog
   25-5-demo-seed-reset-and-indicator: backlog
   epic-25-retrospective: optional

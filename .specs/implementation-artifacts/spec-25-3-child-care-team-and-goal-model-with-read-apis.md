@@ -2,7 +2,7 @@
 title: 'Story 25.3: Child, Care Team and Goal model with read APIs'
 type: 'feature'
 created: '2026-11-24'
-status: 'in-review'
+status: 'done'
 baseline_commit: '3c0fca57e294aa80606cbbcc5af6d10d7feb1be8'
 route: 'dispatch'
 review_loop_iteration: 0
