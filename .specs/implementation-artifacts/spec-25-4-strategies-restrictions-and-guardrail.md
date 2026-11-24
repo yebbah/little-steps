@@ -2,7 +2,7 @@
 title: 'Story 25.4: Strategies, Restrictions and Guardrail'
 type: 'feature'
 created: '2026-11-24'
-status: 'in-review'
+status: 'done'
 baseline_commit: '001673b7878fb5696dcb25f3ae499abbf19cba1d'
 route: 'dispatch'
 review_loop_iteration: 0
