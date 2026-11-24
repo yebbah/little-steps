@@ -78,10 +78,11 @@ class PersistenceBaselineTests extends IntegrationTest {
 		List<String> tables = jdbc.queryForList(
 				"select table_name from information_schema.tables where table_schema = 'public' order by 1",
 				String.class);
-		assertThat(tables).containsExactly("caregiver_membership", "caregivers", "dev_echo", "event_publication", "families",
-				"flyway_schema_history", "tenant_probe");
+		assertThat(tables).containsExactlyInAnyOrder("care_team_member", "care_team_member_prompt_level", "caregiver_membership",
+				"caregivers", "child_profile", "child_sensitivity", "dev_echo", "event_publication", "families",
+				"flyway_schema_history", "goal", "goal_period", "prompt_level", "status_vocabulary_item", "tenant_probe");
 		assertThat(jdbc.queryForObject("select count(*) from flyway_schema_history where success", Integer.class))
-			.isEqualTo(4);
+			.isEqualTo(7);
 	}
 
 	@Test

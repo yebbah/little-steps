@@ -38,6 +38,38 @@
         }
       }
     },
+    "/api/v1/prompt-levels" : {
+      "get" : {
+        "tags" : [ "care-team-controller" ],
+        "summary" : "The Family's ordered Prompt Levels",
+        "operationId" : "promptLevels",
+        "responses" : {
+          "200" : {
+            "description" : "The Prompt Levels in order, retired ones included",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PromptLevelResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ping" : {
       "get" : {
         "tags" : [ "ping-controller" ],
@@ -69,6 +101,141 @@
           },
           "400" : {
             "description" : "Count outside 1 to 10 or not a number",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/goals" : {
+      "get" : {
+        "tags" : [ "goal-controller" ],
+        "summary" : "The Family's Goals",
+        "operationId" : "goals",
+        "responses" : {
+          "200" : {
+            "description" : "The Goals, oldest first, retired ones included",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/GoalResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/goal-periods" : {
+      "get" : {
+        "tags" : [ "goal-controller" ],
+        "summary" : "The Family's Goal Periods",
+        "operationId" : "periods",
+        "responses" : {
+          "200" : {
+            "description" : "The Goal Periods, earliest start first",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/GoalPeriodResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/child-profile" : {
+      "get" : {
+        "tags" : [ "child-profile-controller" ],
+        "summary" : "The Family's Child Profile",
+        "operationId" : "get",
+        "responses" : {
+          "200" : {
+            "description" : "The Child Profile",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ChildProfileResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "The Family has no Child Profile (problem type not-found)",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/care-team-members" : {
+      "get" : {
+        "tags" : [ "care-team-controller" ],
+        "summary" : "The Family's Care Team Members, each with a Status Vocabulary and Prompt Level mapping",
+        "operationId" : "members",
+        "responses" : {
+          "200" : {
+            "description" : "The Care Team Members, oldest first",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CareTeamMemberResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -150,6 +317,25 @@
           }
         }
       },
+      "PromptLevelResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "ordinal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "retired" : {
+            "type" : "boolean"
+          }
+        }
+      },
       "Pong" : {
         "type" : "object",
         "properties" : {
@@ -159,6 +345,219 @@
           "count" : {
             "type" : "integer",
             "format" : "int32"
+          }
+        }
+      },
+      "GoalResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "goalPeriodId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "domain" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "sourceKind" : {
+            "type" : "string"
+          },
+          "sourceId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originalText" : {
+            "type" : "string"
+          },
+          "caregiverText" : {
+            "type" : "string"
+          },
+          "goalType" : {
+            "type" : "string"
+          },
+          "parentGoalId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "context" : {
+            "type" : "string"
+          },
+          "baseline" : {
+            "type" : "string"
+          },
+          "reviewStatus" : {
+            "type" : "string"
+          },
+          "proposedTo" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "revisedFrom" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "lineage" : {
+            "type" : "string"
+          },
+          "retired" : {
+            "type" : "boolean"
+          },
+          "criterionKind" : {
+            "type" : "string"
+          },
+          "criterionTarget" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "criterionOutOf" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "criterionPromptLevelId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "criterionContext" : {
+            "type" : "string"
+          }
+        }
+      },
+      "GoalPeriodResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "careTeamMemberId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "startsOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "endsOn" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "status" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ChildProfileResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "ageBand" : {
+            "type" : "string"
+          },
+          "interests" : {
+            "type" : "string"
+          },
+          "materials" : {
+            "type" : "string"
+          },
+          "engagementNotes" : {
+            "type" : "string"
+          },
+          "sensitivities" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/SensitivityResponse"
+            }
+          }
+        }
+      },
+      "SensitivityResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "text" : {
+            "type" : "string"
+          },
+          "avoid" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "CareTeamMemberResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "role" : {
+            "type" : "string"
+          },
+          "discipline" : {
+            "type" : "string"
+          },
+          "careSetting" : {
+            "type" : "string"
+          },
+          "statusVocabulary" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/StatusVocabularyItemResponse"
+            }
+          },
+          "promptLevelMapping" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PromptLevelMappingResponse"
+            }
+          }
+        }
+      },
+      "PromptLevelMappingResponse" : {
+        "type" : "object",
+        "properties" : {
+          "promptLevelId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "label" : {
+            "type" : "string"
+          }
+        }
+      },
+      "StatusVocabularyItemResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "ordinal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "retired" : {
+            "type" : "boolean"
           }
         }
       }

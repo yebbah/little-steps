@@ -6,6 +6,7 @@ Newest first. Add a line here with every new changelog.
 
 | Story | Title | Changelog |
 |---|---|---|
+| 25.3 | Child, Care Team and Goal model with read APIs | [story-25-3-child-care-team-and-goal-model-with-read-apis.md](story-25-3-child-care-team-and-goal-model-with-read-apis.md) |
 | 25.2 | Device data layer | [story-25-2-device-data-layer.md](story-25-2-device-data-layer.md) |
 | 25.1 | Demo identity and the tenant resolver | [story-25-1-demo-identity-and-the-tenant-resolver.md](story-25-1-demo-identity-and-the-tenant-resolver.md) |
 | 2.3 | App shell, navigation and focus management | [story-2-3-app-shell-navigation-and-focus-management.md](story-2-3-app-shell-navigation-and-focus-management.md) |
