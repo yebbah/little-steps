@@ -35,6 +35,7 @@ Every pull request that is not a story carries a changelog and a security report
 
 | PR | Title | Changelog | Security report |
 |---|---|---|---|
+| chore | Bump every pinned image to its current version, and add the OpenSSL exceptions | [change-bump-image-digests.md](change-bump-image-digests.md) | [report](../security-reports/change-bump-image-digests.md) |
 | chore | Bump the PostgreSQL 18-alpine digest to the current image | [change-bump-postgres-digest.md](change-bump-postgres-digest.md) | [report](../security-reports/change-bump-postgres-digest.md) |
 | epic 25 | Demo Family first, setup features later (Epic 25 stories) | [change-epic-25-stories.md](change-epic-25-stories.md) | [report](../security-reports/change-epic-25-stories.md) |
 | issue #172 | Backfill changelogs and security reports for the older non-story pull requests | [change-epic-02-issue-172-records-backfill.md](change-epic-02-issue-172-records-backfill.md) | [report](../security-reports/change-epic-02-issue-172-records-backfill.md) |

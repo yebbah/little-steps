@@ -14,6 +14,11 @@
 # Story 1.3: Debian base packages in dhi.io/keycloak:26.8.2 (the newest tag on 2026-11-06).
 # Renew or remove these by 2026-12-04, as soon as DHI publishes a newer Keycloak digest.
 # Tracked in the `deferred` GitHub issue for this set (see docs/deferred-items.md); the issue's target date is the same as `expires`. Issue: #56.
+# OpenSSL 3.5.9 in the pinned images, 2026-11-24: dhi.io/postgres, dhi.io/keycloak, dhi.io/node and
+# dhi.io/eclipse-temurin (build stage) and axllent/mailpit. All pins were upgraded to the current image first;
+# no fixed library is in the latest image of any pinned tag. Renew or remove by 2026-12-24 as soon as a fixed
+# image is published. Tracked in the `deferred` GitHub issue #189; its target date is the same as `expires`.
+
 exceptions:
   - cve: CVE-2017-18018
     reason: No fixed version published; OS base package in dhi.io/keycloak:26.8.2, the newest DHI tag on 2026-11-06.
@@ -96,3 +101,39 @@ exceptions:
     reason: zlib 1.4-r0 exists, but no Mailpit image carries it; axllent/mailpit:v1.33.0 is the latest release and the latest tag points at the same digest (checked 2026-11-08).
     mitigation: Mailpit is a local development container published on 127.0.0.1 only, holding fictional data. Never deployed. Re-scanned on every commit; replace the digest when a Mailpit image with zlib 1.4 or later is published.
     expires: 2026-12-04
+  - cve: CVE-2026-107493
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-107494
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-107496
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-121482
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-124709
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-84786
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-88823
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-95691
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
+  - cve: CVE-2026-95692
+    reason: No fixed OpenSSL published in the latest image of the pinned tag (checked 2026-11-24); OS library in dhi.io/postgres, dhi.io/keycloak, dhi.io/node, dhi.io/eclipse-temurin and axllent/mailpit.
+    mitigation: Local development containers published on 127.0.0.1 holding fictional data, and build stages; never deployed. Re-scanned on every commit; replace or bump the image when a fixed one is published (issue #189).
+    expires: 2026-12-24
