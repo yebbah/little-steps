@@ -17,13 +17,13 @@ const demoSession = {
   caregivers: [{ id: '01900000-0000-7000-8000-0000000000a1', displayName: 'Demo A' }],
 }
 const sessionStub = base.extend({
-  context: async ({ context }, use) => {
+  context: async ({ context }, provide) => {
     if (!process.env.API_URL) {
       await context.route('**/api/v1/session', (route) =>
         route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(demoSession) }),
       )
     }
-    await use(context)
+    await provide(context)
   },
 })
 
