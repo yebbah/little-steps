@@ -8,7 +8,7 @@ name: littlesteps
 
 services:
   postgres:
-    image: dhi.io/postgres:18-alpine@sha256:0cdbc51a89a592296aa6d2ef7063f4db283dab5aea4a351ccbd89bb97907c4b4
+    image: dhi.io/postgres:18-alpine@sha256:11d2673dae24c4fa2df8be1f7ce81bd9136e4fe64bebef2508c5233ae884c3e4
     environment:
       POSTGRES_DB: ${LS_POSTGRES_DB:?Copy deploy/local.env.example to deploy/local.env}
       POSTGRES_USER: ${LS_POSTGRES_USER:?Copy deploy/local.env.example to deploy/local.env}
@@ -26,7 +26,7 @@ services:
 
   # One-shot: creates the keycloak role and schema (the DHI image has no initdb.d hook).
   keycloak-db-init:
-    image: dhi.io/postgres:18-alpine@sha256:0cdbc51a89a592296aa6d2ef7063f4db283dab5aea4a351ccbd89bb97907c4b4
+    image: dhi.io/postgres:18-alpine@sha256:11d2673dae24c4fa2df8be1f7ce81bd9136e4fe64bebef2508c5233ae884c3e4
     entrypoint: ["/bin/sh", "/init/keycloak-schema.sh"]
     environment:
       PGHOST: postgres
@@ -43,7 +43,7 @@ services:
     restart: "no"
 
   keycloak:
-    image: dhi.io/keycloak:26.8.2@sha256:50a09844dc6063ee54cb99259ffbc070ac53ded09a6d1c0075ccaff9e5032f1c
+    image: dhi.io/keycloak:26.8.2@sha256:b25d28ed7f1685f74037f7ede62fc5301f4c29f6966a8741b1d8ffdc44b4ad59
     command: ["start-dev", "--import-realm"]
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${LS_KEYCLOAK_ADMIN:?Copy deploy/local.env.example to deploy/local.env}
@@ -84,7 +84,7 @@ services:
     restart: unless-stopped
 
   mailpit:
-    image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
+    image: axllent/mailpit:v1.34.0@sha256:23a2ef85bc50853ab3093645d1d64679afd8887e89da5e48a88940c172591a4e
     ports:
       - "127.0.0.1:${LS_MAILPIT_UI_PORT:?Copy deploy/local.env.example to deploy/local.env}:8025"
       - "127.0.0.1:${LS_MAILPIT_SMTP_PORT:?Copy deploy/local.env.example to deploy/local.env}:1025"
