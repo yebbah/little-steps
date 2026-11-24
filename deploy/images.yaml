@@ -8,32 +8,32 @@
 # node and eclipse-temurin appear more than once: the -dev entries are the Dockerfile build stages (Story 1.5),
 # the plain eclipse-temurin entry is the runtime. Build stages are scanned like every other image; the
 # alpine -dev variants were chosen because they pass the blocking rule (the Debian ones do not).
-# Digests are the multi-arch index digests, read 2026-11-06.
+# Digests are the multi-arch index digests, read 2026-11-24 (Mailpit and Presidio 2026-11-06).
 images:
   - name: dhi.io/postgres
     source: dhi
     tag: "18-alpine"
-    digest: sha256:0cdbc51a89a592296aa6d2ef7063f4db283dab5aea4a351ccbd89bb97907c4b4
+    digest: sha256:11d2673dae24c4fa2df8be1f7ce81bd9136e4fe64bebef2508c5233ae884c3e4
   - name: dhi.io/keycloak
     source: dhi
     tag: "26.8.2"
-    digest: sha256:50a09844dc6063ee54cb99259ffbc070ac53ded09a6d1c0075ccaff9e5032f1c
+    digest: sha256:b25d28ed7f1685f74037f7ede62fc5301f4c29f6966a8741b1d8ffdc44b4ad59
   - name: dhi.io/node
     source: dhi
     tag: "24-alpine3.23-dev"
-    digest: sha256:d331ca42569f4d69779a8a74cf722f7ae709637f49205fcfc1b26ce198c16922
+    digest: sha256:abe5e2eb4166f422dea213c4181c1ab069f63bb5d4b4bb0878abba2039fefec6
   - name: dhi.io/eclipse-temurin
     source: dhi
     tag: "25-jdk-alpine3.23-dev"
-    digest: sha256:337310214d6ad56c57d7370b67fb7191a297bbd41741a9bf00f6920cdafe0f9d
+    digest: sha256:9ccd430c9ef9c747bb78df43e14599a92416b404c6b65965e94b56c7efcdc977
   - name: dhi.io/eclipse-temurin
     source: dhi
     tag: "25"
-    digest: sha256:d0d11acaef8d8cb5874663557a32ad70e800917b9ec7b55977d8c82993daaed5
+    digest: sha256:6d19fe86794c4e6aa17e10090227658d99dc9fa525135e18acf5477bdce9e795
   - name: axllent/mailpit
     source: other
-    tag: "v1.33.0"
-    digest: sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
+    tag: "v1.34.0"
+    digest: sha256:23a2ef85bc50853ab3093645d1d64679afd8887e89da5e48a88940c172591a4e
     reason: Not in the DHI catalog (checked 2026-11-06). Local development only, never deployed.
   # P2 (Epic 18): Presidio, used by the privacy pipeline.
   - name: ghcr.io/data-privacy-stack/presidio-analyzer
