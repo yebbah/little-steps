@@ -1,0 +1,53 @@
+cases:
+  - name: a prescribed item that matches is kept with restriction-conflict
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "Avoid hand-over-hand prompting"
+        items:
+          - { kind: activity, origin: prescribed, text: "Hand over hand prompting for block stacking" }
+        expect:
+          - { outcome: keep, flags: [restriction-conflict] }
+  - name: an AI item that matches is dropped and a prescribed item is not
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        restrictions:
+          - text: "No sticky dough"
+        items:
+          - { kind: activity, origin: ai_suggested, text: "Sticky dough" }
+          - { kind: activity, origin: prescribed, text: "Sticky dough" }
+        expect:
+          - { outcome: drop }
+          - { outcome: keep, flags: [restriction-conflict] }
+  - name: with the lookup unavailable a curated or AI item is dropped
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        lookup: throws
+        items:
+          - { kind: activity, origin: curated, text: "Stack blocks" }
+          - { kind: coach_tip, origin: ai_suggested, text: "Offer a choice" }
+        expect:
+          - { outcome: drop }
+          - { outcome: drop }
+  - name: with the lookup unavailable a prescribed item is kept and flagged
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        lookup: throws
+        items:
+          - { kind: activity, origin: prescribed, text: "Stack blocks" }
+        expect:
+          - { outcome: keep, flags: [check-unavailable] }
+  - name: with no classifier an AI item is dropped even when nothing matches, a curated one is kept
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        items:
+          - { kind: coach_tip, origin: ai_suggested, text: "Offer a choice" }
+          - { kind: coach_tip, origin: curated, text: "Offer a choice" }
+        expect:
+          - { outcome: drop }
+          - { outcome: keep }

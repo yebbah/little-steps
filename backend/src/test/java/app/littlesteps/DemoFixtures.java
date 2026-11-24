@@ -17,6 +17,9 @@ public final class DemoFixtures {
 	}
 
 	public void reset() {
+		jdbc.update("delete from restriction_avoid_term");
+		jdbc.update("delete from restriction");
+		jdbc.update("delete from strategy");
 		jdbc.update("delete from goal");
 		jdbc.update("delete from goal_period");
 		jdbc.update("delete from care_team_member_prompt_level");
@@ -147,6 +150,47 @@ public final class DemoFixtures {
 		String names = String.join(", ", row.keySet());
 		String marks = String.join(", ", java.util.Collections.nCopies(row.size(), "?"));
 		jdbc.update("insert into goal (" + names + ") values (" + marks + ")", row.values().toArray());
+		return (UUID) row.get("id");
+	}
+
+	/** A Family-level (null goal) or Goal-level Restriction prescribed by a Care Team Member. */
+	public UUID restriction(UUID familyId, UUID goalId, UUID memberId, String text, boolean retired, int order) {
+		java.util.Map<String, Object> cols = new java.util.LinkedHashMap<>();
+		cols.put("goal_id", goalId);
+		cols.put("original_text", text);
+		cols.put("created_at", at(order));
+		cols.put("retired_at", retired ? at(99) : null);
+		return rowRaw("restriction", familyId, memberId, cols);
+	}
+
+	public UUID strategy(UUID familyId, UUID goalId, UUID memberId, String text, boolean retired, int order) {
+		java.util.Map<String, Object> cols = new java.util.LinkedHashMap<>();
+		cols.put("goal_id", goalId);
+		cols.put("original_text", text);
+		cols.put("created_at", at(order));
+		cols.put("retired_at", retired ? at(99) : null);
+		return rowRaw("strategy", familyId, memberId, cols);
+	}
+
+	public void avoidTerm(UUID familyId, UUID restrictionId, int ordinal, String term) {
+		jdbc.update("insert into restriction_avoid_term (id, family_id, restriction_id, ordinal, term)"
+				+ " values (?, ?, ?, ?, ?)", id(), familyId, restrictionId, ordinal, term);
+	}
+
+	/** Inserts a strategy or restriction from valid prescribed defaults overridden by {@code cols}. */
+	public UUID rowRaw(String table, UUID familyId, UUID sourceId, java.util.Map<String, Object> cols) {
+		java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
+		row.put("id", id());
+		row.put("family_id", familyId);
+		row.put("source_kind", "care_team_member");
+		row.put("source_id", sourceId);
+		row.put("origin", "prescribed");
+		row.put("original_text", "a text");
+		row.putAll(cols);
+		row.values().removeIf(v -> v == null);
+		String names = String.join(", ", row.keySet());
+		String marks = String.join(", ", java.util.Collections.nCopies(row.size(), "?"));
+		jdbc.update("insert into " + table + " (" + names + ") values (" + marks + ")", row.values().toArray());
 		return (UUID) row.get("id");
 	}
 

@@ -8,6 +8,38 @@
     "url" : "/"
   } ],
   "paths" : {
+    "/api/v1/strategies" : {
+      "get" : {
+        "tags" : [ "strategy-restriction-controller" ],
+        "summary" : "The Family's Strategies",
+        "operationId" : "strategies",
+        "responses" : {
+          "200" : {
+            "description" : "The Strategies, oldest first, retired ones included",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/StrategyResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/session" : {
       "get" : {
         "tags" : [ "session-controller" ],
@@ -27,6 +59,38 @@
           },
           "401" : {
             "description" : "No Caregiver, or the demo flag is off",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/restrictions" : {
+      "get" : {
+        "tags" : [ "strategy-restriction-controller" ],
+        "summary" : "The Family's Restrictions",
+        "operationId" : "restrictions",
+        "responses" : {
+          "200" : {
+            "description" : "The Restrictions, oldest first, retired ones included",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/RestrictionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "No Caregiver",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -277,6 +341,38 @@
           }
         }
       },
+      "StrategyResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "goalId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "sourceKind" : {
+            "type" : "string"
+          },
+          "sourceId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originalText" : {
+            "type" : "string"
+          },
+          "caregiverText" : {
+            "type" : "string"
+          },
+          "retired" : {
+            "type" : "boolean"
+          }
+        }
+      },
       "CaregiverSummary" : {
         "type" : "object",
         "properties" : {
@@ -313,6 +409,44 @@
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/CaregiverSummary"
+            }
+          }
+        }
+      },
+      "RestrictionResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "goalId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "sourceKind" : {
+            "type" : "string"
+          },
+          "sourceId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originalText" : {
+            "type" : "string"
+          },
+          "caregiverText" : {
+            "type" : "string"
+          },
+          "retired" : {
+            "type" : "boolean"
+          },
+          "avoidTerms" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
             }
           }
         }

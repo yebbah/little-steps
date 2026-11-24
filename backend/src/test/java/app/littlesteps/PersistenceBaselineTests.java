@@ -80,9 +80,10 @@ class PersistenceBaselineTests extends IntegrationTest {
 				String.class);
 		assertThat(tables).containsExactlyInAnyOrder("care_team_member", "care_team_member_prompt_level", "caregiver_membership",
 				"caregivers", "child_profile", "child_sensitivity", "dev_echo", "event_publication", "families",
-				"flyway_schema_history", "goal", "goal_period", "prompt_level", "status_vocabulary_item", "tenant_probe");
+				"flyway_schema_history", "goal", "goal_period", "prompt_level", "restriction", "restriction_avoid_term", "status_vocabulary_item",
+				"strategy", "tenant_probe");
 		assertThat(jdbc.queryForObject("select count(*) from flyway_schema_history where success", Integer.class))
-			.isEqualTo(7);
+			.isEqualTo(8);
 	}
 
 	@Test

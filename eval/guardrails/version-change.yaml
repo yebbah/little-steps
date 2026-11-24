@@ -1,0 +1,61 @@
+cases:
+  - name: adding, retiring and editing a Restriction or sensitivity changes the version, an unchanged set does not
+    tags: [guardrail-eval]
+    steps:
+      - scope: family
+        items:
+          - { kind: activity, origin: curated, text: "Singing a song" }
+        expect:
+          - { outcome: keep }
+      - scope: family
+        restrictions:
+          - { text: "No singing" }
+        versionChanged: true
+        items:
+          - { kind: activity, origin: curated, text: "Singing a song" }
+        expect:
+          - { outcome: drop }
+      - scope: family
+        restrictions:
+          - { text: "No singing" }
+        versionChanged: false
+        items:
+          - { kind: activity, origin: curated, text: "Singing a song" }
+        expect:
+          - { outcome: drop }
+      - scope: family
+        restrictions:
+          - { text: "No drumming" }
+        versionChanged: true
+        items:
+          - { kind: activity, origin: curated, text: "Singing a song" }
+        expect:
+          - { outcome: keep }
+      - scope: family
+        restrictions:
+          - { text: "No drumming", retired: true }
+        versionChanged: true
+        items:
+          - { kind: activity, origin: curated, text: "Drumming time" }
+        expect:
+          - { outcome: keep }
+      - scope: family
+        restrictions:
+          - { text: "No drumming", retired: true }
+        sensitivities:
+          - { text: "drumming", avoid: true }
+        versionChanged: true
+        items:
+          - { kind: activity, origin: curated, text: "Drumming time" }
+        expect:
+          - { outcome: drop }
+      - scope: family
+        restrictions:
+          - { text: "No drumming", retired: true }
+        sensitivities:
+          - { text: "drumming", avoid: false }
+        versionChanged: true
+        items:
+          - { kind: activity, origin: curated, text: "Drumming time" }
+        expect:
+          - { outcome: keep }

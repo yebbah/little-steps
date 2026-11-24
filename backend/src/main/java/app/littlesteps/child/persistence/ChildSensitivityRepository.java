@@ -9,4 +9,6 @@ public interface ChildSensitivityRepository extends JpaRepository<ChildSensitivi
 
 	List<ChildSensitivity> findByChildProfileIdOrderByOrdinalAscIdAsc(UUID childProfileId);
 
+	List<ChildSensitivity> findByAvoidTrueOrderByOrdinalAscIdAsc();
+
 }

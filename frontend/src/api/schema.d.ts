@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/v1/strategies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Family's Strategies */
+        get: operations["strategies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/session": {
         parameters: {
             query?: never;
@@ -16,6 +33,23 @@ export interface paths {
          * @description Demo only: the Caregiver and Family the request runs as, and every demo Caregiver. 401 unless the demo flag is on.
          */
         get: operations["session"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/restrictions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Family's Restrictions */
+        get: operations["restrictions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -146,6 +180,19 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        StrategyResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            goalId?: string;
+            sourceKind?: string;
+            /** Format: uuid */
+            sourceId?: string;
+            origin?: string;
+            originalText?: string;
+            caregiverText?: string;
+            retired?: boolean;
+        };
         CaregiverSummary: {
             /** Format: uuid */
             id?: string;
@@ -160,6 +207,20 @@ export interface components {
             familyId?: string;
             demo?: boolean;
             caregivers?: components["schemas"]["CaregiverSummary"][];
+        };
+        RestrictionResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            goalId?: string;
+            sourceKind?: string;
+            /** Format: uuid */
+            sourceId?: string;
+            origin?: string;
+            originalText?: string;
+            caregiverText?: string;
+            retired?: boolean;
+            avoidTerms?: string[];
         };
         PromptLevelResponse: {
             /** Format: uuid */
@@ -266,6 +327,35 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    strategies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Strategies, oldest first, retired ones included */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategyResponse"][];
+                };
+            };
+            /** @description No Caregiver */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
     session: {
         parameters: {
             query?: never;
@@ -285,6 +375,35 @@ export interface operations {
                 };
             };
             /** @description No Caregiver, or the demo flag is off */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetail"];
+                };
+            };
+        };
+    };
+    restrictions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Restrictions, oldest first, retired ones included */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RestrictionResponse"][];
+                };
+            };
+            /** @description No Caregiver */
             401: {
                 headers: {
                     [name: string]: unknown;

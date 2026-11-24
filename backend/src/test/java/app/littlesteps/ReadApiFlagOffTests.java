@@ -19,7 +19,8 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 class ReadApiFlagOffTests extends IntegrationTest {
 
 	private static final List<String> PATHS = List.of("/api/v1/child-profile", "/api/v1/care-team-members",
-			"/api/v1/prompt-levels", "/api/v1/goal-periods", "/api/v1/goals");
+			"/api/v1/prompt-levels", "/api/v1/goal-periods", "/api/v1/goals", "/api/v1/strategies",
+			"/api/v1/restrictions");
 
 	@Autowired
 	private RestTestClient client;
