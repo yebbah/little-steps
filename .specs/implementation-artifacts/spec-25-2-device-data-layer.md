@@ -92,6 +92,7 @@ context:
 - The oxlint ban is `no-restricted-globals` on `fetch` plus `no-restricted-properties` on `window.fetch`, `globalThis.fetch` and `self.fetch`, off only for `src/data/http.ts`.
 - The Playwright sample exercises the echo endpoint's replay contract over HTTP, not the outbox in the browser.
 - Review fixes (2026-11-09): the demo session keeps the last known `sub` (localStorage, `littlesteps.lastSub`) for a network failure; `pass()` sets `inFlight` then re-reads the row before sending; replay runs inside a `navigator.locks` lock; 408 and 429 retry; `undo` checks the owner; `useDraft` flushes on `pagehide` and `visibilitychange`; the echo endpoint re-reads on a replay race. Verification after review: frontend 388 tests (coverage about 96%), backend 103 tests, scan PASS.
+- CI follow-up (2026-11-24): the Playwright suite runs with no backend, so `e2e/support/merged-fixtures.ts` stubs `GET /api/v1/session` for every context (not when `API_URL` is set), and the text-spacing reflow test waits for the gallery before counting. 89 Chromium tests pass on the dev server and the built bundle.
 - Dependencies: `@tanstack/react-query` 5.105.0 (2026-10-26), `dexie` 4.4.7 (2026-10-19), `fake-indexeddb` 6.2.6 (2026-10-16).
 
 ## Spec Change Log
@@ -126,6 +127,8 @@ Reviewers: BH blind, EC edge, VG verification gap (three separate subagents). Th
 | 20 | Parked-state copy "Your review is kept" is review-specific [BH] | low | rejected | the spec says to reuse `error.saveRejected`; no screen renders the parked state yet |
 | 21 | The echo body is unvalidated and unbounded, the 409 is not a problem response, and `ApplicationContextRunner` is vacuous [BH, VG] | low | rejected | test-only code; the global handler turns `ResponseStatusException` into a problem; the runner test fails without `@Profile("test")` because the repository bean is missing |
 | 22 | The context rewrite drops FR, AD and UX tags, and PATCH and DELETE replays are not idempotent [BH] | low | rejected | the context is a compiled aid and the requirement lists stay in the epic file; only `PUT` creates exist |
+| 24 | CI (accessibility job): every app e2e test failed because the data layer requests `GET /api/v1/session` at start, the preview server has no backend (502), and the network error monitor fails a test on a 5xx [CI] | high | patch, fixed | `e2e/support/merged-fixtures.ts` answers the session for every context unless `API_URL` is set; the 89 Chromium tests pass on the dev server (3 runs) and the built bundle |
+| 25 | CI (accessibility job): the text-spacing reflow test counted gallery elements right after `goto`, before the lazy gallery rendered; the stub changed the timing and exposed it [CI] | medium | patch, fixed | the test waits for the first chip before counting |
 | 23 | Missing tests for a Dexie upgrade, a changelog "above 80%" claim without a figure, `window.fetch` limitation not in CONTRIBUTING, Release row [BH] | low | rejected | version 1 is the first schema; the figure is added in the records; the limitation is fixed in #10 |
 
 ## Design Notes

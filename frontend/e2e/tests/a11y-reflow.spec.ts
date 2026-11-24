@@ -259,6 +259,8 @@ test.describe('reflow rules (UX-DR121)', () => {
   test('[P1] chips, the status line and steppers grow with text spacing instead of clipping (WCAG 1.4.12)', async ({ page }) => {
     await page.setViewportSize(viewport(FRAME_WIDTHS.phone))
     await page.goto('/dev/gallery')
+    // The gallery loads lazily: wait for its controls before counting them.
+    await page.locator('[class*="_chip_"]').first().waitFor()
     await page.addStyleTag({
       content: '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }',
     })

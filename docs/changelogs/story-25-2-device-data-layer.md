@@ -27,7 +27,7 @@ The frontend now has one way to read and one way to save. Reads use TanStack Que
 
 ## Fixed
 
-Problems found in review, all fixed in this story: a cold offline start refused saves; a replay racing a coalescing edit could lose the newer edit; two tabs could send a command twice; 408 and 429 were parked instead of retried; `undo` did not check the owner; the last half second of typing was lost when a tab was hidden or closed; `window.fetch`, `globalThis.fetch` and `self.fetch` bypassed the lint ban; a concurrent replay of the echo `PUT` got 409.
+Problems found in review, all fixed in this story: a cold offline start refused saves; a replay racing a coalescing edit could lose the newer edit; two tabs could send a command twice; 408 and 429 were parked instead of retried; `undo` did not check the owner; the last half second of typing was lost when a tab was hidden or closed; `window.fetch`, `globalThis.fetch` and `self.fetch` bypassed the lint ban; a concurrent replay of the echo `PUT` got 409. Found by CI: the Playwright suite failed on a 502 because the app now asks for the session at start, so the e2e fixtures answer `GET /api/v1/session`, and a reflow test that raced the lazy gallery now waits for it.
 
 ## Removed or deprecated
 

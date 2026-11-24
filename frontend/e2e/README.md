@@ -35,6 +35,8 @@ API_URL=http://localhost:8080 npm run test:e2e    # also run the optional API sa
 
 Reports: `playwright-report/` (HTML), `test-results/e2e-junit.xml`, traces and videos in `test-results/e2e/` on failure.
 
+The suite runs without a backend, so `e2e/support/merged-fixtures.ts` answers `GET /api/v1/session` (the app asks for it when it starts). With `API_URL` set, that answer is left to the real backend.
+
 ## Layout
 
 ```
